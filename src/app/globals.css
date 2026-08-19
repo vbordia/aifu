@@ -1,0 +1,376 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: lch(5.52% 0.4 272);
+  --foreground: lch(93% 0 272);
+  --card: lch(6.5% 0.4 272);
+  --card-foreground: lch(93% 0 272);
+  --popover: lch(6.5% 0.4 272);
+  --popover-foreground: lch(93% 0 272);
+  --primary: lch(93% 0 272);
+  --primary-foreground: lch(5.52% 0.4 272);
+  --secondary: lch(8% 0.4 272);
+  --secondary-foreground: lch(93% 0 272);
+  --muted: lch(8% 0.4 272);
+  --muted-foreground: lch(55% 0 272);
+  --accent: lch(10% 0.4 272);
+  --accent-foreground: lch(93% 0 272);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: lch(14.16% 1.48 272 / 1);
+  --input: lch(14.16% 1.48 272 / 0.6);
+  --ring: lch(50% 0 272);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: lch(2.595% 0.4 272);
+  --sidebar-foreground: lch(93% 0 272);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: lch(93% 0 272);
+  --sidebar-accent: lch(8% 0.4 272);
+  --sidebar-accent-foreground: lch(93% 0 272);
+  --sidebar-border: lch(14.16% 1.48 272 / 0.5);
+  --sidebar-ring: lch(50% 0 272);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.7;
+    letter-spacing: 0.011em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html {
+    @apply font-sans scroll-smooth;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+/* KaTeX theme overrides */
+.katex {
+  color: rgb(0 0 0 / 0.85);
+  font-size: 1.02em;
+}
+
+.dark .katex {
+  color: rgb(255 255 255 / 0.85);
+}
+
+.katex-display {
+  margin: 1rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.katex-display::-webkit-scrollbar {
+  height: 4px;
+}
+
+.katex-display::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.15);
+}
+
+.dark .katex-display::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.15);
+}
+
+.katex .mord,
+.katex .mbin,
+.katex .mrel,
+.katex .mop,
+.katex .mopen,
+.katex .mclose,
+.katex .mpunct,
+.katex .mspace {
+  color: inherit;
+}
+
+.katex .mathnormal {
+  color: inherit;
+}
+
+/* KaTeX fraction/root vrule colors */
+.katex .frac-line,
+.katex .sqrt-line,
+.katex .accent-body > :first-child {
+  border-color: rgb(0 0 0 / 0.6);
+}
+
+.dark .katex .frac-line,
+.dark .katex .sqrt-line,
+.dark .katex .accent-body > :first-child {
+  border-color: rgb(255 255 255 / 0.6);
+}
+
+/* Mermaid container polish */
+.mermaid {
+  margin: 1.25rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-wide {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 0 2rem;
+}
+
+.mermaid-wide svg {
+  max-width: none;
+  min-width: 700px;
+}
+
+.mermaid-wide::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mermaid-wide::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mermaid-wide::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.15);
+}
+
+.dark .mermaid-wide::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.15);
+}
+
+/* Custom scrollbars */
+:root {
+  --scrollbar-thumb: oklch(0.45 0 0 / 0.35);
+  --scrollbar-thumb-hover: oklch(0.4 0 0 / 0.5);
+}
+
+.dark {
+  --scrollbar-thumb: lch(50% 0 272 / 0.3);
+  --scrollbar-thumb-hover: lch(60% 0 272 / 0.45);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+html::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Lecture video floating button */
+.lecture-video-btn {
+  position: fixed;
+  left: max(calc(50% - 42rem), 1rem);
+  top: 50%;
+  transform: translateY(-50%) translateX(-0.5rem);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4rem 0.6rem 0.4rem 0.5rem;
+  border-radius: 0.5rem;
+  background: oklch(0.97 0.014 270 / 1);
+  border: 1px solid oklch(0.88 0.01 270 / 1);
+  color: oklch(0.35 0.02 270 / 1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, background 0.15s ease;
+}
+
+.lecture-video-btn--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
+}
+
+.lecture-video-btn:hover {
+  background: oklch(0.93 0.02 270 / 1);
+  border-color: oklch(0.8 0.02 270 / 1);
+  color: oklch(0.25 0.02 270 / 1);
+}
+
+.lecture-video-btn svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.lecture-video-btn:hover svg {
+  opacity: 1;
+}
+
+.dark .lecture-video-btn {
+  background: lch(12% 1.5 272 / 1);
+  border-color: lch(22% 2 272 / 1);
+  color: lch(75% 0.5 272 / 1);
+}
+
+.dark .lecture-video-btn:hover {
+  background: lch(16% 2 272 / 1);
+  border-color: lch(30% 3 272 / 1);
+  color: lch(85% 0.5 272 / 1);
+}
+
+@media (max-width: 1024px) {
+  .lecture-video-btn {
+    left: 0.5rem;
+  }
+}
