@@ -14,6 +14,7 @@ export default function DocsPage({
   headings,
   prev,
   next,
+  wide = false,
   children,
 }: {
   title: string;
@@ -21,11 +22,18 @@ export default function DocsPage({
   headings: Heading[];
   prev?: NavItem;
   next?: NavItem;
+  wide?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <>
-      <div className="mx-auto w-full max-w-3xl px-4 py-10 lg:px-8">
+      <div
+        className={
+          wide
+            ? "mx-auto w-full max-w-[1600px] px-4 py-8 lg:px-8"
+            : "mx-auto w-full max-w-3xl px-4 py-10 lg:px-8"
+        }
+      >
         <article className="min-w-0">
         <header className="mb-9">
           <h1 className="text-3xl font-semibold leading-tight tracking-tight text-foreground/90">

@@ -2,7 +2,7 @@ import MiniSearch from "minisearch";
 
 export type SearchDoc = {
   id: string;
-  type: "concept" | "lecture";
+  type: "concept" | "lecture" | "quiz";
   title: string;
   category: string;
   href: string;

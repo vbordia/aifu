@@ -151,11 +151,12 @@ type MermaidProps = {
   chart: string;
   wide?: boolean;
   fit?: boolean;
+  natural?: boolean;
 };
 
 let idCounter = 0;
 
-export default function Mermaid({ chart, wide = false, fit = false }: MermaidProps) {
+export default function Mermaid({ chart, wide = false, fit = false, natural = false }: MermaidProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme === "dark";
@@ -174,8 +175,8 @@ export default function Mermaid({ chart, wide = false, fit = false }: MermaidPro
       theme: "base",
       fontFamily: FONT_FAMILY,
       fontSize: 14,
-      flowchart: { useMaxWidth: !wide && !fit, htmlLabels: true, curve: "basis" },
-      timeline: { useMaxWidth: !wide && !fit },
+      flowchart: { useMaxWidth: !wide && !fit && !natural, htmlLabels: true, curve: "basis" },
+      timeline: { useMaxWidth: !wide && !fit && !natural },
       themeVariables: dark ? DARK_THEME : LIGHT_THEME,
     });
 
@@ -199,7 +200,7 @@ export default function Mermaid({ chart, wide = false, fit = false }: MermaidPro
     return () => {
       cancelled = true;
     };
-  }, [chart, dark, wide, fit, mounted]);
+  }, [chart, dark, wide, fit, natural, mounted]);
 
   return (
     <div
@@ -209,7 +210,9 @@ export default function Mermaid({ chart, wide = false, fit = false }: MermaidPro
           ? "mermaid-output mermaid-wide"
           : fit
             ? "mermaid-output mermaid-fit"
-            : "mermaid-output"
+            : natural
+              ? "mermaid-output mermaid-natural"
+              : "mermaid-output"
       }
       style={{ minHeight: 32 }}
       suppressHydrationWarning

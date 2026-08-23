@@ -3,7 +3,12 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { BookOpenIcon, PlayCircleIcon, SearchIcon } from "lucide-react";
+import {
+  BookOpenIcon,
+  ClipboardListIcon,
+  PlayCircleIcon,
+  SearchIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
@@ -91,6 +96,8 @@ function ResultItem({
       <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-foreground/[0.06] text-foreground/55">
         {doc.type === "lecture" ? (
           <PlayCircleIcon className="size-4" />
+        ) : doc.type === "quiz" ? (
+          <ClipboardListIcon className="size-4" />
         ) : (
           <BookOpenIcon className="size-4" />
         )}
@@ -120,7 +127,8 @@ export default function SearchPalette({ docs }: { docs: SearchDoc[] }) {
   const results = useMemo(() => searchIndex(index, docs, query), [index, docs, query]);
 
   const concepts = results.filter((r) => r.doc.type === "concept");
-  const lectures = results.filter((r) => r.doc.type === "lecture");
+  const lectures = results.filter((r) => r.doc.type == "lecture");
+  const quizzes = results.filter((r) => r.doc.type === "quiz");
   const hasQuery = query.trim().length > 0;
 
   React.useEffect(() => {
@@ -156,7 +164,7 @@ export default function SearchPalette({ docs }: { docs: SearchDoc[] }) {
         <SearchIcon className="size-4" />
         <span className="hidden sm:inline">Search</span>
         <kbd className="ml-1 hidden items-center gap-0.5 rounded border border-foreground/[0.12] bg-foreground/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-foreground/45 sm:flex">
-          ⌘K
+          âŒ˜K
         </kbd>
       </Button>
 
@@ -165,10 +173,7 @@ export default function SearchPalette({ docs }: { docs: SearchDoc[] }) {
         onOpenChange={(nextOpen) => (nextOpen ? setOpen(true) : close())}
       >
         <CommandInput
-          placeholder="Search concepts, lectures, topics…"
-          value={query}
-          onValueChange={setQuery}
-          autoFocus
+          placeholder="Search concepts, lectures, question papers..."
         />
         <CommandList>
           {hasQuery && results.length === 0 && (
@@ -190,6 +195,20 @@ export default function SearchPalette({ docs }: { docs: SearchDoc[] }) {
               {concepts.length > 0 && <CommandSeparator />}
               <CommandGroup heading="Lectures">
                 {lectures.map((result) => (
+                  <ResultItem
+                    key={result.doc.id}
+                    result={result}
+                    onSelect={() => select(result.doc.href)}
+                  />
+                ))}
+              </CommandGroup>
+            </>
+          )}
+          {quizzes.length > 0 && (
+            <>
+              {(concepts.length > 0 || lectures.length > 0) && <CommandSeparator />}
+              <CommandGroup heading="Question Papers">
+                {quizzes.map((result) => (
                   <ResultItem
                     key={result.doc.id}
                     result={result}

@@ -57,11 +57,39 @@ function useActiveConcept() {
   };
 }
 
-function GroupLabel({ children }: { children: React.ReactNode }) {
+function GroupLabel({
+  children,
+  collapsible,
+  open,
+  onToggle,
+}: {
+  children: React.ReactNode;
+  collapsible?: boolean;
+  open?: boolean;
+  onToggle?: () => void;
+}) {
+  if (!collapsible) {
+    return (
+      <SidebarGroupLabel className="px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/40">
+        {children}
+      </SidebarGroupLabel>
+    );
+  }
   return (
-    <SidebarGroupLabel className="px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/40">
-      {children}
-    </SidebarGroupLabel>
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="flex w-full items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sidebar-foreground/40 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/70"
+    >
+      <span className="flex-1 text-left">{children}</span>
+      <ChevronDownIcon
+        className={cn(
+          "size-3 shrink-0 transition-transform duration-200 ease-out",
+          open && "rotate-180"
+        )}
+      />
+    </button>
   );
 }
 
@@ -213,15 +241,21 @@ export default function DocsNav({
   const isCategoryOpen = (slug: string) =>
     activeCategorySlug === slug || !collapsed[slug];
 
+  const toggleSection = (key: string) =>
+    setCollapsed((prev) => ({ ...prev, [`section:${key}`]: !prev[`section:${key}`] }));
+
+  const isSectionOpen = (key: string) =>
+    !collapsed[`section:${key}`];
+
   return (
     <SidebarContent className="px-1.5">
-      <div className="px-2 pb-1 pt-2">
+      <div className="sticky top-0 z-10 bg-sidebar px-2 pb-2 pt-2">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-sidebar-foreground/40" />
           <SidebarInput
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search concepts…"
+            placeholder="Search…"
             className="h-8 pl-8 pr-8 text-[13px]"
           />
           {query && (
@@ -297,8 +331,21 @@ export default function DocsNav({
       ) : (
         <>
           <SidebarGroup className="px-2">
-            <GroupLabel>Concepts</GroupLabel>
-            <SidebarMenu>
+            <GroupLabel
+              collapsible
+              open={isSectionOpen("concepts")}
+              onToggle={() => toggleSection("concepts")}
+            >
+              Concepts
+            </GroupLabel>
+            <div
+              className={cn(
+                "grid transition-[grid-template-rows] duration-200 ease-out",
+                isSectionOpen("concepts") ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              )}
+            >
+              <div className="overflow-hidden">
+                <SidebarMenu>
               {categories.map((category) => {
                 const categoryActive = category.concepts.some(
                   (c) => `${category.slug}/${c.slug}` === active.concept
@@ -361,27 +408,57 @@ export default function DocsNav({
                   </SidebarMenuItem>
                 );
               })}
-            </SidebarMenu>
+              </SidebarMenu>
+              </div>
+            </div>
           </SidebarGroup>
 
           <SidebarGroup className="px-2">
-            <GroupLabel>Practice</GroupLabel>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={active.quiz}
-                  className="gap-2.5 px-2 text-[13px]"
-                  render={<Link href="/quiz" />}
-                >
-                  <span className="truncate">Question Papers</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <GroupLabel
+              collapsible
+              open={isSectionOpen("practice")}
+              onToggle={() => toggleSection("practice")}
+            >
+              Practice
+            </GroupLabel>
+            <div
+              className={cn(
+                "grid transition-[grid-template-rows] duration-200 ease-out",
+                isSectionOpen("practice") ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              )}
+            >
+              <div className="overflow-hidden">
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={active.quiz}
+                      className="gap-2.5 px-2 text-[13px]"
+                      render={<Link href="/quiz" />}
+                    >
+                      <span className="truncate">Question Papers</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </div>
+            </div>
           </SidebarGroup>
 
           <SidebarGroup className="px-2">
-            <GroupLabel>Lectures</GroupLabel>
-            <SidebarMenu>
+            <GroupLabel
+              collapsible
+              open={isSectionOpen("lectures")}
+              onToggle={() => toggleSection("lectures")}
+            >
+              Lectures
+            </GroupLabel>
+            <div
+              className={cn(
+                "grid transition-[grid-template-rows] duration-200 ease-out",
+                isSectionOpen("lectures") ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              )}
+            >
+              <div className="overflow-hidden">
+                <SidebarMenu>
               {lectures.map((lecture) => {
                 const isActive = lecture.slug === active.lecture;
                 return (
@@ -403,7 +480,9 @@ export default function DocsNav({
                   </SidebarMenuItem>
                 );
               })}
-            </SidebarMenu>
+              </SidebarMenu>
+              </div>
+            </div>
           </SidebarGroup>
         </>
       )}

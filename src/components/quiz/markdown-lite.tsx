@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import katex from "katex";
 import Mermaid from "@/components/ui/mermaid";
+import { cn } from "@/lib/utils";
 
 type Block =
   | { kind: "p"; text: string }
@@ -145,31 +146,36 @@ function parseBlocks(source: string): Block[] {
 }
 
 function ListBlocks({ items }: { items: ListItem[] }) {
-  const build = (level: number, start: number): { node: ReactNode; next: number } => {
-    const children: ReactNode[] = [];
+  const build = (
+    start: number,
+    level: number
+  ): { nodes: ReactNode[]; next: number } => {
+    const nodes: ReactNode[] = [];
     let j = start;
-    while (j < items.length && items[j].level >= level) {
-      if (items[j].level > level) {
-        const sub = build(items[j].level, j);
-        const parent = children.pop();
-        children.push(
-          <li key={`g-${j}`}>
-            {parent}
-            <ul className="ml-5 list-disc space-y-1">{sub.node}</ul>
-          </li>
+    while (j < items.length && items[j].level === level) {
+      const text = renderInline(items[j].text, `li-${j}`);
+      j++;
+      let sub: ReactNode = null;
+      if (j < items.length && items[j].level > level) {
+        const res = build(j, items[j].level);
+        sub = (
+          <ul className="my-1 ml-5 list-disc space-y-1">{res.nodes}</ul>
         );
-        j = sub.next;
-      } else {
-        children.push(<li key={j}>{renderInline(items[j].text, `li-${j}`)}</li>);
-        j++;
+        j = res.next;
       }
+      nodes.push(
+        <li key={j}>
+          {text}
+          {sub}
+        </li>
+      );
     }
-    return { node: <>{children}</>, next: j };
+    return { nodes, next: j };
   };
-  return <ul className="my-2 ml-5 list-disc space-y-1.5">{build(0, 0).node}</ul>;
+  return <ul className="my-2 ml-5 list-disc space-y-1.5">{build(0, items[0]?.level ?? 0).nodes}</ul>;
 }
 
-function Blocks({ blocks }: { blocks: Block[] }) {
+function Blocks({ blocks, onMermaidClick }: { blocks: Block[]; onMermaidClick?: (chart: string) => void }) {
   return (
     <>
       {blocks.map((block, bi) => {
@@ -214,7 +220,39 @@ function Blocks({ blocks }: { blocks: Block[] }) {
           );
         }
         if (block.lang === "mermaid") {
-          return <Mermaid key={bi} chart={block.content.trim()} fit />;
+          const raw = block.content.trim();
+          const isWide = /^%%\s*wide\b/.test(raw);
+          const chart = isWide ? raw.replace(/^%%\s*wide[ \t]*\n?/, "") : raw;
+          return (
+            <div
+              key={bi}
+              role={onMermaidClick ? "button" : undefined}
+              tabIndex={onMermaidClick ? 0 : undefined}
+              onClick={
+                onMermaidClick
+                  ? () => onMermaidClick(chart)
+                  : undefined
+              }
+              onKeyDown={
+                onMermaidClick
+                  ? (e) => {
+                      if (e.key === "Enter") onMermaidClick(chart);
+                    }
+                  : undefined
+              }
+              className={cn(
+                "group relative",
+                onMermaidClick && "cursor-zoom-in"
+              )}
+            >
+              <Mermaid key={bi} chart={chart} wide={isWide} fit={!isWide} />
+              {onMermaidClick && (
+                <span className="pointer-events-none absolute right-2 top-2 rounded-md border border-foreground/[0.12] bg-background/85 px-2 py-0.5 text-[10px] font-medium text-foreground/55 opacity-0 shadow-sm backdrop-blur transition-opacity group-hover:opacity-100">
+                  ⤢ Expand
+                </span>
+              )}
+            </div>
+          );
         }
         return (
           <pre
@@ -229,11 +267,17 @@ function Blocks({ blocks }: { blocks: Block[] }) {
   );
 }
 
-export default function LiteMarkdown({ text }: { text: string }) {
+export default function LiteMarkdown({
+  text,
+  onMermaidClick,
+}: {
+  text: string;
+  onMermaidClick?: (chart: string) => void;
+}) {
   const blocks = parseBlocks(text);
   return (
     <div className="space-y-2.5">
-      <Blocks blocks={blocks} />
+      <Blocks blocks={blocks} onMermaidClick={onMermaidClick} />
     </div>
   );
 }

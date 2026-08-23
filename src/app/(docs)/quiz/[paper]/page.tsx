@@ -34,6 +34,7 @@ export default async function QuizPaperPage({
 
   return (
     <DocsPage
+      wide
       title={paper.title}
       description={`${paper.items.length} questions from ${paper.fileName}. Answer everything, then hit "Check answers".`}
       headings={[]}

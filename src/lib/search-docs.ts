@@ -4,6 +4,7 @@ import {
   getConceptContent,
   getLectureContent,
 } from "@/lib/content";
+import { getAllQuizPapers } from "@/lib/quiz";
 import type { SearchDoc } from "@/lib/search-client";
 
 function stripMarkdown(raw: string): string {
@@ -54,6 +55,24 @@ export function getSearchDocuments(): SearchDoc[] {
       href: `/lectures/${lecture.slug}`,
       headings: lecture.headings.map((h) => h.text),
       body: stripMarkdown(content),
+    });
+  }
+
+  for (const paper of getAllQuizPapers()) {
+    const body = paper.items
+      .map((item) => {
+        const options = item.options?.map((o) => `${o.label}) ${o.text}`).join(" ") ?? "";
+        return `${item.question} ${options}`;
+      })
+      .join(" ");
+    docs.push({
+      id: `quiz-${paper.slug}`,
+      type: "quiz",
+      title: paper.title,
+      category: "Question Paper",
+      href: `/quiz/${paper.slug}`,
+      headings: [...new Set(paper.items.map((i) => i.label).filter((l): l is string => Boolean(l)))],
+      body: stripMarkdown(body),
     });
   }
 

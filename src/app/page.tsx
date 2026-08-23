@@ -26,6 +26,12 @@ export default function Home() {
             >
               Lectures
             </Link>
+            <Link
+              href="/quiz"
+              className="rounded-md px-3 py-1.5 text-[13px] text-foreground/55 transition-colors hover:text-foreground/90"
+            >
+              Practice
+            </Link>
             <SearchPalette docs={searchDocs} />
             <ThemeToggle />
           </nav>

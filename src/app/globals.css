@@ -229,9 +229,14 @@
   width: 100%;
 }
 
-.mermaid-fit svg {
+.mermaid-natural svg {
   max-width: none;
-  min-width: 480px;
+  width: auto;
+  height: auto;
+}
+.mermaid-fit svg {
+  max-width: 100%;
+  min-width: 240px;
 }
 
 .mermaid-fit::-webkit-scrollbar {
