@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import mermaid from "mermaid";
 
@@ -152,13 +152,20 @@ type MermaidProps = {
   wide?: boolean;
 };
 
+let idCounter = 0;
+
 export default function Mermaid({ chart, wide = false }: MermaidProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme === "dark";
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!ref.current) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !containerRef.current) return;
 
     mermaid.initialize({
       startOnLoad: false,
@@ -171,28 +178,34 @@ export default function Mermaid({ chart, wide = false }: MermaidProps) {
       themeVariables: dark ? DARK_THEME : LIGHT_THEME,
     });
 
+    let cancelled = false;
+
     const render = async () => {
       try {
-        const id = `mermaid-${Math.random().toString(36).slice(2)}`;
-
+        idCounter += 1;
+        const id = `mermaid-${idCounter}-${Date.now()}`;
         const { svg } = await mermaid.render(id, chart);
-
-        if (ref.current) {
-          ref.current.innerHTML = svg;
+        if (!cancelled && containerRef.current) {
+          containerRef.current.innerHTML = svg;
         }
-      } catch (error) {
-        console.error("Mermaid rendering error:", error);
+      } catch {
+        // ignore render errors during navigation
       }
     };
 
     render();
-  }, [chart, dark]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [chart, dark, wide, mounted]);
 
   return (
     <div
-      ref={ref}
-      className={wide ? "mermaid mermaid-wide" : "mermaid"}
+      ref={containerRef}
+      className={wide ? "mermaid-output mermaid-wide" : "mermaid-output"}
       style={{ minHeight: 32 }}
+      suppressHydrationWarning
     />
   );
 }

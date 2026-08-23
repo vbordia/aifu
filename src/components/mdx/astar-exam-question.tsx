@@ -15,7 +15,7 @@ interface QStep {
   pathEdges?: string[];
 }
 
-const Q_NODES = ["P", "Q", "R", "T", "U", "V", "W", "Z"];
+const Q_NODES = ["P", "Q", "R", "T", "U", "V", "W", "Z"] as const;
 
 const Q_H: Record<string, number> = { P: 9, Q: 6, R: 7, T: 4, U: 3, V: 2, W: 5, Z: 0 };
 
@@ -31,7 +31,18 @@ const Q_EDGES = [
   { from: "U", to: "V", cost: 2, id: "u-v" },
   { from: "W", to: "Z", cost: 7, id: "w-z" },
   { from: "V", to: "Z", cost: 3, id: "v-z" },
-];
+] as const;
+
+const Q_POSITIONS: Record<string, { x: number; y: number }> = {
+  P: { x: 400, y: 60 },
+  Q: { x: 160, y: 220 },
+  R: { x: 640, y: 220 },
+  T: { x: 80, y: 390 },
+  W: { x: 280, y: 390 },
+  U: { x: 640, y: 390 },
+  V: { x: 400, y: 540 },
+  Z: { x: 400, y: 700 },
+};
 
 const Q_STEPS: QStep[] = [
   {
@@ -40,7 +51,7 @@ const Q_STEPS: QStep[] = [
     closedList: [],
     gScores: { P: 0 },
     fScores: { P: 9 },
-    description: "Initialize: Open = {P(f=0+9=9)}. Closed = {}.",
+    description: "Initialize: Open = {P(f=0+9=9)}, Closed = {}.",
   },
   {
     current: "P",
@@ -56,7 +67,7 @@ const Q_STEPS: QStep[] = [
     closedList: ["P", "R"],
     gScores: { P: 0, Q: 4, R: 2, U: 7 },
     fScores: { P: 9, Q: 10, R: 9, U: 10 },
-    description: "Expand R → Q already in open with g=4, via R g=2+3=5 > 4, skip. U(g=2+5=7, f=7+3=10). Now Q(f=10) and U(f=10) tied. Pick Q (lower g).",
+    description: "Expand R → Q already in open with g=4, via R g=2+3=5 > 4, skip. U(g=7, f=7+3=10). Q and U tied at f=10. Pick Q (lower g).",
   },
   {
     current: "Q",
@@ -64,7 +75,7 @@ const Q_STEPS: QStep[] = [
     closedList: ["P", "R", "Q"],
     gScores: { P: 0, Q: 4, R: 2, U: 7, T: 7, W: 9 },
     fScores: { P: 9, Q: 10, R: 9, U: 10, T: 11, W: 14 },
-    description: "Expand Q → T(g=4+3=7, f=7+4=11), W(g=4+5=9, f=9+5=14). U still f=10 (lowest).",
+    description: "Expand Q → T(g=7, f=7+4=11), W(g=9, f=9+5=14). U still f=10 (lowest).",
   },
   {
     current: "U",
@@ -72,7 +83,7 @@ const Q_STEPS: QStep[] = [
     closedList: ["P", "R", "Q", "U"],
     gScores: { P: 0, Q: 4, R: 2, U: 7, T: 7, W: 9, V: 9 },
     fScores: { P: 9, Q: 10, R: 9, U: 10, T: 11, W: 14, V: 11 },
-    description: "Expand U → V(g=7+2=9, f=9+2=11). T already in open with g=7, via U g=7+4=11 > 7, skip. T(f=11) lowest now.",
+    description: "Expand U → V(g=7+2=9, f=11). T already in open with g=7, via U g=11 > 7, skip. T(f=11) is now lowest.",
   },
   {
     current: "T",
@@ -80,7 +91,7 @@ const Q_STEPS: QStep[] = [
     closedList: ["P", "R", "Q", "U", "T"],
     gScores: { P: 0, Q: 4, R: 2, U: 7, T: 7, W: 9, V: 9 },
     fScores: { P: 9, Q: 10, R: 9, U: 10, T: 11, W: 14, V: 11 },
-    description: "Expand T → V already in open with g=9, via T g=7+3=10 > 9, skip. Only V(f=11) and W(f=14) left. Pick V.",
+    description: "Expand T → V already g=9, via T g=7+3=10 > 9, skip. V(f=11) and W(f=14). Pick V.",
   },
   {
     current: "V",
@@ -88,7 +99,7 @@ const Q_STEPS: QStep[] = [
     closedList: ["P", "R", "Q", "U", "T", "V"],
     gScores: { P: 0, Q: 4, R: 2, U: 7, T: 7, W: 9, V: 9, Z: 12 },
     fScores: { P: 9, Q: 10, R: 9, U: 10, T: 11, W: 14, V: 11, Z: 12 },
-    description: "Expand V → Z(g=9+3=12, f=12+0=12). W still f=14. Now Z(f=12) < W(f=14).",
+    description: "Expand V → Z(g=9+3=12, f=12). W still f=14. Z(f=12) < W(f=14).",
   },
   {
     current: "Z",
@@ -96,11 +107,23 @@ const Q_STEPS: QStep[] = [
     closedList: ["P", "R", "Q", "U", "T", "V", "Z"],
     gScores: { P: 0, Q: 4, R: 2, U: 7, T: 7, W: 9, V: 9, Z: 12 },
     fScores: { P: 9, Q: 10, R: 9, U: 10, T: 11, W: 14, V: 11, Z: 12 },
-    description: "Z is the goal! Optimal path: P→R→U→V→Z, cost = 2+5+2+3 = 12. (Note: P→Q→T→V→Z also costs 4+3+3+3=13, NOT optimal.)",
+    description: "Z is the goal! Optimal path: P → R → U → V → Z, cost = 2 + 5 + 2 + 3 = 12.",
     pathNodes: ["P", "R", "U", "V", "Z"],
     pathEdges: ["p-r", "r-u", "u-v", "v-z"],
   },
 ];
+
+function makeQLabel(id: string, step: QStep): string {
+  const gVal = step.gScores[id];
+  const hVal = Q_H[id];
+  const fVal = step.fScores[id];
+  const g = gVal !== undefined ? String(gVal) : "∞";
+  const f = fVal !== undefined ? String(fVal) : "∞";
+
+  if (id === "P") return `P (Start)\ng=${g}  h=${hVal}  f=${f}`;
+  if (id === "Z") return `Z (Goal)\ng=${g}  h=${hVal}  f=${f}`;
+  return `${id}\ng=${g}  h=${hVal}  f=${f}`;
+}
 
 function buildQElements(step: QStep): ElementDefinition[] {
   const pathSet = new Set(step.pathNodes ?? []);
@@ -111,17 +134,15 @@ function buildQElements(step: QStep): ElementDefinition[] {
     let type = "";
     if (id === "P") type = "start";
     else if (id === "Z") type = "goal";
-    if (pathSet.has(id) && id !== "P" && id !== "Z") type = "path";
-    else if (step.current === id && id !== "P" && id !== "Z") type = "current";
-    else if (closedSet.has(id) && id !== "P" && id !== "Z") type = "explored";
-    else if (openSet.has(id) && id !== "P" && id !== "Z") type = "frontier";
+    else if (pathSet.has(id)) type = "path";
+    else if (step.current === id) type = "current";
+    else if (closedSet.has(id)) type = "explored";
+    else if (openSet.has(id)) type = "frontier";
 
-    const gVal = step.gScores[id] ?? "∞";
-    const hVal = Q_H[id];
-    const fVal = step.fScores[id] ?? "∞";
-    const label = `${id}\ng=${gVal} h=${hVal}\nf=${fVal}`;
-
-    return { data: { id, label, type } };
+    return {
+      data: { id, label: makeQLabel(id, step), type },
+      position: Q_POSITIONS[id],
+    };
   });
 
   const pathEdgeSet = new Set(step.pathEdges ?? []);
@@ -145,7 +166,7 @@ export default function AStarExamQuestion() {
   const elements = buildQElements(step);
 
   return (
-    <div className="my-6 overflow-hidden rounded-xl border border-amber-500/20 bg-amber-500/[0.03]">
+    <div className="-mx-4 my-6 overflow-hidden rounded-xl border border-amber-500/20 lg:-mx-8">
       <div className="border-b border-amber-500/15 bg-amber-500/[0.06] px-4 py-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -170,18 +191,26 @@ export default function AStarExamQuestion() {
                 <button
                   type="button"
                   disabled={stepIdx === 0}
-                  onClick={() => setStepIdx((i) => i - 1)}
-                  className="rounded-md border border-foreground/[0.1] bg-foreground/[0.03] px-2.5 py-1 text-[12px] font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.08] disabled:opacity-30 disabled:cursor-not-allowed"
+                  onClick={() => setStepIdx(0)}
+                  className="rounded-md border border-foreground/[0.1] bg-foreground/[0.03] px-2 py-1 text-[11px] font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.08] disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  Prev
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  disabled={stepIdx === 0}
+                  onClick={() => setStepIdx((i) => i - 1)}
+                  className="rounded-md border border-foreground/[0.1] bg-foreground/[0.03] px-2.5 py-1 text-[11px] font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.08] disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  ← Prev
                 </button>
                 <button
                   type="button"
                   disabled={stepIdx === Q_STEPS.length - 1}
                   onClick={() => setStepIdx((i) => i + 1)}
-                  className="rounded-md border border-foreground/[0.1] bg-foreground/[0.03] px-2.5 py-1 text-[12px] font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.08] disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="rounded-md border border-foreground/[0.1] bg-foreground/[0.03] px-2.5 py-1 text-[11px] font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.08] disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  Next
+                  Next →
                 </button>
               </>
             )}
@@ -189,39 +218,62 @@ export default function AStarExamQuestion() {
         </div>
       </div>
 
-      <CytoscapeGraph elements={elements} height={400} />
+      <CytoscapeGraph
+        elements={elements}
+        height={700}
+        nodeWidth={130}
+        nodeHeight={72}
+        nodeFontSize={13}
+        usePresetPositions
+        layout={{ name: "preset" }}
+        wide
+      />
 
       {showSolution && (
         <div className="border-t border-amber-500/15 px-4 py-3">
-          <div className="mb-3 flex flex-wrap gap-4 text-[12px]">
+          <div className="mb-3 flex flex-wrap gap-x-5 gap-y-1.5 text-[11px]">
             <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full bg-green-500" />
-              <span className="text-foreground/50">Start</span>
+              <span className="inline-block size-3 rounded-sm border-2 border-green-400" style={{ backgroundColor: "#15803d" }} />
+              <span className="text-foreground/50">Start / Path</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full bg-red-500" />
-              <span className="text-foreground/50">Goal</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full bg-amber-500" />
+              <span className="inline-block size-3 rounded-sm border-2 border-amber-400" style={{ backgroundColor: "#b45309" }} />
               <span className="text-foreground/50">Current</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full bg-sky-500" />
-              <span className="text-foreground/50">Frontier</span>
+              <span className="inline-block size-3 rounded-sm border-2 border-sky-400" style={{ backgroundColor: "#0369a1" }} />
+              <span className="text-foreground/50">Frontier (Open)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full bg-gray-500" />
-              <span className="text-foreground/50">Explored</span>
+              <span className="inline-block size-3 rounded-sm border-2 border-gray-400" style={{ backgroundColor: "#4b5563" }} />
+              <span className="text-foreground/50">Explored (Closed)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full bg-emerald-500" />
-              <span className="text-foreground/50">Optimal Path</span>
+              <span className="inline-block size-3 rounded-sm border-2 border-rose-400" style={{ backgroundColor: "#be123c" }} />
+              <span className="text-foreground/50">Goal</span>
             </div>
           </div>
           <p className="text-[13px] leading-relaxed text-foreground/65">
             {step.description}
           </p>
+          <div className="mt-3 grid grid-cols-3 gap-3">
+            <div className="rounded-md border border-foreground/[0.08] bg-foreground/[0.02] px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/40">Current</div>
+              <div className="text-[13px] font-medium text-amber-600 dark:text-amber-400">{step.current}</div>
+            </div>
+            <div className="rounded-md border border-foreground/[0.08] bg-foreground/[0.02] px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/40">Open List</div>
+              <div className="text-[13px] font-medium text-sky-600 dark:text-sky-400">
+                {step.openList.length > 0 ? step.openList.join(", ") : "— (empty)"}
+              </div>
+            </div>
+            <div className="rounded-md border border-foreground/[0.08] bg-foreground/[0.02] px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-foreground/40">Closed List</div>
+              <div className="text-[13px] font-medium text-gray-500 dark:text-gray-400">
+                {step.closedList.length > 0 ? step.closedList.join(", ") : "—"}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

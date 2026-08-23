@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AIFU — AI Search Course Notes
+
+Interactive study material for the **AI Search** course. Built for students who want to understand algorithms, not just memorize them.
+
+> Open this the night before the exam and pass. No lectures required.
+
+## What's Inside
+
+- **9 weeks of lecture notes** — from the history of AI to constraint processing, transcribed and organized
+- **Interactive algorithm visualizations** — step through A* search, see open/closed lists update in real time, practice with exam-level questions
+- **Math rendered properly** — KaTeX for formulas, Mermaid for diagrams, Cytoscape for interactive graphs
+- **Dark mode** — because you're studying at 2 AM
+
+## Content Map
+
+| Week | Topic | Concepts |
+|------|-------|----------|
+| 1 | Introduction, History & Philosophy | — |
+| 2 | State Space Search & Blind Search | DFS, BFS, DFID |
+| 3 | Heuristic Search & Local Search | Best First, Hill Climbing, A* |
+| 4 | Population-Based Methods | Genetic Algorithms, ACO |
+| 5 | A* Variants & Space-Saving | IDA*, SMA*, RBFS |
+| 6 | Sequence Alignment | Dynamic Programming, Bioinformatics |
+| 7 | Game Playing | Minimax, Alpha-Beta |
+| 8 | Planning & AO* | Forward/Backward Search |
+| 9 | Constraint Processing | Arc Consistency, Backtracking |
+
+## Tech Stack
+
+- **Next.js 16** — App Router, static export
+- **MDX** — write content with React components
+- **KaTeX** — math rendering
+- **Mermaid** — static diagrams
+- **Cytoscape.js** — interactive graph visualizations
+- **Tailwind CSS v4** — styling
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+
+# Run development server
 pnpm dev
-# or
-bun dev
+
+# Build for production
+pnpm build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  app/                    # Next.js App Router pages
+  components/
+    mdx/                  # Custom MDX components (Callout, Quiz, AStarViz, etc.)
+    ui/                   # UI primitives (CytoscapeGraph, Mermaid, etc.)
+  content/
+    lectures/             # Week-by-week lecture notes (MDX)
+    concepts/             # Algorithm study pages organized by week (MDX)
+  lib/
+    content.ts            # Content loading and parsing
+    types.ts              # TypeScript interfaces
+```
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on adding content, creating interactive visualizations, and the writing style.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Educational use only. Lecture content is derived from course materials at IIT Madras.

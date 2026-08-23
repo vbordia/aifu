@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 type ConceptItem = {
   slug: string;
   categorySlug: string;
-  frontmatter: { title: string; order: number };
+  frontmatter: { title: string; short?: string; order: number };
 };
 
 type Category = {
@@ -192,7 +192,11 @@ export default function DocsNav({
     if (!q) return [];
     return categories.flatMap((category) =>
       category.concepts
-        .filter((c) => c.frontmatter.title.toLowerCase().includes(q))
+        .filter((c) => {
+          const t = c.frontmatter.title.toLowerCase();
+          const s = (c.frontmatter.short ?? "").toLowerCase();
+          return t.includes(q) || s.includes(q);
+        })
         .map((c) => ({ ...c, categoryName: category.name }))
     );
   }, [categories, q]);
@@ -255,7 +259,9 @@ export default function DocsNav({
                               <Link href={`/concepts/${concept.categorySlug}/${concept.slug}`} />
                             }
                           >
-                            <span className="truncate">{concept.frontmatter.title}</span>
+                            <span className="truncate">
+                              {concept.frontmatter.short ?? concept.frontmatter.title}
+                            </span>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       );
@@ -341,7 +347,9 @@ export default function DocsNav({
                                     <Link href={`/concepts/${category.slug}/${concept.slug}`} />
                                   }
                                 >
-                                  {concept.frontmatter.title}
+                                  <span className="block truncate">
+                                    {concept.frontmatter.short ?? concept.frontmatter.title}
+                                  </span>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             );

@@ -1,5 +1,6 @@
 export interface ConceptFrontmatter {
   title: string;
+  short?: string;
   order: number;
   category: string;
   categoryOrder: number;

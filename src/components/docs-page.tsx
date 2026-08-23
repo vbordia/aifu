@@ -25,7 +25,7 @@ export default function DocsPage({
 }) {
   return (
     <>
-      <div className="mx-auto w-full max-w-3xl px-6 py-10 lg:px-10">
+      <div className="mx-auto w-full max-w-3xl px-4 py-10 lg:px-8">
         <article className="min-w-0">
         <header className="mb-9">
           <h1 className="text-3xl font-semibold leading-tight tracking-tight text-foreground/90">

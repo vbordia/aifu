@@ -7,6 +7,18 @@ import StateSpaceGraph from "@/components/mdx/state-space-graph";
 import LectureVideos from "@/components/mdx/lecture-videos";
 import AStarViz from "@/components/mdx/astar-viz";
 import AStarExamQuestion from "@/components/mdx/astar-exam-question";
+import WAStarViz from "@/components/mdx/wastar-viz";
+import WAStarExamQuestion from "@/components/mdx/wastar-exam-question";
+import SSSStarViz from "@/components/mdx/sssstar-viz";
+import TSPViz from "@/components/mdx/tsp-viz";
+import BnBViz from "@/components/mdx/bnb-viz";
+import DFSBFSViz from "@/components/mdx/dfs-bfs-viz";
+import DFIDViz from "@/components/mdx/dfid-viz";
+import DijkstraViz from "@/components/mdx/dijkstra-viz";
+import MinimaxViz from "@/components/mdx/minimax-viz";
+import AlphaBetaViz from "@/components/mdx/alphabeta-viz";
+import AOStarViz from "@/components/mdx/aostar-viz";
+import MinimaxTweakViz from "@/components/mdx/minimax-tweak-viz";
 
 function isMermaidCode(children: React.ReactNode): string | null {
   if (!children || typeof children !== "object" || !("props" in children)) {
@@ -149,6 +161,18 @@ const components: MDXComponents = {
   LectureVideos,
   AStarViz,
   AStarExamQuestion,
+  WAStarViz,
+  WAStarExamQuestion,
+  SSSStarViz,
+  TSPViz,
+  BnBViz,
+  DFSBFSViz,
+  DFIDViz,
+  DijkstraViz,
+  MinimaxViz,
+  AlphaBetaViz,
+  AOStarViz,
+  MinimaxTweakViz,
 };
 
 export function useMDXComponents(): MDXComponents {
