@@ -41,3 +41,5 @@ yarn-error.log*
 next-env.d.ts
 AI_Search_Papers/pdf_to_yaml.py
 AI_Search_Papers/__pycache__
+
+# scratch analysis workspace\n/scratch

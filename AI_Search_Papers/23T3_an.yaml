@@ -4,458 +4,336 @@ term: 3
 session: an
 subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
 questions:
-- number: 1
-  type: short_answer
-  section: SEARCH
-  context: |
-    Consider a 5-4-1 water jug puzzle with three jugs $a, b, c$ of capacity $5\text{L}, 4\text{L}, 1\text{L}$, respectively. A state is represented as a three-digit string $ABC$, where $A, B, C$ denote the volume of water present in the jugs $a, b, c$, respectively. For example, $140$ denotes a state where jug $a$ has $1$ liter of water, jug $b$ has $4$ liters of water, and jug $c$ is empty.
+- id: 1
+  type: comprehension
+  label: SEARCH
+  description: |
+    The figure shows a map on a uniform grid where each tile is 1x1 in size.
+    The start node is S and the goal node is G.
+    The MoveGen function returns nodes in alphabetical order.
+    Use Manhattan Distance as the heuristic function.
+    Tie-breaker: If several nodes have the same cost, use node labels to break the tie.
 
-    Two types of moves (state transitions) are allowed:
-    - $x\text{E}y$: pick up jug $x$ and empty it into jug $y$
-    - $x\text{F}y$: pick up jug $x$ and fill up (top up) jug $y$
+    Based on the above data, answer the given subquestions.
+  subquestions:
+  - sub_id: '1.1'
+    question_type: short_answer
+    question: |
+      What is the path found by the Best First Search algorithm? Enter the path as a comma separated list of node labels.
 
-    So the possible moves are: $a\text{E}b, a\text{E}c, a\text{F}b, a\text{F}c, b\text{E}a, b\text{E}c, b\text{F}a, b\text{F}c, c\text{E}a, c\text{E}b, c\text{F}a, c\text{F}b$.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,A,B,F,G
+  - sub_id: '1.2'
+    question_type: short_answer
+    question: |
+      What is the path found by A* search algorithm? Enter the path as a comma separated list of node labels.
 
-    **Tie-breaker:** In some states, both $x\text{E}y$ and $x\text{F}y$ may produce the same output state; in such cases, choose $x\text{E}y$ to break the tie. For example, from the $140$ state, both $a\text{E}c$ and $a\text{F}c$ produce the same output state $041$, therefore, to break the tie choose $a\text{E}c$ as the move.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,C,B,F,G
+  - sub_id: '1.3'
+    question_type: short_answer
+    question: |
+      What is the path found by Branch-and-Bound search algorithm? Enter the path as a comma separated list of node labels.
 
-    For the 5-4-1 water jug puzzle, the `MoveGen` function takes a state $ABC$ and returns a set of states that can be produced in one move. For example, $\text{MoveGen}(500)$ returns $\{140, 401\}$.
-  question: Let 500 be the start state and 221 be the goal state, find the shortest path from start to goal. Enter the path starting with 500 as a comma separated list of states (NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS).
-  answer_format: 500,411,747
-  correct_answers:
-  - 500,140,131,230,221
-- number: 2
-  type: short_answer
-  section: SEARCH
-  question: Let 500 be the start state and 221 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list (NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS).
-  answer_format: aFc,cFb,aEc
-  correct_answers:
-  - aFb,bFc,cEa,bFc
-- number: 3
-  type: multiple_choice
-  section: SEARCH FOR OPTIMAL SOLUTION
-  question: Under what cases does Depth First Iterative Deepening (DFID) guarantee an optimal solution?
-  options:
-  - text: When it inspects only new nodes
-    correct: false
-  - text: When it inspects new as well as open nodes
-    correct: false
-  - text: When it inspects new as well as closed nodes
-    correct: true
-  - text: None of these
-    correct: false
-- number: 4
-  type: multiple_choice
-  section: SEARCH FOR OPTIMAL SOLUTION
-  question: |
-    In the map below, nodes are placed on a grid where each tile is $10 \times 10$ in size. Is the Manhattan distance heuristic admissible?
+      Use the Branch-and-Bound variation that avoids cyclic expansions like S,A,S,A,S,A,...
 
-    ```mermaid
-    graph LR
-        S((S)) ---|12| B((B))
-        S ---|12| A((A))
-        S ---|24| C((C))
-        A ---|12| C
-        B ---|12| D((D))
-        B ---|12| C
-        B ---|24| G((G))
-        C ---|12| G
-        D ---|12| G
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,C,D,E,H,I,G
+  - sub_id: '1.4'
+    question_type: multiple_choice
+    question: For the given map, which algorithm finds the shortest path from S to G?
+    options:
+      A: A* Search Algorithm
+      B: Branch-and-Bound Search Algorithm
+      C: None of these
+    correct_option: B
+  - sub_id: '1.5'
+    question_type: multiple_choice
+    question: What can you say about the heuristic function for the given graph?
+    options:
+      A: Admissible
+      B: Inadmissible
+      C: Partly admissible and partly inadmissible
+      D: Cannot be determined
+    correct_option: B
+- id: 2
+  type: comprehension
+  label: TSP BRANCH-AND-BOUND
+  description: |
+    The TSP Branch-and-Bound algorithm is solving a TSP instance where the cities are A, B, C, .... and so on. The Branch-and-Bound search tree at the time when the algorithm has discovered the optimal tour is shown below.
+
+    Each node in the search tree displays an edge (either XY or ~XY), a cost value, and a unique reference number (a1, b1, b2, ..., c1, ..., d1, ..., e2, ..., f1, f2). Use the reference numbers to break ties. When required, enter the reference numbers in short answers.
+
+    What information can you glean from the search tree? Answer the sub-questions based on the information gleaned from the search tree.
+  subquestions:
+  - sub_id: '2.1'
+    question_type: short_answer
+    question: |
+      Let S0 (ref. no. a1) be the first node to be refined, identify the next 4 nodes (2nd to 5th node) that are refined by the TSP Branch-and-Bound algorithm. Enter the nodes (node reference numbers) in the order they are refined.
+
+      Enter a comma separated list of node reference numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a9,b9,c9,d9
+    correct_answer: b1,c1,d2,c2
+  - sub_id: '2.2'
+    question_type: short_answer
+    question: |
+      Which node represents the optimal tour and what is the cost of the optimal tour? Enter the node reference number and the tour cost in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter a node reference number followed by tour cost, separated by comma.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a9,42
+    correct_answer: e1,432
+  - sub_id: '2.3'
+    question_type: short_answer
+    question: |
+      Determine the number of cities in the TSP instance. Enter the number of cities in the text box, or enter NIL if it is not possible to determine the number of cities.
+
+      Enter an integer.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '6'
+  - sub_id: '2.4'
+    question_type: short_answer
+    question: |
+      Start from city A, what is the path representation of the optimal tour? Enter the path representation in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter a comma separated list of cities (city labels).
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: A,B,C
+    correct_answers:
+    - A,B,C,E,F,D
+    - A,D,F,E,C,B
+- id: 3
+  type: comprehension
+  label: GAMES
+  description: |
+    The figure shows a game tree with evaluation function values at the horizon nodes.
+    The horizon nodes are labeled from A to I.
+    Use these labels to enter a horizon node or a list of horizon nodes in short answers (textbox).
+
+    Tie-breaker: when several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+    Based on the above data, answer the given subquestions.
+  subquestions:
+  - sub_id: '3.1'
+    question_type: multiple_choice
+    question: Which of the following is a strategy for the MAX player?
+    options:
+      A: A,B,C
+      B: A,B
+      C: A,D,G
+      D: G,H,I
+    correct_option: B
+  - sub_id: '3.2'
+    question_type: short_answer
+    question: |
+      List the horizon nodes in the best strategy for MAX. Enter the node labels in alphabetical order.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: G,H
+  - sub_id: '3.3'
+    question_type: short_answer
+    question: |
+      List the horizon nodes pruned by Alpha-Beta.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: C,E,F,I
+  - sub_id: '3.4'
+    question_type: short_answer
+    question: |
+      List the horizon nodes not processed (neither LIVE nor SOLVED) by SSS*.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: B,C,E,F,I
+- id: 4
+  type: comprehension
+  label: PROBLEM DECOMPOSITION
+  description: |
+    The figure shows an AND-OR graph that depicts how a problem S can be decomposed into one or more smaller problems. Nodes are uniquely identified by labels (S, A, B, ...). The number in each node is the heuristic estimate of the cost of solving that node.
+
+    Nodes shown in double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as SOLVED and it will not be expanded subsequently.
+
+    The cost of each edge is 1 unit.
+
+    Tie-breaker 1: If several nodes have the same cost then break the tie using node labels.
+    Tie-breaker 2: For AND nodes, select the unsolved branch with the highest cost.
+
+    Use AO* algorithm to solve S, then answer the given subquestions.
+  subquestions:
+  - sub_id: '4.1'
+    question_type: short_answer
+    question: |
+      List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answers:
+    - S,C,A
+    - C,A,D
+  - sub_id: '4.2'
+    question_type: short_answer
+    question: |
+      Determine the value of the start node S after each node is expanded. What are the values of S after the 1st, 2nd and 3rd nodes are expanded, respectively? Enter the 3 values in the textbox.
+
+      Enter a comma separated list of numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12,42,17
+    correct_answers:
+    - 13,16,13
+    - 16,13,18
+  - sub_id: '4.3'
+    question_type: short_answer
+    question: |
+      What is the final value of the start node S?
+
+      Enter a number.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '18'
+- id: 5
+  type: comprehension
+  label: RULE BASED EXPERT SYSTEMS
+  description: |
+    A part of the Rete Net that classifies mushrooms (as edible or poisonous) is shown in the figure. The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, ..., R4 uniquely identify the nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
+
+    Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order. Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
+
+    ```text
+    201. (Mushroom ^specimen B43 ^odour ALMOND ^sp-colour BROWN)
+    202. (Stalk ^specimen B43 ^br-surface SMOOTH)
+    203. (Mushroom ^specimen K13 ^odour NONE ^habitat LEAVES)
+    204. (Cap ^specimen A23 ^colour RED ^surface SMOOTH)
+    205. (Mushroom ^specimen B37 ^odour NONE ^habitat LEAVES)
+    206. (Cap ^specimen B37 ^colour WHITE ^surface SMOOTH)
+    207. (Stalk ^specimen A23 ^root BULBOUS ^ar-colour WHITE)
+    208. (Stalk ^specimen K13 ^br-surface SCALY ^ar-colour WHITE)
+    209. (Mushroom ^specimen A23 ^odour NONE ^sp-colour WHITE)
     ```
-  options:
-  - text: 'Yes'
-    correct: true
-  - text: 'No'
-    correct: false
-  - text: Cannot be determined
-    correct: false
-- number: 5
-  type: multiple_select
-  section: SEARCH FOR OPTIMAL SOLUTION
-  question: Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
-  options:
-  - text: Depth First Search
-    correct: false
-  - text: Breadth First Search
-    correct: true
-  - text: Dijkstra's algorithm
-    correct: true
-  - text: Branch and Bound Search
-    correct: true
-  - text: A*
-    correct: false
-  - text: WA* for some w
-    correct: false
-  - text: Sparse Memory Graph Search (SMGS)
-    correct: false
-- number: 6
-  type: multiple_select
-  section: SEARCH FOR OPTIMAL SOLUTION
-  question: Given a state space with Euclidean edge costs, and with the best admissible heuristics, which of the following algorithms will find the optimal path?
-  options:
-  - text: Depth First Search
-    correct: false
-  - text: Breadth First Search
-    correct: false
-  - text: Dijkstra's algorithm
-    correct: true
-  - text: Branch and Bound Search
-    correct: true
-  - text: A*
-    correct: true
-  - text: WA* for some w
-    correct: false
-  - text: Sparse Memory Graph Search (SMGS)
-    correct: true
-- number: 7
-  type: multiple_select
-  section: SEARCH FOR OPTIMAL SOLUTION
-  question: Which of the following are true about the Branch-and-Bound method (discussed in the lecture) that is used for finding optimal tours for the Traveling Salesman Problem?
-  options:
-  - text: The root of the search tree represents all possible tours.
-    correct: true
-  - text: The root of the search tree represents the shortest/optimal tour.
-    correct: false
-  - text: Each node in the search tree represents a set of tours.
-    correct: true
-  - text: Each node in the search tree represents a single tour.
-    correct: false
-  - text: The costs of the search tree nodes monotonically INCREASE from the root to leaf.
-    correct: true
-  - text: The costs of the search tree nodes monotonically DECREASE from the root to leaf.
-    correct: false
-- number: 8
-  type: multiple_select
-  section: GAMES
-  context: |
-    The figure shows a 4-ply game tree with evaluation function values at the horizon. The nodes in the horizon are assigned labels $A, B, C, \dots, P$. Use these labels when asked to enter a horizon node or a list of horizon nodes.
 
-    **Tie-breaker:** When several nodes qualify then select the left most node; if tie persists then select the deepest node among the left most nodes.
-
-    ```mermaid
-    graph TD
-        Root["MAX (Square)"]
-        N1["MIN (Circle)"]
-        N2["MIN (Circle)"]
-        Root --- N1
-        Root --- N2
-
-        N11["MAX (Square)"]
-        N12["MAX (Square)"]
-        N1 --- N11
-        N1 --- N12
-
-        N21["MAX (Square)"]
-        N22["MAX (Square)"]
-        N2 --- N21
-        N2 --- N22
-
-        N111["MIN (Circle)"]
-        N112["MIN (Circle)"]
-        N121["MIN (Circle)"]
-        N122["MIN (Circle)"]
-        N11 --- N111
-        N11 --- N112
-        N12 --- N121
-        N12 --- N122
-
-        N211["MIN (Circle)"]
-        N212["MIN (Circle)"]
-        N221["MIN (Circle)"]
-        N222["MIN (Circle)"]
-        N21 --- N211
-        N21 --- N212
-        N22 --- N221
-        N22 --- N222
-
-        A["A: 45"]
-        B["B: 82"]
-        N111 --- A
-        N111 --- B
-
-        C["C: 81"]
-        D["D: 59"]
-        N112 --- C
-        N112 --- D
-
-        E["E: 99"]
-        F["F: 99"]
-        N121 --- E
-        N121 --- F
-
-        G["G: 30"]
-        H["H: 57"]
-        N122 --- G
-        N122 --- H
-
-        I["I: 37"]
-        J["J: 54"]
-        N211 --- I
-        N211 --- J
-
-        K["K: 55"]
-        L["L: 93"]
-        N212 --- K
-        N212 --- L
-
-        M["M: 76"]
-        N["N: 34"]
-        N221 --- M
-        N221 --- N
-
-        O["O: 43"]
-        P["P: 87"]
-        N222 --- O
-        N222 --- P
-    ```
-  question: Which of the following are strategies for MAX?
-  options:
-  - text: A,B,E,F
-    correct: true
-  - text: C,D,G,H
-    correct: true
-  - text: A,C,I,J
-    correct: false
-  - text: B,D,J,L
-    correct: false
-- number: 9
-  type: short_answer
-  section: GAMES
-  question: List the horizon nodes in the best strategy for MAX. Enter the nodes in the ascending order of node labels as a comma separated list (NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS).
-  answer_format: X,Y,Z
-  correct_answers:
-  - C,D,E,F
-- number: 10
-  type: short_answer
-  section: GAMES
-  question: List the first five horizon nodes pruned by Alpha-Beta. Enter a comma separated sorted list of node labels (NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS).
-  answer_format: X,Y,Z
-  correct_answers:
-  - G,H,J,L,M
-- number: 11
-  type: short_answer
-  section: CONSTRAINT SATISFACTION
-  context: |
-    The figure shows a constraint graph of a Binary CSP and a part of the matching diagram. When a pair of variables (like $X_1$ and $X_5$) do not have a constraint in the constraint graph then assume a **UNIVERSAL RELATION** in the matching diagram.
-
-    **Variables and Domains:**
-    - $X_1 \in \{a, b, c\}$
-    - $X_2 \in \{d, e, f\}$
-    - $X_3 \in \{1, 2, 3\}$
-    - $X_4 \in \{4, 5, 6\}$
-    - $X_5 \in \{p, q, r\}$
-
-    **Constraint Edges in Graph:**
-    - $(X_1, X_2)$, $(X_1, X_4)$, $(X_2, X_4)$, $(X_2, X_5)$, $(X_3, X_4)$, $(X_3, X_5)$
-
-    **Allowed Value Pairs (Edges in Matching Diagram):**
-    - Between $X_1$ and $X_2$: $(a,d), (a,e), (b,e), (b,f), (c,f)$
-    - Between $X_1$ and $X_4$: $(a,4), (a,5), (b,5), (b,6), (c,6)$
-    - Between $X_2$ and $X_4$: $(d,6), (e,5), (f,4)$
-    - Between $X_2$ and $X_5$: $(d,p), (e,q), (f,r)$
-    - Between $X_4$ and $X_3$: $(4,1), (5,2), (6,3)$
-    - Between $X_5$ and $X_3$: $(p,1), (q,2), (r,3)$
-
-    *Process the variables, and their values, in ALPHABETIC order.*
-  question: The Forward-Checking algorithm begins by assigning X1=a. What are the NEXT four values assigned to variables by the Forward-Checking algorithm? List the values as a comma separated list in the order they are assigned (NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS).
-  answer_format: a,6,1,p
-  correct_answers:
-  - d,e,1,2
-  - e,2,5,p
-- number: 12
-  type: short_answer
-  section: CONSTRAINT SATISFACTION
-  question: What is the first solution found by the Forward-Checking algorithm? Enter a comma separated list of values (NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS).
-  answer_format: a,6,1,p
-  correct_answers:
-  - a,e,2,5,p
-- number: 13
-  type: short_answer
-  section: PROBLEM DECOMPOSITION
-  context: |
-    The figure shows an AND-OR graph that depicts how a problem $S$ can be decomposed and transformed into one or more simpler problems. Nodes are uniquely identified by labels ($S, A, B, \dots$). The number in each node is the heuristic estimate of the cost of solving that node.
-
-    Nodes with double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as SOLVED and it will not be expanded subsequently.
-
-    - **Tie-breaker 1:** For nodes with the same cost, expand in the ascending order of node labels.
-    - **Tie-breaker 2:** For AND nodes, expand the unsolved branch with the highest cost.
-    - Each edge has a unit cost ($c = 1$).
-
-    **Graph Structure:**
-    - Root $S$ (cost: 100) has branches:
-      - 3-connector AND branch to $\{A\text{ (primitive: 20)}, B\text{ (200)}, C\text{ (100)}\}$
-      - OR branch to $D$ (160)
-    - Node $B$ (200) has OR branch to:
-      - Primitive $E$ (40)
-      - Primitive $F$ (60)
-    - Node $C$ (100) has 2-connector AND branch to:
-      - $G$ (80)
-      - Primitive $H$ (100)
-    - Node $D$ (160) has OR branch to:
-      - Primitive $I$ (140)
-    - Node $G$ (80) has OR branch to:
-      - Primitive $J$ (100)
-      - Primitive $K$ (90)
-  question: List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded. Enter a comma separated list of node labels.
-  answer_format: X,Y,Z
-  correct_answers:
-  - S,C,D
-  - S,C,D,G
-- number: 14
-  type: short_answer
-  section: PROBLEM DECOMPOSITION
-  question: Determine the value of the start node S after each node expansion. List the first three values of S that correspond to the first three node expansions. Enter a comma separated list of numbers.
-  answer_format: 12,42,17
-  correct_answers:
-  - 101,161,183
-  - 101,161,183,194
-- number: 15
-  type: short_answer
-  section: PROBLEM DECOMPOSITION
-  question: What is the final value of the start node S? Enter a number.
-  answer_format: '42'
-  correct_answers:
-  - '194'
-- number: 16
-  type: multiple_choice
-  section: PROBLEM DECOMPOSITION
-  question: In the given AND-OR graph, is the heuristic admissible?
-  options:
-  - text: 'No'
-    correct: true
-  - text: 'Yes'
-    correct: false
-  - text: Cannot be determined
-    correct: false
-- number: 17
-  type: multiple_select
-  section: RULE BASED EXPERT SYSTEMS
-  context: |
-    A Rete Net for classification of machines is given with nodes labeled:
-    - Alpha nodes:
-      - $A_1$: $\text{CLASS} = \text{Energy}$
-      - $A_2$: $\text{CLASS} = \text{BoM}$
-      - $A_3$: $\text{CLASS} = \text{Fuel}$
-      - $A_4$: $\text{item} = \langle x \rangle$
-      - $A_5$: $\text{item} = \langle x \rangle$
-      - $A_6$: $\text{item} = \langle x \rangle$
-      - $A_7$: $\text{source} = \text{wind}$
-      - $A_8$: $\text{part} = \text{alternator}$
-      - $A_9$: $\text{source} = \text{stream}$
-      - $A_{10}$: $\text{part} = \text{turbine-blades}$
-      - $A_{11}$: $\text{type} = \text{liquid}$
-      - $A_{12}$: $\text{part} = \text{CD-nozzle}$
-      - $A_{13}$: $\text{type} = \text{solid}$
-    - Beta nodes / Joins:
-      - $B_1 (\langle x \rangle)$: Join of $A_7$ and $A_8 \rightarrow R_1$ (Windmill)
-      - $R_2$ (Generator): From $A_8$
-      - $B_2 (\langle x \rangle)$: Join of $A_9$ and $A_{10} \rightarrow R_3$ (Watermill)
-      - $R_4$ (Turbine): From $A_{10}$
-      - $B_3 (\langle x \rangle)$: Join of $A_{10}$ and $A_{11} \rightarrow R_5$ (Gas Turbine)
-      - $B_4 (\langle x \rangle)$: Join of $A_{11}$ and $A_{12} \rightarrow R_6$ (Liquid Fuel Rocket)
-      - $R_7$ (Rocket): From $A_{12}$
-      - $B_5 (\langle x \rangle)$: Join of $A_{12}$ and $A_{13} \rightarrow R_8$ (Solid Fuel Rocket)
-
-    **Working Memory (in timestamp order):**
-    - `101.` `(Fuel ^item machine5 ^type solid)`
-    - `102.` `(Fuel ^item machine2 ^type liquid)`
-    - `103.` `(Fuel ^item machine3)`
-    - `104.` `(BoM ^item machine4 ^part alternator)`
-    - `105.` `(Energy ^item machine4 ^source wind)`
-    - `106.` `(BoM ^item machine3 ^part alternator)`
-    - `107.` `(BoM ^item machine1 ^part CD-nozzle)`
-  question: Which of the following rule-data tuples are in the conflict-set?
-  options:
-  - text: R1,104,105
-    correct: true
-  - text: R2,104
-    correct: true
-  - text: R2,106
-    correct: true
-  - text: R7,107
-    correct: true
-  - text: R1,104,106
-    correct: false
-  - text: R3,104,106
-    correct: false
-  - text: R6,102,107
-    correct: false
-- number: 18
-  type: short_answer
-  section: RULE BASED EXPERT SYSTEMS
-  question: If the Inference Engine uses Specificity as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one. Enter a comma separated list with a rule label followed by timestamps in sorted order.
-  answer_format: R1,101,102,103
-  correct_answers:
-  - R1,104,105
-  - R1,105,104
-- number: 19
-  type: short_answer
-  section: RULE BASED EXPERT SYSTEMS
-  question: If the Inference Engine uses Recency as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one. Enter a comma separated list with a rule label followed by timestamps in sorted order.
-  answer_format: R1,101,102,103
-  correct_answers:
-  - R7,107
-- number: 20
-  type: multiple_select
-  section: AUTOMATED PLANNING
-  context: |
+    For each WME identify its location (node label) in the Rete Net, and prepare the conflict set for the first cycle, then answer the given subquestions.
+  subquestions:
+  - sub_id: '5.1'
+    question_type: multiple_select
+    question: Which of the following rule-data tuples are in the conflict-set?
+    options:
+      A: R1,205,206
+      B: R2,209
+      C: R3,204,207
+      D: R4,203,208
+      E: R1,203,206
+      F: R4,205,208
+    correct_options: [A, B, C, D]
+  - sub_id: '5.2'
+    question_type: multiple_select
+    question: If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+    options:
+      A: R1,205,206
+      B: R2,209
+      C: R3,204,207
+      D: R4,203,208
+      E: R1,203,206
+      F: R4,205,208
+    correct_options: [C, D]
+  - sub_id: '5.3'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+    options:
+      A: R1,205,206
+      B: R2,209
+      C: R3,204,207
+      D: R4,203,208
+      E: R1,203,206
+      F: R4,205,208
+    correct_option: B
+- id: 6
+  type: comprehension
+  label: AUTOMATED PLANNING
+  description: |
     The domain description of a Blocks World with a single one-armed robot is given below.
 
-    **PREDICATES:**
-    - $\text{armEmpty}$: The arm is not holding any block, it is empty.
-    - $\text{holding}(X)$: The arm is holding $X$.
-    - $\text{onTable}(X)$: $X$ is on the table.
-    - $\text{clear}(X)$: $X$ has nothing above it, it is clear.
-    - $\text{on}(X,Y)$: $X$ is directly placed on $Y$.
+    Consider the planning problem with the following start state and goal description.
 
-    **OPERATORS:**
-    - $\text{Pickup}(X)$: Pick up $X$ from the table.
-      - Preconditions: $\{\text{armEmpty}, \text{clear}(X), \text{onTable}(X)\}$
-      - Add Effects: $\{\text{holding}(X)\}$
-      - Del Effects: $\{\text{armEmpty}, \text{onTable}(X)\}$
-    - $\text{Putdown}(X)$: Place $X$ on the table.
-      - Preconditions: $\{\text{holding}(X)\}$
-      - Add Effects: $\{\text{armEmpty}, \text{onTable}(X)\}$
-      - Del Effects: $\{\text{holding}(X)\}$
-    - $\text{Unstack}(X,Y)$: Pick up $X$ that is directly sitting on $Y$.
-      - Preconditions: $\{\text{armEmpty}, \text{clear}(X), \text{on}(X,Y)\}$
-      - Add Effects: $\{\text{clear}(Y), \text{holding}(X)\}$
-      - Del Effects: $\{\text{armEmpty}, \text{on}(X,Y)\}$
-    - $\text{Stack}(X,Y)$: Place $X$ directly on top of $Y$.
-      - Preconditions: $\{\text{holding}(X), \text{clear}(Y)\}$
-      - Add Effects: $\{\text{armEmpty}, \text{on}(X,Y)\}$
-      - Del Effects: $\{\text{holding}(X), \text{clear}(Y)\}$
+    Start State: { armEmpty, on(A,B), on(C,D), clear(A), clear(C), onTable(B), onTable(D) }
 
-    **Planning Problem:**
-    - **Start State:** $\{\text{onTable}(A), \text{onTable}(B), \text{onTable}(D), \text{on}(C,B), \text{clear}(A), \text{clear}(C), \text{clear}(D), \text{armEmpty}\}$
-    - **Goal Description:** $\{\text{on}(D,B), \text{holding}(C)\}$
-  question: Which of the following are applicable actions for the given problem?
-  options:
-  - text: Pickup(A)
-    correct: true
-  - text: Pickup(D)
-    correct: true
-  - text: Unstack(C,B)
-    correct: true
-  - text: Pickup(C)
-    correct: false
-  - text: Stack(D,B)
-    correct: false
-  - text: Unstack(D,B)
-    correct: false
-- number: 21
-  type: multiple_select
-  section: AUTOMATED PLANNING
-  question: Which of the following are relevant actions for the given problem?
-  options:
-  - text: Pickup(A)
-    correct: false
-  - text: Pickup(D)
-    correct: false
-  - text: Unstack(C,B)
-    correct: true
-  - text: Pickup(C)
-    correct: false
-  - text: Stack(D,B)
-    correct: true
-  - text: Unstack(D,B)
-    correct: false
+    Goal Description: { on(A,C), on(C,B), onTable(B) }
+
+    Based on the above data, answer the given subquestions.
+  subquestions:
+  - sub_id: '6.1'
+    question_type: multiple_select
+    question: Which of the following are applicable actions in the start state?
+    options:
+      A: Unstack (A,B)
+      B: Unstack (C,D)
+      C: Putdown (B)
+      D: Stack (C,B)
+      E: Stack (A,C)
+    correct_options: [A, B]
+  - sub_id: '6.2'
+    question_type: multiple_select
+    question: Which of the following are relevant actions in the goal state?
+    options:
+      A: Unstack (A,B)
+      B: Unstack (C,D)
+      C: Putdown (B)
+      D: Stack (C,B)
+      E: Stack (A,C)
+    correct_options: [C, D, E]
+  - sub_id: '6.3'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex action pairs in Layer 1?
+    options:
+      A: Unstack(A,B), Unstack(C,D)
+      B: Unstack(C,D), NOP-ACTION for armEmpty
+      C: Unstack(A,B), NOP-ACTION for on(A,B)
+      D: Putdown(B), Stack(C,B)
+      E: Stack(A,C), Stack(C,B)
+    correct_options: [A, B, C]
+  - sub_id: '6.4'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex proposition pairs in Layer 1?
+    options:
+      A: clear (B), armEmpty
+      B: holding (A), clear (D)
+      C: armEmpty, on (A,B)
+      D: on (A,B), on (C,D)
+    correct_options: [A, B]
+- id: 7
+  type: comprehension
+  label: CONSTRAINT SATISFACTION
+  description: |
+    The set of junctions (L, W, Y and T type junctions) that occur in a 2D line drawing of trihedral objects is provided below. The in-plane clockwise/counterclockwise rotations of these junctions are valid as well. These junctions provide constraints on the possible edge assignments (convex, concave, arrow) for the edges/lines in 2D line drawings of trihedral objects.
+
+    The junctions carry unique labels: L1, L2, L3, L4, L5, L6, T1, T2, T3, T4, W1, W2, W3, Y1, Y2, Y3. When required, use the labels in short answers.
+
+    Note: A 2D line drawing of trihedral objects is considered to be consistent if all the edges and junctions can be assigned labels that are consistent with each other, otherwise the drawing is considered to be inconsistent and all labels are reset to NIL.
+
+    Apply a suitable algorithm to assign consistent labels to edges/junctions in the 2D line drawings in the sub-questions. Choose a suitable edge and junction order for solving the problems.
+
+    Based on the above data, answer the given subquestions.
+  subquestions:
+  - sub_id: '7.1'
+    question_type: short_answer
+    question: |
+      Assign consistent labels to all the edges and junctions in the 2D line drawing shown below.
+
+      Enter the labels of the junctions 1, 2, 3, 4 in the text box, in that order. Otherwise enter NIL if the drawing has no consistent label assignment.
+
+      Enter a comma separated list of junction labels, or enter NIL.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X9,Y9,Z9,W9
+    correct_answers:
+    - Y1,W1,L1,W1
+    - Y1,W2,L2,W1
+    - Y2,W1,L2,W1
