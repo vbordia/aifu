@@ -1,0 +1,104 @@
+---
+title: "Forcing the Minimax Value — One-Leaf Tweaks"
+short: "Force MinMax Value"
+order: 5
+category: "Week 7 — Game Playing"
+categoryOrder: 7
+description: "Change ONE horizon eval to force the root to a target value — the inverse problem from 23T1 papers, solved with backup arithmetic"
+tags: [minimax, inverse-problem, backup, game-tree]
+week: 7
+difficulty: intermediate
+---
+
+## The Simplest Explanation
+
+The papers' other inverse question (alongside maximize-pruning):
+
+> *"Force the MinMax value of the tree to X by changing the eval of only **one** horizon node. Pick that node, and give the smallest/largest possible new value."*
+
+The tool is pure **backup arithmetic**: root = max of MIN children; each MIN = min of its MAX children; each MAX = max of its leaves. Change one leaf → recompute upward.
+
+<Callout type="tip" title="Remember This">
+To RAISE the root: find a MIN node already equal to the current root value and raise its ceiling — but every sibling under it must also rise. To LOWER the root: shrink the single MIN branch that currently controls it.
+</Callout>
+
+## Interactive Demo
+
+Target: force Root to **98** by changing exactly one leaf. Click a leaf and tweak:
+
+<MinimaxTweakViz />
+
+### What the Demo Shows
+
+Original backups:
+- N1 = min(max(18,69), max(30,53)) = min(69,53) = 53
+- N2 = min(max(15,27), max(98,14)) = min(27,98) = 27
+- N3 = min(max(19,37), max(61,68)) = min(37,68) = 37
+- Root = max(53,27,37) = **53**
+
+Why only leaf E works for target 98:
+- Raising N1 or N3 to 98 needs **both** their MAX children ≥ 98 — two leaves. Not allowed.
+- N2's second child M22 = max(98,14) = 98 **already**. So raising E (in M21) to ≥ 98 makes M21 = 98, then N2 = min(98,98) = 98, then Root = max(53,98,37) = 98 ✓ — one leaf!
+- Smallest value for E that achieves it: exactly **98** (any less leaves N2 < 98).
+
+## Worked Example 2 — Lowering the Root (23T1 AN)
+
+Tree: Root(MAX) → three MINs with pairs (A29,B46), (C75,D96), (E13,F36), (G99,H28), (I33,J26), (K37,L18).
+
+Backups: N1 = min(46,96) = 46; N2 = min(36,99) = 36; N3 = min(33,37) = 33; Root = **46**.
+
+Task: force Root to **36**, choosing the **largest possible** new value.
+
+- Root = 46 comes solely from N1. Lowering N2/N3 changes nothing (they're already ≤ 46).
+- Reduce B (46): M11 = max(29, x). Need N1 = min(M11, 96) ≤ 36 → M11 ≤ 36 → x ≤ 36.
+- Largest feasible x = **36** → answer `B,36` ✓ (official key)
+
+## The General Recipe
+
+1. Back up the whole tree; identify **which MIN child equals the current root value**
+2. To change root to T:
+   - **Raise**: find a MIN node where a single leaf-change can lift its min to T (needs its other MAX child already ≥ T); else impossible with one change
+   - **Lower**: reduce a leaf in the controlling MIN branch so its backed-up value hits T
+3. Compute the boundary value algebraically; pick smallest/largest per the question
+4. Verify no *other* branch exceeds T after your change (for lower-targets) or that root actually reaches T (for raise-targets)
+
+## Properties
+
+| Aspect | Rule |
+|--------|------|
+| Changes allowed | Exactly one leaf |
+| Raise root | Some MIN must reach T with one leaf tweak (its sibling MAX ≥ T already) |
+| Lower root | Controlling MIN's leaf reduced so its min = T |
+| Answer style | `Leaf,Value` e.g. `E,98`, `B,36` |
+| Boundary logic | "smallest/largest possible" = solve the backup inequality at equality |
+
+<Quiz
+  question="Root = max over MIN children. Currently Root=53 via N1=53. Target 98 changing ONE leaf. Which structure makes it possible?"
+  options={[
+    { label: "A", text: "A MIN whose BOTH MAX children can be raised" },
+    { label: "B", text: "A MIN where one MAX child already backs up to ≥ 98, and the other has a raisable leaf" },
+    { label: "C", text: "Any leaf anywhere raised to 98" },
+    { label: "D", text: "Impossible with one change" },
+  ]}
+  correctAnswer="B"
+  explanation="MIN takes the min, so both branches under it must be ≥ 98. If one is already there (like G=98), a single leaf in the other suffices."
+/>
+
+<Quiz
+  question="To LOWER the root from 46 to 36 (root = max(46,36,33)), you should..."
+  options={[
+    { label: "A", text: "Lower any leaf under N2 or N3" },
+    { label: "B", text: "Reduce a leaf in the N1 branch until its backed-up min drops to 36" },
+    { label: "C", text: "Raise a leaf under N3" },
+    { label: "D", text: "It's impossible without two changes" },
+  ]}
+  correctAnswer="B"
+  explanation="N1 controls the max. Shrink its ceiling: reduce its largest supporting leaf so min(M11,M12) = 36. Largest such eval was B=36."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Changing a leaf in the wrong branch**: lowering/raising non-controlling branches does nothing to the root. Always trace which MIN branch supplies the current root value first.
+2. **Ignoring the 'both siblings' rule for raises**: raising one leaf lifts its MAX parent, but the MIN still takes the min against its OTHER child — if that's below target, nothing happens.
+3. **Boundary off-by-one**: 'smallest possible value' means solve the inequality at equality (e.g., need max(E,27) ≥ 98 → E ≥ 98 → smallest is 98, not 97).
+4. **Direction confusion**: 'largest possible' appears when lowering a root (push as high as allowed while still meeting the bound); 'smallest possible' when raising.
+</Accordion>

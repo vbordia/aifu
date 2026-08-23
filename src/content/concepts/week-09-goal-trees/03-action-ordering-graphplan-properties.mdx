@@ -1,0 +1,94 @@
+---
+title: "Action Ordering and GraphPlan Properties"
+short: "Ordering & Mutex Theory"
+order: 3
+category: "Week 9 — Goal Trees"
+categoryOrder: 9
+description: "When does order matter? When do mutexes persist? The theoretical edge cases that become multiple-choice traps"
+tags: [graphplan, action-ordering, mutex-persistence, planning-theory]
+week: 9
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+Two questions appear as theory MCQs independent of any Blocks World state:
+
+1. **Do two orderings `a then b` vs `b then a` give different results?**
+2. **Do mutexes, once formed, persist?**
+
+Both test understanding of **effects** and **monotonicity**.
+
+<Callout type="tip" title="Remember This">
+Order matters only if actions interfere via add/del/prec overlap. Mutexes between actions, once broken, never return — but mutexes between propositions can shrink as more producers appear.
+</Callout>
+
+## 1. When Do Two Orderings Differ?
+
+Papers ask (26T1 Q7.1): actions `a` and `b`, orderings `a→b` vs `b→a`, which conditions (each independently) make outcomes differ?
+
+| Condition | Why order matters | Example |
+|---|---|---|
+| **P ∈ pre(a) and Q ∈ del(b)** (or vice versa) where? Actually: if `a` needs P that `b` deletes, then `b→a` may become inapplicable | Precondition clobbered | `a` needs `clear(X)`, `b` = `Stack(Y,X)` deletes `clear(X)` |
+| **P ∈ add(a) ∩ del(b)** (one adds, other deletes same fact) | Final state differs | `a` adds `on(A,B)`, `b` deletes `on(A,B)` |
+| **P ∈ pre(a) ∩ pre(b) with no interaction** | Both need same fact → both orderings **feasible** (both can run, though perhaps not in same layer) | Both need `armEmpty` — order matters for feasibility only if resource consumed |
+
+**Exam answer for 26T1 FN Q7.1**: Options A (`P` in pre(a), `Q` in del(b)) and B (`P` in add(a) ∩ del(b)) — **both** make orderings differ. Option C "None" is wrong.
+
+For 26T1 AN Q7.1: `P ∈ pre(a)∩pre(b)` and `P ∈ del(a)∩del(b)` — both keep orderings **feasible** (both need same resource or both delete same) → both orderings feasible.
+
+## 2. GraphPlan Mutex Persistence
+
+Q7.2 style: Which statements about mutex are true?
+
+**26T1 FN Q7.2**: `a` and `b` in layer `n` are mutex **if**:
+- (C) `P ∈ pre(a) ∩ del(b)` → **true** (interference)
+- (D) `P ∈ add(a) ∩ del(b)` → **true** (inconsistent effects)
+- (A) "only if every P in pre(a) is mutex with every Q in pre(b)" → **false** (needs ANY, not EVERY — competing needs is `∃` mutex preconditions, not `∀`)
+- (B) "only if every P in pre(a) is in del(b)" → false
+
+**Q7.3**: True statements:
+
+- **(A)** If `A` and `B` are **non-mutex** in layer `n`, they **remain non-mutex** in all future layers → **true** (once mutex broken, never returns: more supporting actions appear, never fewer)
+- (B) Can become mutex later → false
+- Similarly for propositions: if `P,Q` non-mutex in layer 0, they remain so forever (A true), can become mutex later is false.
+
+This monotonicity is key: mutexes only **shrink** over time (propositions monotonically increase, so more ways to achieve them appear).
+
+## Planning Graph vs Search
+
+- **Layer 0** propositions = start state
+- Each layer adds no-ops (frame axioms) → $P_i \subseteq P_{i+1}$
+- Mutexes are **over-approximations**: non-mutex ≠ guaranteed co-achievable, but mutex = definitely not co-achievable at that layer
+
+First layer where goals are non-mutex **and** extraction succeeds = optimal parallel plan length.
+
+<Quiz
+  question="Actions a and b have P ∈ add(a) and P ∈ del(b). Are they mutex?"
+  options={[
+    { label: "A", text: "No, add/del overlap doesn't matter" },
+    { label: "B", text: "Yes — inconsistent effects" },
+    { label: "C", text: "Only if preconditions also clash" },
+    { label: "D", text: "Never" },
+  ]}
+  correctAnswer="B"
+  explanation="Inconsistent effects: one asserts P, the other negates it — they cannot be in same parallel layer."
+/>
+
+<Quiz
+  question="If two actions are non-mutex at layer 5, what about layer 6?"
+  options={[
+    { label: "A", text: "They may become mutex again" },
+    { label: "B", text: "They remain non-mutex forever (mutex monotonic decrease)" },
+    { label: "C", text: "They must have been mutex earlier" },
+    { label: "D", text: "Cannot be determined" },
+  ]}
+  correctAnswer="B"
+  explanation="More layers = more ways to support preconditions, so mutex can only disappear, never appear."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **ANY vs EVERY**: Action mutex needs ∃ conflicting pair; proposition mutex needs ∀ producer pairs mutex. Swapping quantifiers flips answer.
+2. **Same resourceMutex**: Both actions deleting same `armEmpty` is interference, even if they don't directly mention each other — covered by `P ∈ del(a) ∩ del(b)` with shared precondition.
+3. **Non-mutex persistence**: Once two items are non-mutex, they stay non-mutex forever. Papers reuse this as a true statement — memorize it.
+</Accordion>

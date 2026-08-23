@@ -1,0 +1,110 @@
+---
+title: "Alpha-Beta Optimal Leaf Assignment"
+short: "Optimal Leaf Assignment"
+order: 4
+category: "Week 7 — Game Playing"
+categoryOrder: 7
+description: "The inverted exam question — assign values to leaves to MAXIMIZE pruning. Master the α/β window trick behind 2026 papers"
+tags: [alpha-beta, optimal-assignment, pruning, beta-cutoff, alpha-cutoff]
+week: 7
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+Normal Alpha-Beta: given leaf values, count cuts.
+
+**Inverted (2026 papers)**: Given **α,β window** and a set of values `{1,2,3,4}`, **choose assignment** `A,B,C,D` to **maximize** leaves pruned.
+
+Then report minimax, number of α/β cuts, which leaves pruned.
+
+<Callout type="tip" title="Remember This">
+To maximize pruning, make early children look as bad/good as needed to shrink the window quickly. The first leaf of each subtree controls whether rest gets cut.
+</Callout>
+
+## The Setup (26T1 FN Q3)
+
+Subtree entered with a given window; two children, each holding two leaves:
+
+```text
+        Root (window α=2, β=4)
+        /          \
+   Child 1       Child 2
+   /    \        /    \
+  A(?)  B(?)   C(?)  D(?)
+```
+
+Values to place: `{1,2,3,4}` each used exactly once.
+
+Alpha-Beta enters this subtree carrying the window (2,4).
+
+## Worked Example 1 — 26T1 FN (alpha-cuts)
+
+Here each child of the subtree root is a **MIN** node holding two leaves, and the entering window is (α=2, β=4).
+
+**Goal**: make each MIN child α-cut its second leaf. A MIN node α-cuts the moment its running value drops to ≤ α — i.e., its **first** leaf must satisfy `first ≤ α = 2`.
+
+From `{1,2,3,4}` only **1 and 2** qualify as first leaves. Everything else gets pruned:
+
+| Leaf | Value | Role |
+|------|-------|------|
+| A | 1 | First leaf of MIN-child 1 → 1 ≤ 2 → **α-cutoff, B pruned** |
+| B | 3 | never examined |
+| C | 2 | First leaf of MIN-child 2 → 2 ≤ 2 → **α-cutoff, D pruned** |
+| D | 4 | never examined |
+
+**Answer**: assignment `1,3,2,4` · minimax = max(1, 2) = **2** · **2 α-cuts, 0 β-cuts** · pruned **B,D** — exactly the official key.
+
+## Worked Example 2 — 26T1 AN (beta-cuts)
+
+Mirror image: children of the root are **MAX** nodes, window (α=1, β=3).
+
+A MAX node β-cuts when its running value reaches ≥ β — so each **first** leaf needs `first ≥ β = 3`. Candidates: **3 and 4**.
+
+| Leaf | Value | Role |
+|------|-------|------|
+| A | 3 | First leaf of MAX-child 1 → 3 ≥ 3 → **β-cutoff, B pruned** |
+| B | 1 | never examined |
+| C | 4 | First leaf of MAX-child 2 → 4 ≥ 3 → **β-cutoff, D pruned** |
+| D | 2 | never examined |
+
+**Answer**: assignment `3,1,4,2` · minimax = min(3, 4) = **3** · **0 α-cuts, 2 β-cuts** · pruned **B,D** — again the official key.
+
+## The General Recipe
+
+1. Identify the child type directly under the given window: **MIN children → α-cuts**, **MAX children → β-cuts**
+2. Compute how many values in the set satisfy the trigger (`≤ α` or `≥ β`) — you need exactly one per child
+3. Place those as the **first** leaf of each child; dump the leftovers into the second positions (they'll be pruned)
+4. Report: minimax from the surviving first-leaves, cut counts by type, pruned = all second leaves
+
+<Quiz
+  question="To cause a β-cutoff at a MAX node with window (α,β), the first child's value should be..."
+  options={[
+    { label: "A", text: "≤ α" },
+    { label: "B", text: "≥ β" },
+    { label: "C", text: "Between α and β" },
+    { label: "D", text: "Exactly α" },
+  ]}
+  correctAnswer="B"
+  explanation="MAX raises α. If α ≥ β after first child, window closes → prune rest. So need value ≥ β to push α up enough."
+/>
+
+<Quiz
+  question="Maximizing pruning in Alpha-Beta means..."
+  options={[
+    { label: "A", text: "Random assignment" },
+    { label: "B", text: "Place extreme values early to close windows, leaving rest pruned" },
+    { label: "C", text: "Place all values equal" },
+    { label: "D", text: "Avoid any cutoff" },
+  ]}
+  correctAnswer="B"
+  explanation="Put a value that triggers cutoff as the first leaf of each subtree; the exam's optimal assignments do exactly this, pruning B and D."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Identify child type first**: MIN children produce alpha-cuts (first leaf must be small); MAX children produce beta-cuts (first leaf must be large). Getting the type backwards flips the whole assignment.
+2. **Count cuts per type**: report as "alpha-cuts,beta-cuts" — FN was `2,0`, AN was `0,2`.
+3. **NIL vs list**: If no leaves pruned, answer `NIL`.
+4. **Unique values**: The set is a permutation — each value used exactly once.
+5. **Minimax from survivors only**: compute the root value using the FIRST leaves that survived; pruned leaves never contributed.
+</Accordion>

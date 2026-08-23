@@ -1,0 +1,122 @@
+---
+title: "Plan-Space Planning and Partial-Order Planning (POP)"
+short: "Partial-Order Planning"
+order: 3
+category: "Week 8 — Planning"
+categoryOrder: 8
+description: "Search over partial plans, not states — causal links, threats, promotion/demotion, and the elegant answer to the Sussman anomaly"
+tags: [pop, plan-space, partial-order, threats, causal-links]
+week: 8
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+Goal-stack planning forces a goal order and stumbles on the Sussman anomaly. Plan-space planning refuses to commit:
+
+> Search the space of **partial plans**. A plan is finished only when it has no flaws — unresolved goals or unhandled threats. Ordering constraints get added only when a threat forces them.
+
+<Callout type="tip" title="Remember This">
+Π = ⟨A, O, L, B⟩: Actions, Orderings, causal Links, Bindings. Two flaw types: open goals (unsupported preconditions) and threats (actions that might delete a protected fact). Solve flaws until none remain.
+</Callout>
+
+## The Partial Plan Tuple
+
+| Component | Meaning |
+|-----------|---------|
+| $A$ | partially instantiated operators (variables written `?x`) |
+| $O$ | ordering links $a_i \prec a_j$ |
+| $L$ | causal links $a_i \xrightarrow{p} a_j$ — "$a_i$ guarantees p for $a_j$" |
+| $B$ | binding constraints ($?x = A$, $?x \neq ?y$) |
+
+**Initial plan** $\Pi_0$: just two dummy actions —
+- $a_0$: no preconditions; effects = start state
+- $a_\infty$: preconditions = goal; no effects
+
+plus one ordering $a_0 \prec a_\infty$. This "empty plan" compactly represents **every possible linear plan at once**.
+
+## Flaws and Their Repairs
+
+| Flaw | Definition | Repairs |
+|------|-----------|---------|
+| **Open goal** | precondition p of $a_j$ unsupported by any causal link | reuse an existing producer (add link + order), or insert a new action that adds p |
+| **Threat** | action $a_t$ deletes p on link $a_i \xrightarrow{p} a_j$ and could be ordered between them | **Promotion** $a_t \prec a_i$, **Demotion** $a_j \prec a_t$, or **Separation** (variable binding) |
+
+## Worked Example (the lecture's full trace)
+
+Start: On(B,C), OnTable(C), OnTable(A), Clear(A), Clear(B), ArmEmpty.
+Goal: OnTable(B) ∧ On(A,B).
+
+1. $\Pi_0$: two open goals — OnTable(B), On(A,B)
+2. Resolve On(A,B): insert **Stack(A,B)** → new open goals Holding(A), Clear(B); link Stack $\xrightarrow{On(A,B)} a_\infty$
+3. Clear(B): true in start → link $a_0 \xrightarrow{Clear(B)}$ Stack(A,B)
+4. Holding(A): insert **Pickup(A)** (A is on table) → opens OnTable(A), Clear(A), ArmEmpty — all satisfied by links from $a_0$
+5. OnTable(B): insert **Putdown(B)** → opens Holding(B)
+6. Holding(B): insert **Unstack(B,C)** → its preconditions all from $a_0$
+
+Now all goals closed — but three **threats** appear:
+
+| Threat | Threatener | Endangered link |
+|--------|-----------|-----------------|
+| T1 | Stack(A,B) deletes Clear(B) | $a_0 \xrightarrow{Clear(B)}$ Unstack(B,C) |
+| T2 | Pickup(A) deletes ArmEmpty | $a_0 \xrightarrow{ArmEmpty}$ Unstack(B,C) |
+| T3 | Putdown(B) deletes ArmEmpty | $a_0 \xrightarrow{ArmEmpty}$ Pickup(A) |
+
+All resolved by **demotion** (push threat after consumer):
+
+$$\text{Unstack(B,C)} \prec \text{Stack(A,B)}, \quad \text{Unstack(B,C)} \prec \text{Pickup(A)}, \quad \text{Putdown(B)} \prec \text{Pickup(A)}$$
+
+Linearizing yields the 4-step plan: **Unstack(B,C) → Putdown(B) → Pickup(A) → Stack(A,B)**.
+
+```mermaid
+graph LR
+    u1["Unstack(B,C)"] --> pd["Putdown(B)"]
+    pd --> pu["Pickup(A)"]
+    pu --> st["Stack(A,B)"]
+    style u1 fill:#0369a1,color:#ffffff;
+    style st fill:#15803d,color:#ffffff;
+```
+
+### Why This Beats Goal Stack Here
+
+GSP would chase OnTable(B) first or On(A,B) first and clobber itself (Sussman pattern). POP never chose an order — the *threats themselves* discovered that Unstack(B,C) must precede both other actions. Non-serializable subgoals are handled naturally.
+
+## Properties
+
+| Property | Value |
+|----------|-------|
+| Search space | partial plans (usually smaller than state spaces) |
+| Soundness | yes — every step's preconditions protected by causal links |
+| Non-serializable goals | handled via interleaving forced by threats |
+| Least-commitment | orderings exist only where conflicts demand them |
+
+<Quiz
+  question="An 'open goal' in POP is..."
+  options={[
+    { label: "A", text: "an action with no effects" },
+    { label: "B", text: "a precondition not yet supported by any causal link" },
+    { label: "C", text: "a deleted predicate" },
+    { label: "D", text: "the final goal" },
+  ]}
+  correctAnswer="B"
+  explanation="Every action precondition needs a causal link guaranteeing it. Missing link = open goal = flaw to repair."
+/>
+
+<Quiz
+  question="A threat exists when action a_t..."
+  options={[
+    { label: "A", text: "adds a fact already true" },
+    { label: "B", text: "deletes a proposition protected by some causal link, and can be ordered between its endpoints" },
+    { label: "C", text: "has no preconditions" },
+    { label: "D", text: "comes before a_0" },
+  ]}
+  correctAnswer="B"
+  explanation="Threat = potential clobbering of a protected fact. Promotion/demotion/separation constrain the ordering to remove the danger."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Promotion vs demotion naming**: PROMOTION pushes the threat EARLIER ($a_t \prec a_i$, before the producer); DEMOTION pushes it LATER ($a_j \prec a_t$). Exams test the vocabulary precisely.
+2. **Both flaw types needed**: a plan with zero open goals but one live threat is NOT a solution. Check threats only after closing goals.
+3. **Why POP beats GSP**: don't say "it searches more" — say it defers ordering commitments so non-serializable subgoals interleave automatically.
+4. **Separation applies only with variables**: if actions are fully grounded, promotion/demotion are the only threat repairs available.
+</Accordion>

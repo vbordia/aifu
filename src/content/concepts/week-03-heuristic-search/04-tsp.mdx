@@ -1,0 +1,199 @@
+---
+title: "Traveling Salesperson Problem (TSP)"
+short: "TSP"
+order: 4
+category: "Week 3 — Heuristic Search"
+categoryOrder: 3
+description: "The most famous NP-hard optimization problem — visit every city exactly once at minimum cost"
+tags: [tsp, np-hard, optimization, nearest-neighbor, 2-opt]
+week: 3
+difficulty: intermediate
+---
+
+## The Simplest Explanation
+
+You have a list of cities and distances between every pair. Visit **each city exactly once** and return home. Find the **shortest possible tour**.
+
+That's the entire problem. It's trivial to state, brutally hard to solve optimally for large instances, and shows up everywhere — logistics, circuit board drilling, DNA sequencing.
+
+<Callout type="tip" title="The One Thing to Remember">
+TSP is **NP-hard**. There is no known polynomial-time algorithm that always finds the optimal tour. For $n$ cities, brute force checks $n!$ tours. For 50 cities, $50! \approx 3 \times 10^{64}$ — more than atoms in the observable universe. This is why we use heuristics.
+</Callout>
+
+## The Problem Formally
+
+**Given**: A complete graph with $n$ vertices, edge weights $d(i,j)$ representing distance/cost between cities $i$ and $j$.
+
+**Find**: A Hamiltonian cycle (tour visiting every vertex exactly once) with **minimum total cost**.
+
+$$\min_{\pi \in \text{permutations}} \sum_{i=1}^{n-1} d(\pi_i, \pi_{i+1}) + d(\pi_n, \pi_1)$$
+
+## Distance Matrix
+
+The input to TSP is a **distance matrix** (also called cost matrix). For 5 cities:
+
+| | A | B | C | D | E |
+|---|---|---|---|---|---|
+| **A** | — | 3 | 7 | 10 | 5 |
+| **B** | 3 | — | 4 | 9 | 6 |
+| **C** | 7 | 4 | — | 8 | 7 |
+| **D** | 10 | 9 | 8 | — | 2 |
+| **E** | 5 | 6 | 7 | 2 | — |
+
+- The matrix is **symmetric** ($d(A,B) = d(B,A)$) for standard TSP
+- Diagonal is meaningless (distance from a city to itself)
+- Read: "From A to B costs 3, from A to C costs 7, from D to E costs 2"
+
+### Symmetric vs Asymmetric TSP
+
+- **Symmetric TSP**: $d(i,j) = d(j,i)$ for all pairs. Road networks are symmetric.
+- **Asymmetric TSP (ATSP)**: $d(i,j) \neq d(j,i)$ in general. Airfares, one-way streets, shipping costs are asymmetric.
+
+## The Scale of the Problem
+
+| $n$ | Tours to check ($n!$) | Time at 1M/sec |
+|-----|----------------------|-----------------|
+| 5 | 12 | Instant |
+| 10 | 362,880 | 0.4 seconds |
+| 15 | $\approx 1.3 \times 10^{12}$ | 15 days |
+| 20 | $\approx 2.4 \times 10^{18}$ | 76,000 years |
+| 50 | $\approx 3 \times 10^{64}$ | $10^{51}$ years |
+
+This is why exact methods (brute force, BnB, dynamic programming) only work for small instances. For real-world problems with hundreds or thousands of cities, **heuristic methods** are essential.
+
+## Nearest Neighbor Heuristic
+
+The simplest constructive heuristic: **always go to the closest unvisited city**.
+
+1. Start at any city
+2. Go to the nearest unvisited city
+3. Repeat until all cities visited
+4. Return to start
+
+<TSPViz />
+
+### Nearest Neighbor Result
+
+Starting from A: **A→B→C→E→D→A** = 3+4+7+2+10 = **26**
+
+But the optimal tour is: **A→E→D→C→B→A** = 5+2+8+4+3 = **22**
+
+Nearest neighbor missed the optimal by 4 (18% over optimal). This is typical — nearest neighbor can produce tours up to **50% longer** than optimal in the worst case.
+
+### Properties of Nearest Neighbor
+
+| Property | Value |
+|----------|-------|
+| Time complexity | $O(n^2)$ |
+| Solution quality | Within $\frac{1}{2}(\lceil\log_2 n\rceil + 1)$ of optimal |
+| Worst case | ~50% longer than optimal |
+| Deterministic? | Depends on starting city |
+
+<Callout type="warning" title="Starting City Matters">
+Running nearest neighbor from each city and taking the best result gives a much better solution. For 5 cities, running from E gives: E→A→B→C→D→E = 5+3+4+8+9 = 29 (worse!). From D: D→E→A→B→C→D = 2+5+3+4+8 = 22 (optimal!). Always try multiple starting cities.
+</Callout>
+
+## 2-Opt Improvement
+
+Nearest neighbor gives an initial tour. **2-opt** improves it by swapping edges.
+
+### The Idea
+
+Remove two edges from the tour, reconnect the two resulting paths in the other possible way. If the new tour is shorter, keep it.
+
+```
+Before: ...→ A → B → ... → C → D →...
+Swap edges A-B and C-D:
+After:  ...→ A → C → ... → B → D →...
+```
+
+### 2-Opt on Our Example
+
+Starting tour: A→B→C→E→D→A (cost 26)
+
+1. Try swapping edges (B,C) and (E,D): A→B→E→C→D→A = 3+6+7+8+10 = 34. Worse.
+2. Try swapping edges (A,B) and (D,A): This creates A→D→E→C→B→A = 10+2+7+4+3 = 26. Same.
+3. Try swapping edges (C,E) and (D,A): A→B→C→D→E→A = 3+4+8+2+5 = 22. **Better!** Found the optimal.
+
+2-opt is a **local search** — it finds a locally optimal tour where no 2-edge swap improves it. The result depends on the starting tour.
+
+## Other TSP Heuristics
+
+| Method | Type | Time | Quality |
+|--------|------|------|---------|
+| Nearest Neighbor | Constructive | $O(n^2)$ | ~25% over optimal |
+| Greedy (Kruskal-like) | Constructive | $O(n^2 \log n)$ | ~20% over optimal |
+| Savings (Clarke-Wright) | Constructive | $O(n^2 \log n)$ | ~15% over optimal |
+| 2-Opt | Local search | $O(n^2)$ per pass | Improves initial tour |
+| 3-Opt | Local search | $O(n^3)$ per pass | Better than 2-opt |
+| Lin-Kernighan | Variable depth | $O(n^{2.2})$ | Near-optimal |
+| Christofides | Approximation | $O(n^3)$ | Within 1.5× optimal |
+
+### Christofiles Algorithm (Guaranteed Bound)
+
+For metric TSP (triangle inequality holds), Christofides guarantees a tour within **1.5× optimal**:
+
+1. Build a minimum spanning tree (MST)
+2. Find a minimum weight perfect matching on the odd-degree vertices
+3. Combine them into a tour
+
+This is the best known polynomial-time approximation ratio for metric TSP.
+
+## Properties Summary
+
+| Property | Value |
+|----------|-------|
+| Problem class | NP-hard |
+| Exact solution time | Exponential |
+| Best exact method | Branch and Bound, Held-Karp DP |
+| Best heuristic | Lin-Kernighan-Helsgaun |
+| Approximation ratio | 1.5× (Christofides, metric TSP) |
+| Inapproximable | No constant ratio for general TSP (unless P=NP) |
+
+<Quiz
+  question="What is the time complexity of the nearest neighbor heuristic for TSP?"
+  options={[
+    { label: "A", text: "O(n!)" },
+    { label: "B", text: "O(n²)" },
+    { label: "C", text: "O(n log n)" },
+    { label: "D", text: "O(2ⁿ)" },
+  ]}
+  correctAnswer="B"
+  explanation="At each of n steps, scan up to n cities to find the nearest unvisited one. Total: n × n = O(n²)."
+/>
+
+<Quiz
+  question="What does 2-opt do?"
+  options={[
+    { label: "A", text: "Adds two new cities to the tour" },
+    { label: "B", text: "Removes two edges and reconnects differently" },
+    { label: "C", text: "Solves TSP optimally in O(n²)" },
+    { label: "D", text: "Runs nearest neighbor from 2 starting cities" },
+  ]}
+  correctAnswer="B"
+  explanation="2-opt removes two edges from the current tour and reconnects the two path fragments the other way. If shorter, keep it. Repeat until no improvement."
+/>
+
+<Quiz
+  question="For metric TSP, what is the best polynomial-time approximation guarantee?"
+  options={[
+    { label: "A", text: "Within 2× optimal (MST doubling)" },
+    { label: "B", text: "Within 1.5× optimal (Christofides)" },
+    { label: "C", text: "Exactly optimal (no approximation needed)" },
+    { label: "D", text: "No constant factor guarantee exists" },
+  ]}
+  correctAnswer="B"
+  explanation="Christofides algorithm (MST + min-weight perfect matching on odd-degree vertices) guarantees a tour within 1.5× optimal for metric TSP."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Confusing TSP with shortest path**: TSP visits ALL cities. Shortest path (Dijkstra/A*) finds the best route between TWO cities. These are fundamentally different problems.
+
+2. **Thinking nearest neighbor always gives a good solution**: It can produce tours up to 50% longer than optimal. Always try multiple starting cities and apply improvement heuristics.
+
+3. **Forgetting the return edge**: A TSP tour is a cycle — you must return to the starting city. The cost includes the return trip.
+
+4. **Confusing symmetric and asymmetric TSP**: In symmetric TSP, the distance matrix is symmetric. In asymmetric TSP (like airfares), going A→B may cost differently than B→A. Different algorithms apply.
+
+5. **Not understanding why TSP is hard**: It's not hard because we don't know how to solve it — we can solve it exactly. It's hard because the number of possible tours grows as $n!$, making exact solutions infeasible for large $n$.
+</Accordion>

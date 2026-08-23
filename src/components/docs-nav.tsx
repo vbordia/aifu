@@ -53,6 +53,7 @@ function useActiveConcept() {
   return {
     concept: match ? `${match[1]}/${match[2]}` : null,
     lecture: pathname.match(/^\/lectures\/([^/]+)/)?.[1] ?? null,
+    quiz: pathname.startsWith("/quiz"),
   };
 }
 
@@ -360,6 +361,21 @@ export default function DocsNav({
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroup>
+
+          <SidebarGroup className="px-2">
+            <GroupLabel>Practice</GroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={active.quiz}
+                  className="gap-2.5 px-2 text-[13px]"
+                  render={<Link href="/quiz" />}
+                >
+                  <span className="truncate">Question Papers</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
 

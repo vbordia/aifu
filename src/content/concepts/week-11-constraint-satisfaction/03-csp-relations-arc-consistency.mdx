@@ -1,0 +1,110 @@
+---
+title: "CSP Relations and Arc/Path Consistency"
+short: "Arc/Path Consistency"
+order: 3
+category: "Week 11 — Constraint Satisfaction"
+categoryOrder: 11
+description: "From math definitions to pruning power — compute R_AC from mod constraints, then enforce arc and path consistency like the papers demand"
+tags: [csp, arc-consistency, path-consistency, relations]
+week: 11
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+A **binary CSP** has variables with **domains** and **relations** (allowed tuples) for each constrained pair.
+
+- Relation `R_AC` = set of pairs `(a,c)` that satisfy constraint between A and C
+- **Arc consistent** = for every value in every domain, there exists a compatible value in each neighbor's domain
+- **Path consistent** = for every pair of values, there exists a middle value completing the path
+
+<Callout type="tip" title="Remember This">
+Arc consistency prunes domains (values). Path consistency prunes relations (tuples).
+</Callout>
+
+## Computing Relations from Math Constraints (26T1 Papers)
+
+Domains: $D_A=D_B=D_C=\{1,2,3,4\}$
+
+### Example 1: $R_{AC}: A = \text{mod}(2C, 3)$
+
+For each $C$, compute $2C \mod 3$, then find matching $A$:
+
+| $C$ | $2C$ | $2C \mod 3$ | Allowed $A$ | Tuples |
+|---|---|---|---|---|
+| 1 | 2 | 2 | 2 | (2,1) |
+| 2 | 4 | 1 | 1 | (1,2) |
+| 3 | 6 | 0 | — (0 not in domain!) | none |
+| 4 | 8 | 2 | 2 | (2,4) |
+
+So $R_{AC} = \{(1,2), (2,1), (2,4)\}$ — matches answer `A,B,C`.
+
+### Example 2: $R_{BA}: B = \text{mod}(3A,4)$ (26T1 AN)
+
+| $A$ | $3A \mod 4$ | $B$ | Tuple |
+|---|---|---|---|
+| 1 | 3 | 3 | (3,1) |
+| 2 | 2 | 2 | (2,2) |
+| 3 | 1 | 1 | (1,3) |
+| 4 | 0 | 0 not in domain | none |
+
+$R_{BA}=\{(3,1),(2,2),(1,3)\}$ — tuples are $(B,A)$ order!
+
+**Crucial**: Tuple order matches relation name: $R_{AC}$ tuples are $(A,C)$, $R_{BA}$ are $(B,A)$.
+
+## Arc Consistency
+
+A CSP is **arc consistent** iff for every arc $X→Y$, every $x \in D_X$ has some $y \in D_Y$ with $(x,y) \in R_{XY}$.
+
+Check each $x$: if no supporting $y$, delete $x$ from $D_X$ and re-queue neighbors.
+
+### Is Our Example Arc-Consistent?
+
+$R_{AC}=\{(1,2),(2,1),(2,4)\}$:
+
+- $A=3$: No support in $R_{AC}$ → **Remove 3** from $D_A$
+- $A=4$: No support → **Remove 4**
+- $C=3$: No $A$ with $(A,3) \in R_{AC}$ → Remove 3 from $D_C$
+
+After pruning, papers answer: **Not arc-consistent (No)**. After making it arc-consistent, re-check path consistency.
+
+## Path Consistency
+
+For every pair $(X,Y)$ and every tuple $(x,y) \in R_{XY}$, there must exist $z \in D_Z$ such that $(x,z) \in R_{XZ}$ and $(z,y) \in R_{ZY}$.
+
+After arc pruning, 26T1 papers find **it IS path consistent**. Hence solution exists: e.g., $A=2, B=2, C=1$ (AN) or $A=2,B=4,C=1$ (FN).
+
+## Constraint Graph
+
+- Nodes = variables, edges = constrained pairs (triangle A-B-C)
+- Triangle is cyclic — but path consistency still applies (contrary to distractor "does not apply because cycle").
+
+<Quiz
+  question="R_AC tuples are ordered as..."
+  options={[
+    { label: "A", text: "(C,A)" },
+    { label: "B", text: "(A,C) — first variable first" },
+    { label: "C", text: "Alphabetical regardless" },
+    { label: "D", text: "Random" },
+  ]}
+  correctAnswer="B"
+  explanation="Relation name encodes order: R_AC contains (A,C) pairs. R_BA contains (B,A) pairs."
+/>
+
+<Quiz
+  question="Arc consistency removes..."
+  options={[
+    { label: "A", text: "Entire variables" },
+    { label: "B", text: "Domain values that have no supporting value in a neighbor" },
+    { label: "C", text: "All tuples unconditionally" },
+    { label: "D", text: "The constraint graph" },
+  ]}
+  correctAnswer="B"
+  explanation="For each arc X→Y, every x needs a witness y. No witness → delete x."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Mod with 0 remainder**: Domain is 1-4, so mod result 0 has no support — that C value prunes.
+2. **Tuple order**: R_BA is (B,A), not (A,B).
+3. **Arc vs path**: Arc prunes domains, path prunes relations. Question 9.4 says make it arc-consistent, THEN check path — do sequentially.
+</Accordion>

@@ -1,0 +1,124 @@
+---
+title: "Rete Algorithm — Conflict Sets and Resolution"
+short: "Rete Algorithm"
+order: 1
+category: "Week 10 — Rule-Based Systems"
+categoryOrder: 10
+description: "How expert systems match thousands of rules efficiently — alpha nets, beta nets, timestamps, and why specificity beats recency (or vice versa)"
+tags: [rete, expert-systems, conflict-set, specificity, recency]
+week: 10
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+A rule-based expert system has **rules** like `IF Fuel=diesel AND BoM=crankshaft THEN R1` and a **working memory (WM)** of facts with timestamps (101, 102, …).
+
+Naively, each cycle you'd test every rule against every fact → $O(R·W^k)$. **Rete (Forgy 1982)** compiles rules into a network so WM changes only trickle through affected paths.
+
+- **Alpha net**: filters single WMEs by condition (e.g., `CLASS=Fuel`, `type=diesel`)
+- **Beta net**: joins WMEs that share a variable binding (e.g., both `^item` = same machine)
+- **Conflict set**: all fully-matched **rule-data tuples** ready to fire
+
+Then a **conflict resolution strategy** picks one tuple to fire.
+
+<Callout type="tip" title="Remember This">
+Alpha = one-fact filter. Beta = multi-fact join (shared variable). Conflict set = Beta outputs that match a rule. Strategy picks the winner.
+</Callout>
+
+## Network Structure (from Papers)
+
+Example from 26T1 FN (mushroom Rete):
+
+```
+WME → A1: CLASS=Cap → A4: specimen=&lt;n&gt; → A7: surface=SMOOTH → A14: colour=RED → B2 → R3
+                → A8: colour=WHITE ──┘
+      A2: CLASS=Stalk → A5 → A9: root=BULBOUS → B1 → R1
+                            → A10: br-surface=SCALY ─→ B1
+      A3: CLASS=Mushroom → A6 → A11: habitat=LEAVES etc → B3 → R4
+```
+
+Timestamps matter: WME 101 is older than 107. Assume WMEs reside at appropriate Alpha nodes; Beta nodes point to WMEs in Alphas.
+
+## Step-by-Step: Building the Conflict Set
+
+Given WM:
+
+```
+101. (Fuel ^item machine5 ^type diesel)
+102. (Fuel ^item machine2 ^type petrol)
+103. (Fuel ^item machine3)
+104. (Power ^item machine4 ^lines 1)
+105. (BoM ^item machine4 ^part armature)
+...
+```
+
+1. Route each WME down Alpha: 101 → Fuel+diesel branch, 105 → BoM+armature, etc.
+2. At each Beta, check shared `^item` equality: does Fuel and BoM refer to same machine?
+   - 101 (^item machine5) + 106 (^item machine3) → **different** → no join
+   - 104 (^item machine4) + 105 (^item machine4) → **same** → joins
+3. Those that survive all Betas for a rule = one entry in conflict set, e.g., `R6,104,105`.
+
+## Conflict Resolution Strategies
+
+Papers test two strategies every year:
+
+| Strategy | Picks... | Intuition | Example Winner |
+|---|---|---|---|
+| **Specificity** | Tuple with **most conditions** (most specific rule) | Prefer detailed knowledge over general | `R1,101,107` (3 refs) beats `R2,107` (1 ref) |
+| **Recency** | Tuple containing the **newest WME** (highest timestamp) | Prefer recent data (like stack) | `R1,101,107` has max 107 vs `R6,104,105` max 105 → R1 wins |
+
+**Tie-breakers**: within same specificity/recency, papers use **label ordering** (R1 before R7) or timestamp ordering.
+
+### Worked Example: 22T3 FN Q10
+
+WM max timestamp = 107. Conflict set includes: `R1,101,107` (max 107), `R2,107` (107), `R6,104,105` (105), `R7,105` (105), `R7,106` (106).
+
+- Specificity: Count WMEs per tuple: R1 has 2, R6 has 2, R7 has 1 → R1 and R6 tie → label order picks **R1,101,107**.
+- Recency: Highest timestamp in each tuple: R1=107, R2=107, R7,106=106... R1 and R2 tie on 107 → specificity tie-break again → **R1,101,107** (both strategies converge here; not always).
+
+Contrast with 23T1 FN Q6: WM up to 105, conflict set `F1-Car,104,107,109` (recency max 109) wins Recency, but Specificity picks `Truck,101,102,105` (most conditions) — they diverge!
+
+<Quiz
+  question="A Beta node in Rete checks..."
+  options={[
+    { label: "A", text: "Whether a single WME matches a pattern" },
+    { label: "B", text: "Whether multiple WMEs share a variable binding (e -^item equality)" },
+    { label: "C", text: "Whether a rule should fire" },
+    { label: "D", text: "Timestamps are sorted" },
+  ]}
+  correctAnswer="B"
+  explanation="Alpha filters one WME; Beta joins two or more WMEs on a shared variable (e.g., same ^item or ^specimen). Rule fires only after all Betas pass."
+/>
+
+<Quiz
+  question="Specificity prefers..."
+  options={[
+    { label: "A", text: "Newest timestamp" },
+    { label: "B", text: "Fewest conditions" },
+    { label: "C", text: "Most conditions / most specific rule-data tuple" },
+    { label: "D", text: "Smallest rule label" },
+  ]}
+  correctAnswer="C"
+  explanation="More conditions = more specific knowledge. Specificity counts WMEs/conditions in tuple. Recency counts max timestamp."
+/>
+
+<Quiz
+  question="If conflict set has R1,101,107 (max 107) and R7,106 (max 106), Recency picks..."
+  options={[
+    { label: "A", text: "R7,106 (older is better)" },
+    { label: "B", text: "R1,101,107 (higher max timestamp = more recent)" },
+    { label: "C", text: "Both equally" },
+    { label: "D", text: "Neither - need specificity" },
+  ]}
+  correctAnswer="B"
+  explanation="Recency maximizes the newest WME in tuple. 107 > 106, so R1 wins. If tie on max, use label order."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Alpha vs Beta confusion**: Alpha = single WME test; Beta = join. Questions ask "where does WME 105 reside?" → answer is an Alpha node label (e.g., A10), not Beta.
+2. **Shared variable miss**: Must check that `^item` or `^specimen` values match across WMEs in a Beta. Mismatched items → tuple never enters conflict set.
+3. **Specificity ≠ Recency**: Specificity counts rule conditions, Recency counts max timestamp. Papers deliberately include cases where they pick different winners — read the subquestion carefully.
+4. **Timestamp order matters**: WMEs are given in order (101 is oldest). Recency uses numeric max, not textual order.
+5. **Not-equal conditions (`<>`)**: Attribute exists AND value ≠ x. Students forget the existence check — e.g., `ar-colour <> BROWN` fails if ar-colour missing.
+</Accordion>

@@ -1,0 +1,412 @@
+file: 2025T3_AI_Search_Methods_for_Problem_Solving_FN.pdf
+year: 2025
+term: 3
+session: fn
+subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
+questions:
+- id: 1
+  type: comprehension
+  label: SEARCH
+  description: |
+    The figure shows a map on a uniform grid where each tile is 1x1 in size.
+    The start node is S and the goal node is G.
+    The MoveGen function returns nodes in alphabetical order.
+    Use Manhattan Distance as the heuristic function.
+
+    **Tie-breaker**: If several nodes have the same cost, use node labels to break the tie.
+
+    ```mermaid
+    graph TD
+        S((S)) ---|1| A((A))
+        S ---|4| B((B))
+        A ---|1| C((C))
+        A ---|2| D((D))
+        B ---|1| D
+        B ---|2| E((E))
+        C ---|1| F((F))
+        D ---|2| F
+        D ---|2| G((G))
+        E ---|1| G
+        F ---|1| G
+    ```
+  subquestions:
+  - sub_id: '1.1'
+    question_type: short_answer
+    question: |-
+      What is the path found by the Best First Search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z,G
+    correct_answer: S,B,D,G
+  - sub_id: '1.2'
+    question_type: short_answer
+    question: |-
+      What is the path found by A* search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z,G
+    correct_answer: S,A,D,G
+  - sub_id: '1.3'
+    question_type: short_answer
+    question: |-
+      What is the path found by Branch-and-Bound search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z,G
+    correct_answer: S,A,C,F,G
+  - sub_id: '1.4'
+    question_type: multiple_choice
+    question: For the given map, which algorithm finds the shortest path from S to G?
+    options:
+      A: A* Search Algorithm
+      B: Branch-and-Bound Search Algorithm
+      C: Both A* and Branch-and-Bound Search Algorithms
+      D: None of these
+    correct_option: B
+  - sub_id: '1.5'
+    question_type: multiple_choice
+    question: Select the correct statement about the given graph.
+    options:
+      A: Heuristic is admissible.
+      B: Heuristic is not admissible.
+      C: Heuristic is admissible in some cases and not admissible in other cases.
+      D: There is not enough information to determine admissibility.
+    correct_option: B
+- id: 2
+  type: comprehension
+  label: 'GAMES: ALPHA-BETA'
+  description: |
+    Consider a game tree with the root node as MAX.
+    Alpha-Beta algorithm is in mid-flight currently processing a path from the root to a node labeled N.
+    The snapshot of evals of nodes along the current path is: 2, 14, 4, 10, N.
+    Where evals are restricted to EVEN NUMBERS greater than zero and less than 15.
+  subquestions:
+  - sub_id: '2.1'
+    question_type: short_answer
+    question: |-
+      Determine the eval of node N that will induce a cutoff to prune its siblings.
+
+      Enter an even number.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 16
+    correct_answer: '2'
+  - sub_id: '2.2'
+    question_type: multiple_choice
+    question: What type of cut-off is induced by the eval selected for N?
+    options:
+      A: Alpha Cutoff
+      B: Beta Cutoff
+      C: Alpha-Beta Cutoff
+      D: None of these
+    correct_option: A
+- id: 3
+  type: comprehension
+  label: 'GAMES: SSS STAR'
+  description: |
+    The figure shows a game tree with evaluation function values at the horizon nodes.
+    The horizon nodes are labeled from A to D.
+    Use these labels to enter a horizon node or a list of horizon nodes in short answers.
+
+    **Tie-breaker**:
+    When several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+    Run SSS* algorithm on the game tree, then answer the sub-questions.
+
+    ```mermaid
+    graph TD
+        Root[Root] --- L(( ))
+        Root --- R(( ))
+        L --- L1[ ]
+        L --- L2[ ]
+        R --- R1[ ]
+        R --- R2[ ]
+        L1 --- A(("A: 11"))
+        L2 --- B(("B: 70"))
+        R1 --- C(("C: 48"))
+        R2 --- D(("D: 54"))
+    ```
+  subquestions:
+  - sub_id: '3.1'
+    question_type: short_answer
+    question: |-
+      List the horizon nodes assigned SOLVED status by SSS* algorithm, then enter the labels of those nodes in the textbox, or enter NIL if no nodes are assigned SOLVED status.
+
+      Enter node labels as a comma separated list in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,B,C,D
+  - sub_id: '3.2'
+    question_type: short_answer
+    question: |-
+      List the horizon nodes pruned by SSS* algorithm, i.e., horizon nodes removed from the queue by MAX-ancestor. Enter the labels of those nodes in the textbox, or enter NIL if no nodes are pruned.
+
+      Enter node labels as a comma separated list in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,C,D
+- id: 4
+  type: comprehension
+  label: PROBLEM DECOMPOSITION
+  description: |
+    The figure shows an AND-OR decomposition of problem S into smaller problems.
+    The nodes are uniquely identified by labels (S, A, B, C, …).
+
+    Each node shows the heuristic estimate of the cost of solving that node.
+    Nodes shown in double lines are primitive nodes and their values are actual costs.
+
+    A primitive node is added to the graph, with SOLVED status, when its parent is expanded. And therefore, a primitive node is never expanded.
+
+    The cost of each edge is 2 units.
+
+    **Tie-breaker 1**: If several nodes have the same cost then break the tie using node labels.
+    **Tie-breaker 2**: For AND nodes, select the unsolved branch with the highest cost.
+
+    Use AO* algorithm to solve S, then answer the sub-questions.
+
+    ```mermaid
+    graph TD
+        S((S: 10)) --- A((A: 30))
+        S --- B((B: 6))
+        S --- C((C: 12))
+        A --- D((D: 10))
+        A --- E((E: 4))
+        A --- I[[I: 4]]
+        E --- H[[H: 2]]
+        E --- I
+        B --- F((F: 1))
+        B --- G((G: 3))
+        F --- J[[J: 6]]
+        G --- J
+        G --- K[[K: 8]]
+        C --- K
+        C --- L[[L: 2]]
+    ```
+  subquestions:
+  - sub_id: '4.1'
+    question_type: short_answer
+    question: |-
+      List the nodes expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: S,C,B,G
+  - sub_id: '4.2'
+    question_type: short_answer
+    question: |-
+      For each node expanded by AO* algorithm, determine the value propagated to the start node S. Enter the values of S as a list.
+
+      Enter a comma separated list of numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12,42,17
+    correct_answer: 22,24,26,28
+  - sub_id: '4.3'
+    question_type: multiple_choice
+    question: What can you conclude about the given AND-OR decomposition?
+    options:
+      A: The heuristic is admissible.
+      B: The heuristic is inadmissible.
+      C: The heuristic is sometimes admissible and sometimes inadmissible.
+    correct_option: B
+- id: 5
+  type: comprehension
+  label: RULE BASED EXPERT SYSTEMS
+  description: |
+    A Rete Net for classification of vehicles is shown in the figure. Labels A1, A2, A3, ..., A10, A11, A12, A13, ..., and B1, B2, B3 uniquely identify nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
+
+    The Working Memory contains the following WMEs uniquely identified by timestamps (sequence numbers). Assume that WMEs reside in the appropriate Alpha node, and Beta nodes simply point to WMEs in the Alpha nodes.
+
+    101. (Cargo ^vin A1 ^bed flat)
+    102. (Passenger ^vin A1 ^limit 2)
+    103. (Passenger ^vin B2 ^limit 8)
+    104. (Passenger ^vin C3 ^limit 2)
+    105. (Power ^vin A1 ^hp 400)
+    106. (Power ^vin B2 ^hp 250)
+    107. (Power ^vin C3 ^hp 900)
+    108. (Wheel ^vin B2 ^tyre regular)
+    109. (Wheel ^vin C3 ^tyre regular)
+
+    For each WME identify its location (node label) in the Rete Net, then prepare the conflict set for the first Match-Resolve-Execute cycle, then answer the sub-questions.
+  subquestions:
+  - sub_id: '5.1'
+    question_type: multiple_select
+    question: Which of the following rule-data tuples occur in the conflict set?
+    options:
+      A: Luxury-Car,104,107
+      B: Minivan,103,106
+      C: Truck,101,102,105
+      D: Minivan,103,106,108
+    correct_options:
+    - A
+    - B
+    - C
+  - sub_id: '5.2'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Specificity for conflict resolution then which rule-data tuple will fire in the first round?
+    options:
+      A: Luxury-Car,104,107
+      B: Minivan,103,106
+      C: Truck,101,102,105
+      D: Minivan,103,106,108
+    correct_option: C
+  - sub_id: '5.3'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Recency for conflict resolution which rule-data tuple will fire in the first round?
+    options:
+      A: Luxury-Car,104,107
+      B: Minivan,103,106
+      C: Truck,101,102,105
+      D: Minivan,103,106,108
+    correct_option: A
+- id: 6
+  type: comprehension
+  label: AUTOMATED PLANNING 1
+  description: |
+    Answer the subquestions related to automated planning and planning graph representations.
+  subquestions:
+  - sub_id: '6.1'
+    question_type: multiple_choice
+    question: Consider actions a and b and two feasible orderings (a then b) and (b then a). Which of the following conditions will produce different outcomes for each ordering?
+    options:
+      A: P is in pre(a) and also in del-effects(b).
+      B: P is in add-effects(a) and also in del-effects(b).
+      C: None of these.
+    correct_option: B
+  - sub_id: '6.2'
+    question_type: multiple_select
+    question: In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ .
+    options:
+      A: if P in pre(a) and Q in pre(b) are mutex
+      B: if P is in pre(a), in del-effects(a), in pre(b) and also in del-effects(b)
+      C: if P is in pre(a) and also in del-effects(b)
+      D: if P is in add-effects(a) and also in del-effects(b)
+    correct_options:
+    - A
+    - B
+    - C
+    - D
+  - sub_id: '6.3'
+    question_type: multiple_choice
+    question: In planning graphs constructed by GraphPlan, propositions P and Q in layer n are mutex __________ .
+    options:
+      A: if every action pair (a,b) with P in add-effects(a) and Q in add-effects(b) in layer n is mutex
+      B: if at least one action pair (a,b) with P in add-effects(a) and Q in add-effects(b) in layer n is mutex
+      C: none of these
+    correct_option: A
+- id: 7
+  type: comprehension
+  label: AUTOMATED PLANNING 2
+  description: |
+    The domain description of a Blocks World with a single one-armed robot is given below.
+
+    **PREDICATES**
+    - `armEmpty`: The arm is not holding any block, it is empty.
+    - `holding(X)`: The arm is holding X.
+    - `onTable(X)`: X is on the table.
+    - `clear(X)`: X has nothing above it, it is clear.
+    - `on(X,Y)`: X is directly placed on Y.
+
+    **OPERATORS**
+    - `Pickup(X)`: pick up X from the table.
+      - Preconditions: { `armEmpty`, `clear(X)`, `onTable(X)` }
+      - Add Effects: { `holding(X)` }
+      - Del Effects: { `armEmpty`, `onTable(X)` }
+    - `Putdown(X)`: place X on the table.
+      - Preconditions: { `holding(X)` }
+      - Add Effects: { `armEmpty`, `onTable(X)` }
+      - Del Effects: { `holding(X)` }
+    - `Unstack(X,Y)`: pick up X that is directly sitting on Y.
+      - Preconditions: { `armEmpty`, `clear(X)`, `on(X,Y)` }
+      - Add Effects: { `clear(Y)`, `holding(X)` }
+      - Del Effects: { `armEmpty`, `on(X,Y)` }
+    - `Stack(X,Y)`: place X directly on top of Y.
+      - Preconditions: { `holding(X)`, `clear(Y)` }
+      - Add Effects: { `armEmpty`, `on(X,Y)` }
+      - Del Effects: { `holding(X)`, `clear(Y)` }
+
+    **NOTE**: variables X and Y must bind to different objects
+
+    The GraphPlan algorithm is in mid-flight solving a planning problem, from the planning graph two consecutive propositional layers (layer k and k+1) are presented.
+
+    Both proposition layers are fully populated (no missing propositions).
+    Mutex proposition pairs in layer k are:
+    `(on(A,B), holding(A))`, `(on(A,B), clear(B))`, `(armEmpty, clear(B))`, `(armEmpty, holding(A))`.
+
+    Populate the action layer and mutex links, then answer the sub-questions.
+  subquestions:
+  - sub_id: '7.1'
+    question_type: multiple_choice
+    question: What can you conclude about layer k?
+    options:
+      A: Layer k describes the start state of the planning problem.
+      B: Layer k cannot describe the start state of the planning problem.
+      C: There is insufficient information to comment on layer k.
+    correct_option: B
+  - sub_id: '7.2'
+    question_type: multiple_select
+    question: Which of the following are applicable actions in layer k+1?
+    options:
+      A: Putdown(A)
+      B: Stack(A,B)
+      C: Unstack(A,B)
+      D: Unstack(B,C)
+    correct_options:
+    - A
+    - B
+    - C
+  - sub_id: '7.3'
+    question_type: multiple_select
+    question: Which of the following are mutex pairs in layer k+1?
+    options:
+      A: Putdown(A) and Stack(A,B)
+      B: Stack(A,B) and Unstack(A,B)
+      C: nop-3 and nop-4
+    correct_options:
+    - A
+    - B
+    - C
+  - sub_id: '7.4'
+    question_type: multiple_choice
+    question: armEmpty and clear(B) in layer k+1 are non mutex because __________ .
+    options:
+      A: nop-3 and nop-4 are non mutex
+      B: PutDown(A) and nop-4 are non mutex
+      C: None of these
+    correct_option: B
+- id: 8
+  type: comprehension
+  label: CONSTRAINT SATISFACTION
+  description: |
+    Consider a CSP over 3 variables A, B, C (processed in that order) with domains and constraints as shown below.
+
+    $D_A = D_B = D_C = \{1, 2, \dots, 9\}$
+    $R_{AB} = \{(2, 6), (3, 5)\}$
+    $R_{AC} = \{(2, 7), (2, 8)\}$
+    $R_{BC} = \{(4, 7), (5, 7), (6, 8)\}$
+
+    Draw the constraint graph and matching-diagram then answer the sub-questions.
+  subquestions:
+  - sub_id: '8.1'
+    question_type: multiple_choice
+    question: Is the given CSP arc consistent?
+    options:
+      A: 'Yes'
+      B: 'No'
+      C: Cannot be determined
+    correct_option: B
+  - sub_id: '8.2'
+    question_type: multiple_choice
+    question: If the given CSP is not already arc consistent, make it arc consistent, then check if it is path consistent.
+    options:
+      A: It is path consistent.
+      B: It is not path consistent.
+      C: Path consistency does not apply because the constraint graph is cyclic.
+    correct_option: A
+  - sub_id: '8.3'
+    question_type: short_answer
+    question: |-
+      Does the given CSP have a solution? Enter the solution for the variables A,B,C as a comma separated list. Enter NIL if there is no solution.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 1,2,3
+    correct_answer: 2,6,8

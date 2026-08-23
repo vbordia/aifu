@@ -1,0 +1,111 @@
+---
+title: "Genetic Algorithms for TSP — Representations and Crossover"
+short: "GA Crossovers for TSP"
+order: 5
+category: "Week 4 — Local Search"
+categoryOrder: 4
+description: "Why naive crossover breaks tours — cycle crossover, PMX, order crossover, adjacency encoding, and the ordinal trick that makes any cut safe"
+tags: [ga-tsp, cycle-crossover, pmx, order-crossover, ordinal-representation]
+week: 4
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+Applying GA to TSP breaks immediately: a tour is a **permutation**, and swapping segments between two permutations usually produces invalid children (repeated or missing cities). The fixes come in two flavors:
+
+1. Keep the natural **path representation** but invent permutation-safe crossovers (CX, PMX, OX)
+2. Change the **encoding** so standard crossover just works (adjacency, ordinal)
+
+<Callout type="tip" title="Remember This">
+Path + CX/PMX/OX = valid-by-construction crossovers. Ordinal representation = make plain single-point crossover safe. Adjacency = fast next-city lookup but some strings aren't tours.
+</Callout>
+
+## Path Representation & Permutation-Safe Crossovers
+
+Tour written as visit order: `C A B D` means C→A→B→D→C.
+
+### Cycle Crossover (CX)
+
+Find "cycles" of positions where the two parents' cities loop into each other: if position 1 holds O in P1 and A in P2, and some later position holds A in P1 and O in P2, those two positions form a cycle — following the swap from one returns you to the other.
+
+- Child 1 takes **odd cycles** from P1, even cycles from P2
+- Child 2 gets the opposite
+- Every city appears exactly once by construction ✓
+
+### Partially Mapped Crossover (PMX)
+
+1. Copy a contiguous subtour from P1 into C1
+2. For each conflicting remaining position, follow the partial mapping (P1-city ↔ P2-city) until an open slot is found
+3. Unconflicting cities copied straight from P2
+
+### Order Crossover (OX)
+
+1. Copy a subtour from P1 into C1
+2. Fill remaining positions with P2's cities **in the order they appear in P2**, skipping duplicates
+
+Preserves relative ordering information from P2.
+
+## Adjacency Representation
+
+Index cities alphabetically; value at position i = the city visited **after** i.
+
+- Tour A→H→K stores H at index A, K at index H.
+- Pro: next-city lookup is O(1); heuristic crossover ("take whichever parent's edge is shorter") is natural
+- Con: not every string decodes to one complete tour — premature small cycles can appear; alternating-edges crossover needs repair
+
+## Ordinal Representation — The Clever One
+
+Invented precisely so that **plain single-point crossover always yields a valid tour**.
+
+Encode: keep an index list of remaining cities in alphabetical order. Walk the tour; at each step record the *current index* of the visited city, then remove it from the list.
+
+Tour `O D G ...`:
+1. Index `[A,B,C,...]`: O sits at position 15 → write 15, remove O
+2. Next D: now at position 4 → write 4, remove D
+3. Next G: position 6 → write 6, remove G
+4. Continue; final city always writes 1
+
+Resulting sequence decreases toward 1. Any single-point crossover over two such sequences still decodes to a valid permutation — no repair needed.
+
+<Callout type="warning" title="Tradeoff">
+Encoding/decoding is more work, and ordinal numbers don't correspond to cities intuitively — harder to reason about what crossover does to tour structure.
+</Callout>
+
+## Comparison
+
+| Representation | Standard 1-point crossover? | Notes |
+|----------------|----------------------------|-------|
+| Path + CX / PMX / OX | ✗ (needs special operators) | preserves subtours / relative order |
+| Adjacency | ✗ | O(1) lookup; risk of sub-cycles |
+| **Ordinal** | **✓ safe by design** | encode/decode overhead |
+
+<Quiz
+  question="Why does single-point crossover fail on path-represented TSP tours?"
+  options={[
+    { label: "A", text: "It produces too-short tours" },
+    { label: "B", text: "Swapped tails duplicate some cities and drop others, breaking the permutation" },
+    { label: "C", text: "It reverses tour direction" },
+    { label: "D", text: "It only works on symmetric matrices" },
+  ]}
+  correctAnswer="B"
+  explanation="Permutations require every city exactly once; blind tail-swapping violates that. Hence CX/PMX/OX or re-encoding."
+/>
+
+<Quiz
+  question="The ordinal representation's key property is..."
+  options={[
+    { label: "A", text: "fastest next-city lookup" },
+    { label: "B", text: "any single-point crossover of two ordinals decodes to a valid tour" },
+    { label: "C", text: "it encodes edge weights directly" },
+    { label: "D", text: "it requires mutation" },
+  ]}
+  correctAnswer="B"
+  explanation="By recording indices into a shrinking alphabetical list, every resulting sequence is itself a valid ordinal — crossover safety by construction."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Mixing up CX and OX**: CX alternates whole cycles between parents; OX copies one segment then preserves P2's ORDER for the rest. PMX resolves conflicts via the partial mapping.
+2. **Adjacency validity**: adjacency strings are not all tours — a child containing a short cycle (A→B→A) is invalid and needs repair.
+3. **Ordinal decode direction**: remember you REMOVE each city as you go — later indices shrink accordingly.
+</Accordion>

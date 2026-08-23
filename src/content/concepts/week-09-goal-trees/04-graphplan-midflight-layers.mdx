@@ -1,0 +1,125 @@
+---
+title: "GraphPlan Mid-Flight Layer Reasoning"
+short: "Mid-Flight Layers"
+order: 4
+category: "Week 9 — Goal Trees"
+categoryOrder: 9
+description: "Given layers k and k+1 mid-planning-graph — can layer k be a state? Which actions apply next? Why are two facts (non-)mutex? The 25T3 question family"
+tags: [graphplan, planning-graph, mutex-propagation, noop-actions]
+week: 9
+difficulty: advanced
+---
+
+## The Simplest Explanation
+
+2025 papers stopped asking only about Layer 1 from the start state. Now they hand you a planning graph **mid-flight** — layers `k` and `k+1` already populated with facts, actions, and mutex pairs — and test whether you understand the *machinery*:
+
+1. **Can layer k be the start state?**
+2. **Which actions become applicable in layer k+1?**
+3. **Which pairs are mutex in layer k+1 — and WHY?**
+
+<Callout type="tip" title="Remember This">
+A real state can never contain two mutex facts (they'd have to be simultaneously true and provably incompatible). And mutexes propagate forward through ALL producer pairs — including no-ops.
+</Callout>
+
+## Question 1 — Can layer k be the start state?
+
+**Rule**: $P_0$ (start layer) is a *single reachable state* — every fact in it holds simultaneously. By definition of mutex ("can never co-occur"), **any layer containing even one mutex pair cannot be a genuine state**, so it cannot be $P_0$.
+
+Worked check (25T3 FN Q7.1): layer k contains mutex pairs `(on(A,B), holding(A))`, `(armEmpty, clear(B))`, … Since e.g. a block can't be both on A and held by the arm, these facts can't co-exist in one state → layer k is NOT the start state. Answer: **No**.
+
+## Question 2 — Applicable actions in layer k+1
+
+An action appears in $A_{k+1}$ iff **all its preconditions are present AND pairwise non-mutex in layer k**.
+
+Blocks World checks (given layer-k facts):
+
+| Action | Preconditions present? | Any mutex among them? | In $A_{k+1}$? |
+|--------|----------------------|----------------------|---------------|
+| Stack(A, B) | holding(A) ✓, clear(B) ✓ | holding(A) ⊕ clear(B)? not mutex here ✓ | Yes |
+| Unstack(x,y) | needs on(x,y) ∧ clear(x) ∧ armEmpty | on(A,B) ⊕ holding(A) irrelevant; check actual combo | depends |
+| Pickup(C) | needs onTable(C) — absent from layer k | — | **No** (fact missing beats everything) |
+
+Two independent rejection reasons: fact simply absent, or facts present-but-mutex.
+
+## Question 3 — Mutex propagation into layer k+1
+
+Propositions p, q are mutex in $P_{k+1}$ iff **every** pair of their producers is mutex in $A_{k+1}$. Producers include the **no-ops**. Three sources of producer-pair mutex:
+
+| Source | Example |
+|--------|---------|
+| **nop–nop inheritance** | if p ⊕ q mutex at layer k, then nop(p) ⊕ nop(q) mutex at $A_{k+1}$ |
+| **nop–action interference** | action deletes p, while nop(p) persists p → they conflict |
+| **action–action** | inconsistent effects / interference / competing needs |
+
+### Why would two facts be NON-mutex in k+1?
+
+Exhibit **one** surviving producer pair. Classic justification (25T3 Q7.4): `armEmpty` and `clear(B)` are non-mutex in layer k+1 because
+
+- nop(armEmpty) exists,
+- some action adding clear(B) (e.g., Unstack(D,A) adds Clear(A)-type facts… specifically any adder whose preconditions don't clash with ArmEmpty),
+- and that action–nop pair shares no deleted/precondition conflict → not mutex → the pair escapes mutex.
+
+One clean producer pair breaks the ALL quantifier.
+
+### Conversely — why HOLDING(A) ⊕ ARMEMPTY stays mutex in k+1
+
+Every producer pair is conflicted:
+- nop(holding(A)) vs nop(armEmpty): inherited mutex from layer k ✓
+- Stack(A,B) (deletes holding(A), adds armEmpty) vs either nop: interference/inconsistent-effects ✓
+- Any other action pair touching them likewise.
+
+ALL pairs fail → mutex. (The AN paper made this a multi-select: *all three* justification types were correct.)
+
+## Worked Mini-Trace
+
+Layer k facts: `{on(A,B), holding(A), clear(B), clear(D), on(D,C), armEmpty}` with known mutexes `(on(A,B),holding(A))`, `(armEmpty,clear(B))`.
+
+1. Start-state check: mutexes exist → not $P_0$.
+2. $A_{k+1}$ candidates: Stack(A,B) needs holding(A)+clear(B) — but those are **mutex** at layer k! → excluded by competing needs, despite both being individually present. Putdown(A) needs only holding(A) ✓ included. Unstack(D,A)? needs on(D,A) — absent → excluded.
+3. Propagation: `on(A,B)` and `clear(B)` stay mutex at k+1 via nop–nop inheritance (their layer-k mutex propagates).
+
+That triple rhythm — *state-check → applicability-with-mutex → propagation* — solves every subquestion.
+
+<Quiz
+  question="A planning-graph layer contains two facts marked mutex. This layer..."
+  options={[
+    { label: "A", text: "must be the start state P0" },
+    { label: "B", text: "cannot be a genuine state, hence cannot be P0" },
+    { label: "C", text: "is invalid and the graph is wrong" },
+    { label: "D", text: "must be the last layer" },
+  ]}
+  correctAnswer="B"
+  explanation="Mutex means 'cannot co-occur'. A state's facts all co-occur. So any mutex-bearing layer is a superset abstraction, not a single state."
+/>
+
+<Quiz
+  question="Facts p and q are NON-mutex in layer k+1 iff..."
+  options={[
+    { label: "A", text: "all their producer pairs are mutex" },
+    { label: "B", text: "at least ONE pair of producers (possibly nop–action) is non-mutex" },
+    { label: "C", text: "neither has a nop" },
+    { label: "D", text: "they appeared together in some earlier layer" },
+  ]}
+  correctAnswer="B"
+  explanation="Proposition mutex requires ALL producer pairs mutex. A single clean pair — often a nop plus an unrelated adder — breaks it."
+/>
+
+<Quiz
+  question="Action X's preconditions are all present in layer k, but two of them are mutex there. X..."
+  options={[
+    { label: "A", text: "appears in A(k+1) anyway" },
+    { label: "B", text: "is excluded — competing needs makes it mutex with itself's requirements" },
+    { label: "C", text: "appears only if it is a nop" },
+    { label: "D", text: "appears but is auto-pruned later" },
+  ]}
+  correctAnswer="B"
+  explanation="Applicability needs preconditions present AND pairwise non-mutex. Competing needs is one of the four action-mutex conditions."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Forgetting nops when counting producers**: every fact always has its nop producer. Skipping nop–nop inheritance misses the most common mutex source.
+2. **Confusing 'fact present' with 'action applicable'**: applicability also fails on mutex preconditions (competing needs) and on absent facts. Check all three.
+3. **Claiming non-mutex without exhibiting a producer pair**: the exam asks WHY — cite the specific surviving pair (usually nop + benign adder).
+4. **Assuming mutexes can appear spontaneously**: p,q non-mutex at k means their nops stay non-mutex forever — mutex sets only shrink across layers (monotonicity).
+</Accordion>

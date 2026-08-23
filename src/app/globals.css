@@ -223,6 +223,33 @@
   padding: 0 2rem;
 }
 
+.mermaid-fit {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.mermaid-fit svg {
+  max-width: none;
+  min-width: 480px;
+}
+
+.mermaid-fit::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mermaid-fit::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mermaid-fit::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.15);
+}
+
+.dark .mermaid-fit::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.15);
+}
 .mermaid-wide svg {
   max-width: none;
   min-width: 700px;

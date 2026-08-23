@@ -1,0 +1,443 @@
+file: 2024T2_AI_Search_Methods_for_Problem_Solving_AN.pdf
+year: 2024
+term: 2
+session: an
+subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
+questions:
+- id: 1
+  type: comprehension
+  label: SEARCH
+  description: |
+    The figure shows a map on a uniform grid where each tile is 1x1 in size.
+    The start node is S and the goal node is G.
+    The MoveGen function returns nodes in alphabetical order.
+    Use Manhattan Distance as the heuristic function.
+    **Tie-breaker**: If several nodes have the same cost, use node labels to break the tie.
+
+    Grid coordinates of nodes:
+    - S: (3, 0) $\implies h(S) = |3-2| + |0-9| = 10$
+    - E: (0, 2) $\implies h(E) = |0-2| + |2-9| = 9$
+    - F: (5, 2) $\implies h(F) = |5-2| + |2-9| = 10$
+    - D: (1, 6) $\implies h(D) = |1-2| + |6-9| = 4$
+    - C: (5, 6) $\implies h(C) = |5-2| + |6-9| = 6$
+    - B: (7, 7) $\implies h(B) = |7-2| + |7-9| = 7$
+    - A: (3, 7) $\implies h(A) = |3-2| + |7-9| = 3$
+    - G: (2, 9) $\implies h(G) = 0$
+
+    ```mermaid
+    graph TD
+        S((S)) ---|12| E((E))
+        S ---|8| F((F))
+        E ---|8| D((D))
+        F ---|12| D
+        F ---|8| C((C))
+        F ---|8| B((B))
+        D ---|8| A((A))
+        D ---|8| G((G))
+        C ---|4| A
+        C ---|8| B
+        A ---|4| G
+        B ---|12| G
+    ```
+  subquestions:
+  - sub_id: '1.1'
+    question_type: short_answer
+    question: |
+      What is the path found by the Best First Search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,E,D,G
+  - sub_id: '1.2'
+    question_type: short_answer
+    question: |
+      What is the path found by A* search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,F,C,A,G
+  - sub_id: '1.3'
+    question_type: short_answer
+    question: |
+      What is the path found by Branch-and-Bound search algorithm? Enter the path as a comma separated list of node labels.
+
+      Use the Branch-and-Bound variation that avoids cyclic expansions like S,A,S,A,S,A,...
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,F,C,A,G
+  - sub_id: '1.4'
+    question_type: multiple_select
+    question: For the given map, which algorithm finds the shortest path from S to G?
+    options:
+      A: Best First Search
+      B: A* Search Algorithm
+      C: Branch-and-Bound Search Algorithm
+      D: None of these.
+    correct_options:
+    - B
+    - C
+  - sub_id: '1.5'
+    question_type: multiple_choice
+    question: What can you say about the heuristic function for the given graph?
+    options:
+      A: Admissible.
+      B: Inadmissible.
+      C: Partly admissible and partly inadmissible.
+      D: Cannot be determined.
+    correct_option: A
+- id: 2
+  type: comprehension
+  label: TSP BRANCH-AND-BOUND
+  description: |
+    The TSP Branch-and-Bound algorithm is solving a TSP instance where the cities are A, B, C, ....
+    The Branch-and-Bound search tree at the time when the algorithm has discovered the optimal tour is shown below.
+
+    Each node in the search tree displays an edge (either XY or ~XY), a cost value, and a unique reference number (a1, b1, b2, c1, c2, c3, c4, d1, d2, d3, d4, e1, e2).
+    Use the reference numbers to break ties.
+
+    ```mermaid
+    graph TD
+        a1["a1: S0 (254)"] --> b1["b1: AC (254)"]
+        a1 --> b2["b2: ~AC (279)"]
+        b1 --> c1["c1: AD (302)"]
+        b1 --> c2["c2: ~AD (271)"]
+        c2 --> d1["d1: BD (271)"]
+        c2 --> d2["d2: ~BD (342)"]
+        d1 --> e1["e1: AB (282)"]
+        d1 --> e2["e2: ~AB (286)"]
+        b2 --> c3["c3: AD (279)"]
+        b2 --> c4["c4: ~AD (308)"]
+        c3 --> d3["d3: BD (300)"]
+        c3 --> d4["d4: ~BD (305)"]
+    ```
+  subquestions:
+  - sub_id: '2.1'
+    question_type: short_answer
+    question: |
+      Let S0 (ref. no. a1) be the first node to be refined, identify the next 4 nodes (2nd to 5th node) that are refined by the TSP Branch-and-Bound algorithm. Enter the nodes (node reference numbers) in the order they are refined.
+
+      Enter a comma separated list of node reference numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a9,b9,c9,d9
+    correct_answer: b1,c2,d1,b2
+  - sub_id: '2.2'
+    question_type: short_answer
+    question: |
+      Which node represents the optimal tour and what is the cost of the optimal tour? Enter the node reference number and the tour cost in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter a node reference number followed by tour cost, separated by comma.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a9,42
+    correct_answer: e1,282
+  - sub_id: '2.3'
+    question_type: short_answer
+    question: |
+      Determine the number of cities in the TSP instance. Enter the number of cities in the text box, or enter NIL if it is not possible to determine the number of cities.
+
+      Enter an integer.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '5'
+  - sub_id: '2.4'
+    question_type: short_answer
+    question: |
+      Start from city A, what is the path representation of the optimal tour? Enter the path representation in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter a comma separated list of cities (city labels).
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: A,X,Y
+    correct_answer: A,B,D,E,C
+- id: 3
+  type: comprehension
+  label: GAMES
+  description: |
+    The figure shows a game tree with evaluation function values at the leaf nodes.
+    The leaf nodes are labeled from A to K.
+    Use these labels to enter a leaf node or a list of leaf nodes in short answers.
+
+    **Tie-breaker**: when several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes.
+
+    ```mermaid
+    graph TD
+        Root["Root (MAX)"] --> L1_1["Min node 1"]
+        Root --> L1_2["Min node 2"]
+        Root --> L1_3["Min node 3"]
+
+        L1_1 --> A["A: 48"]
+        L1_1 --> L2_1["Max node 1"]
+        L2_1 --> B["B: 68"]
+        L2_1 --> C["C: 30"]
+
+        L1_2 --> D["D: 56"]
+        L1_2 --> L2_2["Max node 2"]
+        L2_2 --> E["E: 78"]
+        L2_2 --> F["F: 22"]
+
+        L1_3 --> G["G: 20"]
+        L1_3 --> L2_3["Max node 3"]
+        L2_3 --> L3_1["Min node 4"]
+        L2_3 --> L3_2["Min node 5"]
+
+        L3_1 --> H["H: 42"]
+        L3_1 --> I["I: 76"]
+        L3_2 --> J["J: 88"]
+        L3_2 --> K["K: 98"]
+    ```
+  subquestions:
+  - sub_id: '3.1'
+    question_type: multiple_select
+    question: Which of the following is a strategy for the MAX player?
+    options:
+      A: A,C
+      B: A,D,G
+      C: G,J,K
+      D: D,E,F
+    correct_options:
+    - A
+    - C
+  - sub_id: '3.2'
+    question_type: short_answer
+    question: |
+      List the leaf nodes in the best strategy for MAX. Enter the node labels in alphabetical order.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: D,E
+  - sub_id: '3.3'
+    question_type: short_answer
+    question: |
+      List the leaf nodes pruned by Alpha-Beta.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: C,F,H,I,J,K
+  - sub_id: '3.4'
+    question_type: short_answer
+    question: |
+      List the leaf nodes solved (assigned SOLVED status) by SSS*.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,D,E,G
+- id: 4
+  type: comprehension
+  label: PROBLEM DECOMPOSITION
+  description: |
+    The figure shows an AND-OR graph that depicts how a problem S can be decomposed into one or more smaller problems.
+    Nodes are uniquely identified by labels (S, A, B, ...). The number in each node is the heuristic estimate of the cost of solving that node.
+
+    Nodes shown in double lines are primitive nodes and their values are actual costs.
+    Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as SOLVED and it will not be expanded subsequently.
+
+    The cost of each edge is 2 units.
+
+    **Tie-breaker 1**: If several nodes have the same cost then break the tie using node labels.
+    **Tie-breaker 2**: For AND nodes, select the unsolved branch having the highest cost.
+
+    ```mermaid
+    graph TD
+        S((S: 10)) --> A((A: 10))
+        S --> B((B: 10))
+        S --> C((C: 14))
+        A --> D[["D (primitive): 30"]]
+        A --> E[["E (primitive): 20"]]
+        B --> E
+        B --> F[["F (primitive): 16"]]
+        C --> F
+        C --> G[["G (primitive): 18"]]
+    ```
+  subquestions:
+  - sub_id: '4.1'
+    question_type: short_answer
+    question: |
+      List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: S,A,C
+  - sub_id: '4.2'
+    question_type: short_answer
+    question: |
+      Determine the value of the start node S after each node is expanded. What are the values of S after the 1st, 2nd and 3rd nodes are expanded, respectively? Enter the 3 values in the textbox.
+
+      Enter a comma separated list of numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12,42,17
+    correct_answer: 28,32,56
+  - sub_id: '4.3'
+    question_type: short_answer
+    question: |
+      What is the final value of the start node S?
+
+      Enter a number.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '56'
+- id: 5
+  type: comprehension
+  label: RULE BASED EXPERT SYSTEMS
+  description: |
+    A Rete Net for classification of machines is shown.
+    Labels A1 to A14 and B1 to B3 identify nodes in the network.
+
+    Working Memory Elements (WMEs) in timestamp order:
+    101. (Cargo ^vin A1 ^bed flat)
+    102. (Passenger ^vin A1 ^limit 2)
+    103. (Passenger ^vin B2 ^limit 8)
+    104. (Passenger ^vin C3 ^limit 2)
+    105. (Power ^vin A1 ^hp 400)
+    106. (Power ^vin B2 ^hp 250)
+    107. (Power ^vin C3 ^hp 900)
+    108. (Wheel ^vin B2 ^tyre regular)
+    109. (Wheel ^vin C3 ^tyre regular)
+  subquestions:
+  - sub_id: '5.1'
+    question_type: multiple_select
+    question: Which of the following rule-data tuples are in the conflict-set?
+    options:
+      A: Luxury-Car,104,107
+      B: Minivan,103,106
+      C: Truck,101,102,105
+      D: Minivan,103,106,108
+    correct_options:
+    - A
+    - B
+    - C
+  - sub_id: '5.2'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+    options:
+      A: Luxury-Car,104,107
+      B: Minivan,103,106
+      C: Truck,101,102,105
+      D: Minivan,103,106,108
+    correct_option: C
+  - sub_id: '5.3'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+    options:
+      A: Luxury-Car,104,107
+      B: Minivan,103,106
+      C: Truck,101,102,105
+      D: Minivan,103,106,108
+    correct_option: A
+- id: 6
+  type: comprehension
+  label: AUTOMATED PLANNING
+  description: |
+    The domain description of a Blocks World with a single one-armed robot is given below.
+
+    **PREDICATES**:
+    - `armEmpty`: The arm is not holding any block, it is empty.
+    - `holding(X)`: The arm is holding X.
+    - `onTable(X)`: X is on the table.
+    - `clear(X)`: X has nothing above it, it is clear.
+    - `on(X,Y)`: X is directly placed on Y.
+
+    **OPERATORS**:
+    - `Pickup(X)`: pick up X from the table.
+      - Preconditions: `{ armEmpty, clear(X), onTable(X) }`
+      - Add Effects: `{ holding(X) }`
+      - Del Effects: `{ armEmpty, onTable(X) }`
+    - `Putdown(X)`: place X on the table.
+      - Preconditions: `{ holding(X) }`
+      - Add Effects: `{ armEmpty, onTable(X) }`
+      - Del Effects: `{ holding(X) }`
+    - `Unstack(X,Y)`: pick up X that is directly sitting on Y.
+      - Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
+      - Add Effects: `{ clear(Y), holding(X) }`
+      - Del Effects: `{ armEmpty, on(X,Y) }`
+    - `Stack(X,Y)`: place X directly on top of Y.
+      - Preconditions: `{ holding(X), clear(Y) }`
+      - Add Effects: `{ armEmpty, on(X,Y) }`
+      - Del Effects: `{ holding(X), clear(Y) }`
+
+    **Start State**:
+    `{ onTable(B), onTable(A), onTable(E), clear(D), clear(C), clear(E), on(D,B), on(C,A), armEmpty }`
+
+    **Goal Description**:
+    `{ on(A,C), on(B,A) }`
+  subquestions:
+  - sub_id: '6.1'
+    question_type: multiple_select
+    question: Which of the following are applicable actions in the start state?
+    options:
+      A: Putdown(D)
+      B: Unstack(D,B)
+      C: Unstack(C,A)
+      D: Pickup(E)
+      E: Pickup(A)
+      F: Stack(B,A)
+      G: Stack(A,C)
+    correct_options:
+    - B
+    - C
+    - D
+  - sub_id: '6.2'
+    question_type: multiple_select
+    question: Which of the following are relevant actions in the goal state?
+    options:
+      A: Putdown(D)
+      B: Unstack(D,B)
+      C: Unstack(C,A)
+      D: Pickup(E)
+      E: Pickup(A)
+      F: Stack(B,A)
+      G: Stack(A,C)
+    correct_options:
+    - F
+    - G
+  - sub_id: '6.3'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex action pairs in Layer 1?
+    options:
+      A: Unstack(D,B) , Pickup (E)
+      B: Unstack(D,B), Unstack(C,A)
+      C: Pickup(E), Stack(B,A)
+      D: Pickup(E), Stack(A,C)
+    correct_options:
+    - A
+  - sub_id: '6.4'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex proposition pairs in Layer 1?
+    options:
+      A: clear(B),holding (C)
+      B: clear(B), clear(A)
+      C: clear(E), on(D,B)
+      D: clear(E), holding(D)
+    correct_options:
+    - A
+    - B
+- id: 7
+  type: comprehension
+  label: CONSTRAINT SATISFACTION
+  description: |
+    The set of junctions (L, W, Y and T type junctions) that occur in a 2D line drawing of trihedral objects is provided.
+    The in-plane clockwise/counterclockwise rotations of these junctions are valid as well.
+    These junctions provide constraints on the possible edge assignments (convex, concave, arrow) for the edges/lines in 2D line drawings of trihedral objects.
+
+    Junction labels: L1..L6, W1..W3, Y1..Y3, T1..T4.
+
+    Note: A 2D line drawing of trihedral objects is considered to be consistent if all the edges and junctions can be assigned labels that are consistent with each other, otherwise the drawing is considered to be inconsistent and all labels are reset to NIL.
+  subquestions:
+  - sub_id: '7.1'
+    question_type: short_answer
+    question: |
+      Assign consistent labels to all the edges and junctions in the 2D line drawing shown below.
+      Enter the labels of the junctions 1, 2, 3, 4 in the text box, in that order. Enter NIL if the drawing has no consistent label assignment.
+
+      Enter a comma separated list of junction labels, or enter NIL.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: Y9,T9,W9,L9
+    correct_answer: NIL
+  - sub_id: '7.2'
+    question_type: short_answer
+    question: |
+      Assign consistent labels to all the edges and junctions in the 2D line drawing shown below.
+      Enter the labels of the junctions 1, 2, 3, 4 in the text box, in that order. Enter NIL if the drawing has no consistent label assignment.
+    correct_answer: NIL

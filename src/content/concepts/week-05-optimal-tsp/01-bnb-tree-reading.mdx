@@ -1,0 +1,99 @@
+---
+title: "Reading a TSP Branch-and-Bound Tree"
+short: "Reading B&B Trees"
+order: 1
+category: "Week 5 — Optimal TSP"
+categoryOrder: 5
+description: "How to read any BnB search tree from the papers — number of cities, refinement order, optimal tour, and why the numbers increase toward leaves"
+tags: [tsp, branch-and-bound, bnb-tree, refinement, lower-bound]
+week: 5
+difficulty: intermediate
+---
+
+## The Simplest Explanation
+
+A TSP BnB tree is not a state space — each node represents a **set of tours** defined by included/excluded edges.
+
+- Root S0: all $n!$ tours, cost = lower bound (e.g., 305)
+- Edge label: `XY` = must include edge X-Y, `~XY` = must exclude XY
+- Cost: lower bound of that set (monotonically **increasing** toward leaves)
+- Reference `a1, b1, c1...`: use these to answer "which node refined next"
+
+<Callout type="tip" title="Remember This">
+Costs ↑ from root to leaf (more constraints = higher lower bound). Branch on lowest-cost open node. First fully-specified leaf with cost < all open nodes = optimal tour.
+</Callout>
+
+## What Every Question Asks (Template)
+
+Papers reuse 5 subquestions verbatim:
+
+| # | Question | How to answer |
+|---|---|---|
+| 1 | **Number of cities** | Depth of tree + 1? Or reference pattern: `a1` root, deepest leaves at level `e/f` → count edges? For 23T1 FN answer was 5, for 23T1 AN answer 6. Count distinct city letters mentioned? Simpler: infer from reference depth (e.g., a-b-c-d-e = 5 levels → 5 cities if root counts, or 6 if leaves are tours). In exam, `NIL` if ambiguous. |
+| 2 | **Refinement order** (next 4 nodes after S0) | Simulate BnB: always pick **lowest-cost open node**. Example 23T1 AN: S0(424) → b1(BF 424) lowest → c2(~DF 437) vs c1(DF 449) → pick c2 → next d3(EF 440) → next c1... answer `b1,c2,d3,c1` |
+| 3 | **Optimal tour node** | Lowest-cost **leaf** where all decisions fixed and no open node has lower cost. Example: `d5` cost 366 vs open `e2` 403 → d5 is optimal |
+| 4 | **Optimal cost** | Cost value on that leaf (e.g., 366, 456, 434) |
+| 5 | **Path representation** starting from A | Tour order of cities, e.g., `A,B,D,C,E` or `A,C,E,D,B,F` — must include return to start implicitly |
+
+## Detailed Trace: 23T1 FN Tree
+
+```
+a1 S0(305) → b1 AC(305) vs b2 ~AC(342)
+b1 → c1 BD(305) vs c2 ~BD(350)
+c1 → d1 CD(382) vs d2 ~CD(327)
+d2 → e1 BC(378) vs e2 ~BC(403)
+...
+```
+
+Trace:
+1. Open = `[a1 305]`. Expand a1 → open = `[b1 305, b2 342]` → pick lowest **b1**
+2. Expand b1 → open = `[c1 305, b2 342, c2 350]` → pick **c1** (lowest)
+3. Expand c1 → open = `[d2 327, b2 342, c2 350, d1 382]` → pick **d2** (lowest)
+4. Next pick **b2 342** (lowest remaining)
+
+Refinement order after S0: `b1,c1,d2,b2` — exactly the exam's answer.
+
+**Crucial rule**: At each step, pick globally lowest cost among all open nodes, break ties by reference number.
+
+## Cost Monotonicity (Theory)
+
+- Root = set of all tours → lowest possible lower bound (e.g., assignment relaxation)
+- Adding constraint (include or exclude an edge) can only **raise** (or keep) the bound → costs increase root→leaf
+- Hence options "monotonically INCREASE from root to leaf" is **true**, "DECREASE" is false
+
+## Path Representation Tips
+
+- Papers say "Start from city A" — so rotate tour to start at A
+- List comma-separated without spaces: `A,B,D,C,E`
+- For symmetric TSP, tour `A,B,C,D,A` same as `A,D,C,B,A` — but exam expects one specific rotation
+
+<Quiz
+  question="In a TSP BnB tree, what does node label 'CD (500)' mean?"
+  options={[
+    { label: "A", text: "Tour cost is 500 and edge C-D is included" },
+    { label: "B", text: "Lower bound 500 for all tours that include edge C-D (and respect ancestors' decisions)" },
+    { label: "C", text: "Exact cost of tour C-D" },
+    { label: "D", text: "Number of tours is 500" },
+  ]}
+  correctAnswer="B"
+  explanation="Each node is a set of tours sharing inclusion/exclusion decisions along path; cost is lower bound, not exact tour cost unless leaf."
+/>
+
+<Quiz
+  question="How does BnB choose next node to refine?"
+  options={[
+    { label: "A", text: "Depth-first" },
+    { label: "B", text: "Lowest lower-bound among open nodes (best-first)" },
+    { label: "C", text: "Alphabetical by reference" },
+    { label: "D", text: "Random" },
+  ]}
+  correctAnswer="B"
+  explanation="Always expand most promising (lowest bound). Reference order only breaks ties."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Reference vs city letters**: Answer wants `b1,c1` (reference numbers) not `AC,BD` (edge labels). Read question: it says "enter reference numbers".
+2. **Counting cities**: Don't guess from letters visible; infer from tree depth or explicit cost matrix. If uncertain, answer NIL as allowed.
+3. **Optimal tour node**: Not the last expanded leaf, but the lowest-cost feasible leaf that beats all open bounds. Check that its cost < min(open costs).
+4. **Path format**: Cities comma-separated, starting from requested start city, no spaces.
+</Accordion>

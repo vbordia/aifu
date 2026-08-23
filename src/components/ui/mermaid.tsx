@@ -150,11 +150,12 @@ const DARK_THEME = {
 type MermaidProps = {
   chart: string;
   wide?: boolean;
+  fit?: boolean;
 };
 
 let idCounter = 0;
 
-export default function Mermaid({ chart, wide = false }: MermaidProps) {
+export default function Mermaid({ chart, wide = false, fit = false }: MermaidProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme === "dark";
@@ -173,8 +174,8 @@ export default function Mermaid({ chart, wide = false }: MermaidProps) {
       theme: "base",
       fontFamily: FONT_FAMILY,
       fontSize: 14,
-      flowchart: { useMaxWidth: !wide, htmlLabels: true, curve: "basis" },
-      timeline: { useMaxWidth: !wide },
+      flowchart: { useMaxWidth: !wide && !fit, htmlLabels: true, curve: "basis" },
+      timeline: { useMaxWidth: !wide && !fit },
       themeVariables: dark ? DARK_THEME : LIGHT_THEME,
     });
 
@@ -198,12 +199,18 @@ export default function Mermaid({ chart, wide = false }: MermaidProps) {
     return () => {
       cancelled = true;
     };
-  }, [chart, dark, wide, mounted]);
+  }, [chart, dark, wide, fit, mounted]);
 
   return (
     <div
       ref={containerRef}
-      className={wide ? "mermaid-output mermaid-wide" : "mermaid-output"}
+      className={
+        wide
+          ? "mermaid-output mermaid-wide"
+          : fit
+            ? "mermaid-output mermaid-fit"
+            : "mermaid-output"
+      }
       style={{ minHeight: 32 }}
       suppressHydrationWarning
     />

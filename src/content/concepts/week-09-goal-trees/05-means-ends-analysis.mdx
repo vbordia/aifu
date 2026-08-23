@@ -1,0 +1,100 @@
+---
+title: "Means-Ends Analysis and the General Problem Solver"
+short: "Means-Ends Analysis"
+order: 5
+category: "Week 9 — Goal Trees"
+categoryOrder: 9
+description: "Reason like a human planner — find the biggest difference, pick the operator that kills it, recurse on preconditions. Newell & Simon's GPS"
+tags: [means-ends-analysis, gps, operator-difference-table, newell-simon]
+week: 9
+difficulty: intermediate
+---
+
+## The Simplest Explanation
+
+Compare where you are with where you want to be. List the **differences**. Attack the **largest** one first using whatever operator reduces that kind of difference — then recursively handle that operator's preconditions, then continue on what remains.
+
+That's Means-Ends Analysis, the strategy of Newell & Simon's **General Problem Solver (GPS)** — planning the way humans intuitively do.
+
+<Callout type="tip" title="Remember This">
+Difference table maps difference-magnitudes to operators. Pick the biggest difference → its operator → achieve its preconditions (recursion) → apply → repeat on remaining differences.
+</Callout>
+
+## The Strategy
+
+1. Compare current state $s$ with goal $G$; list differences
+2. Order differences by magnitude
+3. Reduce the largest difference first using an operator chosen from the **operator-difference table**
+4. Recursively achieve the chosen operator's preconditions
+5. Apply it; recompute differences; repeat
+
+The recursion produces an **AND structure**: *achieve preconditions* AND *then* solve rest-from-new-state.
+
+## The Operator-Difference Table (travel example)
+
+| Distance to close | Operators that reduce it |
+|---|---|
+| > 5000 km | Airplane |
+| 100–5000 km | Airplane, Train, Car |
+| 1–100 km | Train, Car, Taxi, Bus |
+| < 2 km | Walk, Bus, Taxi |
+
+### Worked Trip: IIT Madras → Parashar Lake (Himachal)
+
+1. Biggest difference ≈ 2500 km → **flight** (Chennai → Delhi)
+2. Flight's preconditions (be at Chennai airport) → smaller difference ~15 km → **taxi**
+3. After landing in Delhi, remaining ~2000 km? No — next leg Delhi→Mandi by **bus**
+4. Last stretch Mandi→Parashar Lake (~50 km) → **taxi/walk**
+
+Notice the shape: the *middle* of the plan (the flight) gets chosen FIRST; prefix and suffix are filled in recursively around it. Forward/backward state-space planners commit to a direction — means-ends commits to the most significant *difference* instead.
+
+## Why It Yields AND-OR Trees
+
+"Achieve G from s" decomposes into:
+
+```
+Achieve G from s
+ ├─ AND ─ Achieve preconditions of O (recursive)
+ └─ AND ─ Apply O, then achieve G from s'
+```
+
+Both branches mandatory → AND node; alternative operators for the same difference are OR options. This is exactly the structure AO\* searches — means-ends analysis is a *generator* of AND-OR problems, AO\* is the solver.
+
+## Properties
+
+| Property | Value |
+|----------|-------|
+| Origin | Newell & Simon, General Problem Solver (1957–59) |
+| Search direction | neither forward nor backward — difference-driven |
+| Knowledge requirement | operator-difference table (domain-specific) |
+| Structure produced | recursive AND-OR decomposition |
+
+<Quiz
+  question="Means-ends analysis selects which operator first?"
+  options={[
+    { label: "A", text: "the cheapest available one" },
+    { label: "B", text: "the one whose precondition list is shortest" },
+    { label: "C", text: "one that reduces the LARGEST current difference between state and goal" },
+    { label: "D", text: "a random applicable operator" },
+  ]}
+  correctAnswer="C"
+  explanation="Difference-driven selection via the operator-difference table is the defining heuristic of GPS."
+/>
+
+<Quiz
+  question="Choosing the flight (middle of the journey) before the taxi legs illustrates that means-ends analysis..."
+  options={[
+    { label: "A", text: "plans strictly forward from the start" },
+    { label: "B", text: "plans strictly backward from the goal" },
+    { label: "C", text: "commits to the most significant action first, filling prefix/suffix recursively" },
+    { label: "D", text: "cannot use multiple transport modes" },
+  ]}
+  correctAnswer="C"
+  explanation="Unlike FSSP/BSSP, difference-reduction picks plan 'anchors' by importance, not position."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Table lookup discipline**: only operators listed against a difference magnitude are eligible. Choosing a walk for 2000 km fails the table.
+2. **AND vs OR reading**: alternative operators for one difference = OR; preconditions-plus-application = AND. Exam asks you to classify nodes of the resulting tree.
+3. **Recursion depth**: after applying O, you re-difference between s' and G — don't forget post-conditions may create NEW differences (e.g., being at the airport without luggage resolved separately).
+</Accordion>

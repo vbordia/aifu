@@ -1,0 +1,92 @@
+---
+title: "Game Evaluation Functions"
+short: "Evaluation Functions"
+order: 6
+category: "Week 7 — Game Playing"
+categoryOrder: 7
+description: "When the game tree is too big to search to the end — cut off at k-ply, score the board statically, and back up as if it were terminal"
+tags: [evaluation-function, shannon, chess, tic-tac-toe, k-ply]
+week: 7
+difficulty: beginner
+---
+
+## The Simplest Explanation
+
+Tic-Tac-Toe is small enough to search to the end. Chess is not — so search only **k moves ahead** (a **k-ply search**), then score each leaf position with a static **evaluation function** $e(n)$, and run Minimax/Alpha-Beta exactly as if those leaves were real endings.
+
+<Callout type="tip" title="Remember This">
+e(n) is static (board → number), continuous in [−1, +1], positive = good for MAX. It replaces true game values at the horizon; everything above it is unchanged minimax machinery.
+</Callout>
+
+## The Two Standard Components
+
+Shannon's 1950 recipe for chess:
+
+$$e(n) = f(\text{material}) + f(\text{positional})$$
+
+| Component | Examples |
+|-----------|----------|
+| **Material** | piece counts weighted by value (queen ≈ 9, rook ≈ 5, …) |
+| **Positional** | center control, pawn structure, mobility, king safety |
+
+This framework underlies essentially every chess engine's leaf scoring.
+
+## Tic-Tac-Toe Worked Example
+
+Eval: count open rows/columns/diagonals for MAX, subtract those open for MIN.
+
+Position after MAX takes a corner and MIN takes the center:
+- MAX open lines: 4
+- MIN open lines: 5
+
+$$e = 4 - 5 = -1$$
+
+Note: Tic-Tac-Toe's true minimax value with perfect play is **0** (a draw) — the eval is only an *estimate* at a shallow horizon, and that gap is exactly why deeper search plays better.
+
+## How It Plugs Into Search
+
+1. Grow the tree to depth k
+2. At horizon leaves compute $e(n)$
+3. Back up with min/max (α–β prunes along the way)
+4. Root's best child = move played; then search again after opponent replies
+
+Deeper k ⇒ more accurate backups but exponential cost — α–β's $b^{m/2}$ best case is what buys practical depth.
+
+## Properties
+
+| Property | Value |
+|----------|-------|
+| Range | typically [−1, +1] in this course |
+| Static? | Yes — inspects only the current board |
+| Relation to heuristic h | Same idea transplanted to adversarial search |
+| Accuracy lever | Search depth k and eval quality trade off |
+
+<Quiz
+  question="A k-ply search evaluates leaves because..."
+  options={[
+    { label: "A", text: "the game has no rules" },
+    { label: "B", text: "the full tree is too large, so horizon positions get static estimates that stand in for terminal values" },
+    { label: "C", text: "minimax requires negative numbers" },
+    { label: "D", text: "it avoids alpha-beta pruning" },
+  ]}
+  correctAnswer="B"
+  explanation="Depth cutoffs trade exactness for feasibility; e(n) approximates the subtree's eventual worth."
+/>
+
+<Quiz
+  question="Shannon's chess evaluation combines..."
+  options={[
+    { label: "A", text: "only material counts" },
+    { label: "B", text: "material strength plus positional factors (mobility, king safety, pawn structure)" },
+    { label: "C", text: "random noise for variety" },
+    { label: "D", text: "the opponent's clock time" },
+  ]}
+  correctAnswer="B"
+  explanation="The 1950 formulation e = f(material) + f(positional) still shapes modern engines."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Estimate ≠ truth**: an eval of −1 doesn't mean the position is lost (tic-tac-toe is a draw!) — horizons lie. Expect questions testing this distinction.
+2. **Range convention**: this course uses [−1,+1] with positive favoring MAX; some textbooks scale by piece points instead. Follow the paper's sign/scale.
+3. **Static means static**: e(n) looks only at the current board — no lookahead inside the evaluator itself.
+</Accordion>

@@ -1,0 +1,480 @@
+file: 2025T2_AI_Search_Methods_for_Problem_Solving_AN.pdf
+year: 2025
+term: 2
+session: an
+subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
+questions:
+- id: 1
+  type: comprehension
+  label: SEARCH
+  description: |
+    The figure shows a map on a uniform grid where each tile is 1x1 in size.
+    The start node is S and the goal node is G.
+    The MoveGen function returns nodes in alphabetical order.
+    Use Manhattan Distance as the heuristic function.
+
+    **Tie-breaker**: If several nodes have the same cost, use node labels to break the tie.
+
+    ```mermaid
+    graph LR
+        S((S)) ---|4| B((B))
+        S ---|16| C((C))
+        B ---|4| A((A))
+        B ---|6| D((D))
+        B ---|12| C
+        A ---|4| E((E))
+        D ---|6| E
+        D ---|12| C
+        D ---|8| F((F))
+        E ---|8| G((G))
+        C ---|8| F
+        F ---|8| G
+    ```
+  subquestions:
+  - sub_id: '1.1'
+    question_type: short_answer
+    question: |
+      What is the path found by the Best First Search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,C,F,G
+  - sub_id: '1.2'
+    question_type: short_answer
+    question: |
+      What is the path found by A* search algorithm? Enter the path as a comma separated list of node labels.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,B,A,E,G
+  - sub_id: '1.3'
+    question_type: short_answer
+    question: |
+      What is the path found by Branch-and-Bound search algorithm? Enter the path as a comma separated list of node labels.
+
+      Use the Branch-and-Bound variation that avoids cyclic expansions like S,B,S,B,S,B,...
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,B,A,E,G
+  - sub_id: '1.4'
+    question_type: multiple_choice
+    question: For the given map, which algorithm finds the shortest path from S to G?
+    options:
+      A: A* Search Algorithm
+      B: Branch-and-Bound Search Algorithm
+      C: Both A* and Branch-and-Bound Search Algorithms
+      D: None of these
+    correct_option: C
+  - sub_id: '1.5'
+    question_type: multiple_choice
+    question: Select the correct statement(s) about the given graph.
+    options:
+      A: Heuristic is admissible.
+      B: Heuristic is not admissible.
+      C: Heuristic is admissible in some cases and not admissible in other cases.
+      D: There is not enough information to determine admissibility.
+    correct_option: A
+- id: 2
+  type: comprehension
+  label: TSP BNB
+  description: |
+    TSP BnB algorithm is solving a TSP instance where the cities are A, B, C, .... and so on. The BnB search tree (at the point when the algorithm discovers the optimal tour) is provided below.
+
+    Each node in the search tree displays an edge (either XY or $\neg$XY), a cost value, and a unique reference number (a1, b1, ..., c1, ..., d1, ..., e1, e2). Use the reference numbers to break ties. When required, use reference numbers in short answers.
+
+    What information can you glean from the search tree? Answer the sub-questions based on the information gleaned from the search tree.
+
+    ```mermaid
+    graph TD
+        a1["a1: S0 (305)"] --> b1["b1: AC (305)"]
+        a1 --> b2["b2: ¬AC (342)"]
+        b1 --> c1["c1: BD (305)"]
+        b1 --> c2["c2: ¬BD (350)"]
+        b2 --> c3["c3: BD (342)"]
+        b2 --> c4["c4: ¬BD (387)"]
+        c1 --> d1["d1: CD (382)"]
+        c1 --> d2["d2: ¬CD (327)"]
+        c2 --> d3["d3: CD (500)"]
+        c2 --> d4["d4: ¬CD (516)"]
+        c3 --> d5["d5: CD (366)"]
+        c3 --> d6["d6: ¬CD (382)"]
+        d2 --> e1["e1: BC (378)"]
+        d2 --> e2["e2: ¬BC (403)"]
+    ```
+  subquestions:
+  - sub_id: '2.1'
+    question_type: short_answer
+    question: |
+      Let S0 (ref. no. a1) be the first node to be refined, identify the next 4 nodes (2nd to 5th node) that are refined by the TSP BnB algorithm. Enter the nodes (node reference numbers) in the order they are refined.
+
+      Enter a comma separated list of node reference numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a9,b9,c9,d9
+    correct_answer: b1,c1,d2,b2
+  - sub_id: '2.2'
+    question_type: short_answer
+    question: |
+      Which node represents the optimal tour? Enter the node reference number in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter a node reference number.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a9
+    correct_answer: d5
+  - sub_id: '2.3'
+    question_type: short_answer
+    question: |
+      What is the cost of the optimal tour? Enter the cost of the optimal tour in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter an integer.
+      NO SPACES, TABS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '366'
+  - sub_id: '2.4'
+    question_type: short_answer
+    question: |
+      Determine the number of cities in the TSP instance. Enter the number of cities in the text box, or enter NIL if it is not possible to determine the number of cities.
+
+      Enter an integer.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '5'
+  - sub_id: '2.5'
+    question_type: short_answer
+    question: |
+      Start from city A, what is the path representation of the optimal tour? Enter the path representation in the text box, or enter NIL if it is not possible to determine the optimal tour.
+
+      Enter a comma separated list of cities (city labels).
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: A,B,C
+    correct_answer: A,B,D,C,E
+- id: 3
+  type: comprehension
+  label: GAMES
+  description: |
+    The figure shows a game tree with evaluation function values at the leaf nodes.
+    The leaf nodes are labeled from A to K.
+    Use these labels to enter a leaf node or a list of leaf nodes in short answers (textbox).
+
+    **Tie-breaker**:
+    When several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+    ```mermaid
+    graph TD
+        Root["MAX"] --> MIN1["MIN"]
+        Root --> MIN2["MIN"]
+        Root --> MIN3["MIN"]
+
+        MIN1 --> MAX1["MAX"]
+        MAX1 --> A["A: 56"]
+        MAX1 --> MIN11["MIN"]
+        MIN11 --> B["B: 63"]
+        MIN11 --> MIN12["MIN"]
+        MIN12 --> C["C: 77"]
+        MIN12 --> D["D: 70"]
+
+        MIN2 --> E["E: 49"]
+        MIN2 --> MAX2["MAX"]
+        MAX2 --> F["F: 84"]
+        MAX2 --> MIN21["MIN"]
+        MIN21 --> G["G: 42"]
+        MIN21 --> H["H: 14"]
+
+        MIN3 --> I["I: 35"]
+        MIN3 --> MIN31["MIN"]
+        MIN31 --> J["J: 28"]
+        MIN31 --> K["K: 21"]
+    ```
+  subquestions:
+  - sub_id: '3.1'
+    question_type: multiple_select
+    question: Which of the following is a strategy for the MAX player?
+    options:
+      A: I,K
+      B: E,F,G
+      C: E,F
+      D: I,J,K
+    correct_options:
+    - A
+    - C
+  - sub_id: '3.2'
+    question_type: short_answer
+    question: |
+      List the leaf nodes in the best strategy for MAX. Enter the node labels in alphabetical order.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,C,D
+  - sub_id: '3.3'
+    question_type: short_answer
+    question: |
+      List the leaf nodes inspected by Alpha-Beta algorithm.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,B,E,I
+  - sub_id: '3.4'
+    question_type: short_answer
+    question: |
+      List the leaf nodes SOLVED by SSS*.
+
+      Enter a comma separated list of node labels in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,B,E,I
+- id: 4
+  type: comprehension
+  label: PROBLEM DECOMPOSITION
+  description: |
+    The figure shows an AND-OR graph that depicts how a problem S can be decomposed into one or more smaller problems. Nodes are uniquely identified by labels (S, A, B, ...). The number in each node is the heuristic estimate of the cost of solving that node.
+
+    Nodes shown in double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as SOLVED and it will not be expanded subsequently.
+
+    The cost of each edge is 2 units.
+
+    **Tie-breaker 1**: If several nodes have the same cost then break the tie using node labels.
+    **Tie-breaker 2**: For AND nodes, expand the unsolved branch with the highest cost.
+
+    Use AO* algorithm to solve S, then answer the subquestions.
+
+    ```mermaid
+    graph TD
+        S((S: 20)) --- A((A: 35))
+        S --- B((B: 20))
+        S --- C((C: 10))
+        A --- D[["D (primitive): 20"]]
+        A --- E[["E (primitive): 30"]]
+        B --- E
+        B --- F[["F (primitive): 10"]]
+        C --- G[["G (primitive): 20"]]
+    ```
+  subquestions:
+  - sub_id: '4.1'
+    question_type: short_answer
+    question: |
+      List the nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: S,B,A
+  - sub_id: '4.2'
+    question_type: short_answer
+    question: |
+      Determine the value of the start node S after each node is expanded. Enter the value of S after each node is expanded.
+
+      Enter a comma separated list of numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12,42,17
+    correct_answer: 34,37,56
+  - sub_id: '4.3'
+    question_type: short_answer
+    question: |
+      What is the final value of the start node S computed by AO*?
+
+      Enter a number.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '56'
+- id: 5
+  type: comprehension
+  label: RULE BASED EXPERT SYSTEMS
+  description: |
+    A Rete Net for a rule based system to identify engines, turbines and motors is shown in the figure. Here, BoM refers to Bill-of-Materials, which is a list of parts and their quantities needed for assembling a machine.
+
+    The nodes in the network are uniquely identified by labels: A1, A2, ... for Alpha nodes; B1, B2, ... for beta nodes; R1, R2, ... for rules.
+
+    ```mermaid
+    graph TD
+        WME --> A1["A1: CLASS = Energy"]
+        WME --> A2["A2: CLASS = BoM"]
+        WME --> A3["A3: CLASS = Fuel"]
+
+        A1 --> A4["A4: item = <x>"]
+        A2 --> A5["A5: item = <x>"]
+        A3 --> A6["A6: item = <x>"]
+
+        A4 --> A7["A7: source = wind"]
+        A4 --> A8["A8: part = alternator"]
+        A4 --> A9["A9: source = stream"]
+
+        A5 --> A10["A10: part = blades"]
+        A5 --> A12["A12: part = nozzle"]
+
+        A6 --> A11["A11: type = liquid"]
+        A6 --> A12
+        A6 --> A13["A13: type = solid"]
+
+        A7 --> B1["B1 (= <x>)"]
+        A8 --> B1
+        B1 --> R1["R1: Windmill"]
+
+        A8 --> R2["R2: Generator"]
+
+        A8 --> B2["B2 (= <x>)"]
+        A9 --> B2
+        B2 --> R3["R3: Watermill"]
+
+        A10 --> R4["R4: Turbine"]
+
+        A10 --> B3["B3 (= <x>)"]
+        A11 --> B3
+        B3 --> R5["R5: Gas Turbine"]
+
+        A11 --> B4["B4 (= <x>)"]
+        A12 --> B4
+        B4 --> R6["R6: Liquid Fuel Rocket"]
+
+        A12 --> R7["R7: Rocket"]
+
+        A12 --> B5["B5 (= <x>)"]
+        A13 --> B5
+        B5 --> R8["R8: Solid Fuel Rocket"]
+    ```
+
+    The Working Memory contains the following WMEs uniquely identified by timestamps (sequence numbers). Assume that WMEs reside in the appropriate Alpha node, and Beta nodes simply point to elements in the ancestor Alpha nodes.
+
+    ```text
+    101. (Fuel ^item N59 ^type solid)
+    102. (Fuel ^item N26 ^type liquid)
+    103. (Fuel ^item N37)
+    104. (BoM ^item N48 ^part alternator)
+    105. (Energy ^item N48 ^source wind)
+    106. (BoM ^item N37 ^part alternator)
+    107. (BoM ^item N15 ^part CD-nozzle)
+    ```
+
+    The sub-questions are based on the first Match-Resolve-Execute cycle. Determine the locations of the WMEs and compute the conflict set, then answer the given sub-questions.
+  subquestions:
+  - sub_id: '5.1'
+    question_type: multiple_select
+    question: Which of the following rule-data tuples occur in the conflict set?
+    options:
+      A: (Liquid-Fuel-Rocket, 102, 107)
+      B: (Solid-Fuel-Rocket, 107, 101)
+      C: (Windmill, 105, 104)
+      D: (Generator, 104)
+      E: (Generator, 106)
+      F: (Rocket, 107)
+    correct_options:
+    - C
+    - D
+    - E
+    - F
+  - sub_id: '5.2'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Specificity for conflict resolution then which rule-data tuple will fire in the first round?
+    options:
+      A: (Liquid-Fuel-Rocket, 102, 107)
+      B: (Solid-Fuel-Rocket, 107, 101)
+      C: (Windmill, 105, 104)
+      D: (Generator, 104)
+      E: (Generator, 106)
+      F: (Rocket, 107)
+    correct_option: C
+  - sub_id: '5.3'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Recency for conflict resolution which rule-data tuple will fire in the first round?
+    options:
+      A: (Liquid-Fuel-Rocket, 102, 107)
+      B: (Solid-Fuel-Rocket, 107, 101)
+      C: (Windmill, 105, 104)
+      D: (Generator, 104)
+      E: (Generator, 106)
+      F: (Rocket, 107)
+    correct_option: F
+- id: 6
+  type: comprehension
+  label: AUTOMATED PLANNING
+  description: |
+    The domain description of a Blocks World with a single one-armed robot is given below.
+
+    **PREDICATES**
+    - `armEmpty`: The arm is not holding any block, it is empty.
+    - `holding(X)`: The arm is holding X.
+    - `onTable(X)`: X is on the table.
+    - `clear(X)`: X has nothing above it, it is clear.
+    - `on(X,Y)`: X is directly placed on Y.
+
+    **OPERATORS**
+
+    `Pickup(X)`: pick up X from the table.
+    - Preconditions: `{ armEmpty, clear(X), onTable(X) }`
+    - Add Effects: `{ holding(X) }`
+    - Del Effects: `{ armEmpty, onTable(X) }`
+
+    `Putdown(X)`: place X on the table.
+    - Preconditions: `{ holding(X) }`
+    - Add Effects: `{ armEmpty, onTable(X) }`
+    - Del Effects: `{ holding(X) }`
+
+    `Unstack(X,Y)`: pick up X that is directly sitting on Y.
+    - Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
+    - Add Effects: `{ clear(Y), holding(X) }`
+    - Del Effects: `{ armEmpty, on(X,Y) }`
+
+    `Stack(X,Y)`: place X directly on top of Y.
+    - Preconditions: `{ holding(X), clear(Y) }`
+    - Add Effects: `{ armEmpty, on(X,Y) }`
+    - Del Effects: `{ holding(X), clear(Y) }`
+
+    Consider the following planning problem:
+
+    **Start State**: `{ onTable(A), onTable(B), onTable(C), clear(D), clear(E), clear(C), on(D,A), on(E,B), armEmpty }`
+    **Goal Description**: `{ on(B,C), on(A,B) }`
+
+    Based on the above data, answer the given subquestions.
+  subquestions:
+  - sub_id: '6.1'
+    question_type: multiple_select
+    question: Which of the following are applicable actions in the start state?
+    options:
+      A: Putdown(D)
+      B: Unstack(D,A)
+      C: Unstack(E,B)
+      D: Pickup(C)
+      E: Pickup(A)
+      F: Stack(A,B)
+      G: Stack(B,C)
+    correct_options:
+    - B
+    - C
+    - D
+  - sub_id: '6.2'
+    question_type: multiple_select
+    question: Which of the following are relevant actions in the goal state?
+    options:
+      A: Putdown(D)
+      B: Unstack(D,A)
+      C: Unstack(E,B)
+      D: Pickup(C)
+      E: Pickup(A)
+      F: Stack(A,B)
+      G: Stack(B,C)
+    correct_options:
+    - F
+    - G
+  - sub_id: '6.3'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex action pairs in Layer 1?
+    options:
+      A: Unstack(D,A), Pickup(C)
+      B: Unstack(D,A), Unstack(E,B)
+      C: Pickup(C), Stack(A,B)
+      D: Pickup(C), Stack(B,C)
+    correct_options:
+    - A
+    - B
+  - sub_id: '6.4'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex proposition pairs in Layer 1?
+    options:
+      A: clear(A), holding(E)
+      B: clear(A), clear(B)
+      C: clear(C), on(D,A)
+      D: clear(C), holding(E)
+    correct_options:
+    - A
+    - B

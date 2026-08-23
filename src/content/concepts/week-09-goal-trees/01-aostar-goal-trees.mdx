@@ -1,0 +1,141 @@
+---
+title: "AND-OR Trees and the AO* Algorithm"
+short: "AO* Goal Trees"
+order: 1
+category: "Week 9 — Goal Trees"
+categoryOrder: 9
+description: "When one goal splits into many mandatory subgoals — A* grows up, leaves path-land, and starts solving subtrees. Asked in every paper"
+tags: [aostar, and-or-trees, goal-trees, problem-decomposition]
+week: 9
+difficulty: intermediate
+---
+
+## The Simplest Explanation
+
+So far every solution was a **path**. Now goals decompose: *"plan an evening out"* = pick an activity **AND** a movie **AND** a restaurant. All three must succeed. That changes the search space into an **AND-OR tree**:
+
+- **OR node**: any ONE child suffices (a choice — like normal search)
+- **AND node**: ALL children must be solved together (a decomposition)
+
+A solution is no longer a path — it is a **solution subtree** rooted at the start.
+
+<Callout type="tip" title="Remember This">
+OR = choose one branch (either/or). AND = need all branches (every subgoal). AO\* finds the cheapest solution SUBTREE, and it decides using backed-up costs of whole branches — never raw h values.
+</Callout>
+
+## Why Not Just Use A*?
+
+| Aspect | A* | AO* |
+|--------|----|----|
+| Graph type | OR graph | AND-OR graph |
+| Solution | Path from start to goal | Subtree rooted at start |
+| Expansion rule | Expand lowest-$f$ open node anywhere | Follow marked paths down to live nodes |
+| Cost bookkeeping | $f(n) = g(n) + h(n)$ per node | Backed-up cost = best child costs + edge costs |
+| Terminates when | Goal dequeued from Open | Root labeled **solved** |
+
+AO* (Martelli & Montanari, 1978) — the star means admissible: with underestimating $h$, it returns the least-cost solution subtree.
+
+## The Algorithm: Two Phases per Iteration
+
+**Forward phase** — decide WHERE to look:
+1. From the root, trace only **marked** arcs (currently-believed-best choices) down to unexpanded (**live**) nodes
+2. Pick one live node and expand it
+
+**Backward phase** — update what you believe:
+1. For each modified node (deepest first):
+   - Compute cost of each option: for an OR choice, child cost + edge; for an AND choice, sum over all conjuncts + edges
+   - **Mark** the cheapest option
+2. If all successors on the marked option are **solved**, mark this node solved too
+3. Propagate cost changes up to ancestors
+4. Stop when the root becomes **solved**
+
+<Callout type="important" title="The #1 Exam Insight">
+Expansion order follows MARKED paths from the root — not global lowest-f. And the decision to switch branches uses BACKED-UP costs: a low-h node can sit on a hopeless expensive branch and never get expanded.
+</Callout>
+
+## Interactive Demo
+
+Click through a full AO* run. Watch the marker, the backed-up root cost, and notice A is never expanded:
+
+<AOStarViz />
+
+### Reading the Trace
+
+- Step 2 shows the marker logic: S compares via-A (7) vs via-B (5), marks B.
+- Step 3 shows propagation: refining B lowers S's estimate 5 → 4.
+- Step 4 shows solved-labeling cascade: G solved → B solved → S solved. Total solution cost **4**, subtree `S→B→G→{leaves}`.
+
+## Overestimating vs Underestimating (the lecture's key experiment)
+
+Run AO* on the same graph with different edge costs:
+
+| Edge cost | h values are... | Costs during refinement | Marker behavior | Guarantee |
+|-----------|-----------------|------------------------|-----------------|-----------|
+| 1 | **overestimates** | keep coming DOWN as nodes are refined | first promising branch stays best — never switches | fast, but may miss optimum |
+| 10 | **underestimates** | keep going UP as nodes are refined | switches back and forth as reality emerges | slower, **guaranteed optimal** |
+
+This mirrors Weighted A*: big overestimates ≈ large $w$ (fast, suboptimal); underestimates ≈ admissible $h$ (optimal). Exam questions frequently give you both traces and ask which marker switch happens at which step.
+
+## Worked Mini-Trance by Hand
+
+Graph: S has OR-children X ($h{=}9$) and Y ($h{=}5$). Expanding Y yields an AND pair `{P, Q}`, both primitive (cost 0), edge costs all 1.
+
+1. Expand S: via-X = 9+1 = 10; via-Y = 5+1 = 6. Mark S→Y. Backed-up(S) = 6.
+2. Follow marked path to Y; expand it → P, Q appear. Option through `{P,Q}`: 0+1 + 0+1 = 2 < 6. Mark it.
+3. P, Q are primitive → solved. Y solved. Propagate: S = 2+1 = 3, marked successor Y is solved → **S solved**.
+
+Answer: minimum-cost solution subtree = `S→Y→{P,Q}`, cost **3**.
+
+## Where AND-OR Trees Show Up
+
+- **Planning**: achieve goal = AND of subgoals; alternative operators = OR
+- **Means-Ends Analysis** (Newell & Simon's GPS): reduce largest difference (then apply op AND then finish rest) — inherently AND-shaped
+- **Logical deduction / proof search**: proving a conjunction = AND node; multiple inference rules proving the same sentence = OR node
+
+<Quiz
+  question="At an AND node, the backed-up cost equals..."
+  options={[
+    { label: "A", text: "the minimum child cost plus the edge cost" },
+    { label: "B", text: "the maximum child cost" },
+    { label: "C", text: "the SUM of all children's costs plus all edge costs — every conjunct is mandatory" },
+    { label: "D", text: "the average of the children's costs" },
+  ]}
+  correctAnswer="C"
+  explanation="All components of an AND decomposition must be paid for. OR nodes take the min; AND nodes take the sum."
+/>
+
+<Quiz
+  question="AO* chooses WHICH node to expand next by..."
+  options={[
+    { label: "A", text: "global lowest f-value among all open nodes, like A*" },
+    { label: "B", text: "following marked arcs from the root down to a live node" },
+    { label: "C", text: "alphabetical order" },
+    { label: "D", text: "the node with the largest h" },
+  ]}
+  correctAnswer="B"
+  explanation="AO* maintains a partial solution graph with markers and refines along it. There is no global open list priority queue."
+/>
+
+<Quiz
+  question="With UNDERestimating heuristics, AO*'s cost estimates during refinement tend to..."
+  options={[
+    { label: "A", text: "rise toward the true cost, possibly switching markers between branches — guaranteeing optimality" },
+    { label: "B", text: "fall steadily, locking in the first branch" },
+    { label: "C", text: "stay exactly constant" },
+    { label: "D", text: "oscillate randomly with no pattern" },
+  ]}
+  correctAnswer="A"
+  explanation="Underestimates mean reality is worse than hoped: real costs push estimates up, forcing re-evaluation and marker switches — that thoroughness is what buys optimality."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Summing where you should minimize (and vice versa)**: OR choice → take the CHEAPEST single option; AND choice → add ALL options' costs. Label node types before computing anything.
+
+2. **Forgetting to propagate solved labels upward**: a parent is solved only if ALL successors along its MARKED option are solved. Partially-solved AND sets don't count.
+
+3. **Expanding the globally-cheapest open node (A\* reflex)**: AO* expands only along the current marked subtree. If your trace expands an off-marker node, it's wrong.
+
+4. **Ignoring edge costs in backups**: the backed-up cost includes the edge(s) into the chosen children. Lecture examples hinge entirely on this (edge=1 vs edge=10 flips the answer).
+
+5. **Confusing AO* with minimax**: both 'back up' values, but there's NO adversary here — no max/min alternation, just min over OR choices and sum over AND choices.
+</Accordion>

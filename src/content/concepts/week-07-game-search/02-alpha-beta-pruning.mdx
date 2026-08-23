@@ -1,0 +1,184 @@
+---
+title: "Alpha-Beta Pruning"
+short: "Alpha-Beta Pruning"
+order: 2
+category: "Week 7 — Game Playing"
+categoryOrder: 7
+description: "Minimax's answer without reading every leaf — prune branches that provably can't matter. Asked in every exam paper"
+tags: [alpha-beta, pruning, minimax, game-tree, cutoff]
+week: 7
+difficulty: intermediate
+---
+
+## The Simplest Explanation
+
+Minimax wastes effort on branches that could **never influence the final decision**. Alpha-beta's insight:
+
+> *"While backing up values, keep track of the best already-guaranteed options for both sides. If a branch turns out worse than something already guaranteed — stop looking. Cut it off."*
+
+Two values travel down the tree:
+
+- **α (alpha)**: the best value MAX is already assured of *somewhere else* (lower bound). Starts at $-\infty$.
+- **β (beta)**: the best value MIN is already assured of (upper bound). Starts at $+\infty$.
+
+**The cutoff rule**: whenever $\alpha \geq \beta$, stop expanding the current node and return. Nothing below can change the outcome.
+
+<Callout type="tip" title="Remember This">
+Alpha-beta returns the EXACT same root value as minimax — it just skips work that cannot matter. α is "how good MAX's fallback is", β is "how good MIN's fallback is". When they cross (α ≥ β), the current branch is dead.
+</Callout>
+
+## The Rules (memorize these four lines)
+
+1. At a **MAX node**: update $\alpha \leftarrow \max(\alpha, \text{child value})$
+2. At a **MIN node**: update $\beta \leftarrow \min(\beta, \text{child value})$
+3. Children inherit the current $(\alpha, \beta)$ window
+4. If at any point $\alpha \geq \beta$: **prune** remaining children of this node and back up immediately
+   - If cut off at a MAX node → called a **β-cutoff**
+   - If cut off at a MIN node → called an **α-cutoff**
+
+## Interactive Demo
+
+Same idea as minimax — but watch two leaves escape evaluation entirely:
+
+<AlphaBetaViz />
+
+### What Just Happened
+
+- After B backs up 3, the root knows: whatever else happens, MAX gets ≥ 3 ($\alpha = 3$).
+- Inside C, the first child returns 2. C is a MIN node, so C ≤ 2 < 3. MAX would never pick C.
+- Therefore C's remaining children (4, 6) are irrelevant — **pruned without being read**.
+
+Result: minimax value **3**, optimal move **A→B**, only 7 of 9 leaves examined.
+
+## Worked Exam-Style Trace (by hand)
+
+Tree: Root MAX with three MIN children; leaves left-to-right: B(3, 12, 8), C(2, 4, 6), D(14, 5, 2).
+
+| Step | Where | Action | α at root | Notes |
+|------|-------|--------|-----------|-------|
+| 1 | B | min(3,12,8) = 3 backed up | α = 3 | full min computed |
+| 2 | C | first leaf 2 → β_C = 2 ≤ α = 3 | α = 3 | **α-cutoff**: skip C's other leaves |
+| 3 | D | leaves 14, then 5 (>3 keep going), then 2 | α = 3 | 2 ≤ 3 fires but no siblings remain |
+
+Root value: $\max(3, 2, 2) = 3$. Leaves evaluated: 7 of 9.
+
+### How to Count Cuts in Exams
+
+A cut fires the moment a node's provisional value becomes **≤ α** (at MIN nodes) or **≥ β** (at MAX nodes), using the inherited window. Count every sibling after the firing child as pruned — even if the firing child was last, some papers still ask "was there a cutoff?" (answer: the condition held).
+
+## Inverse Design Problems (2026 trend!)
+
+Recent exams flip the question: *"Assign evaluation values to maximize the number of cuts."*
+
+Strategy:
+- To force an early **α-cutoff** at a MIN node under window $(\alpha, \beta)$: make its **first** leaf ≤ α (e.g., very negative)
+- To force an early **β-cutoff** at a MAX node: make its **first** leaf ≥ β (e.g., very large)
+- Left-to-right order matters: cuts only fire on children examined **after** the window tightened, so put extreme values early in promising subtrees and let later siblings be cut
+
+## Effectiveness
+
+| Scenario | Leaves evaluated |
+|----------|-----------------|
+| Worst ordering (best moves last) | $b^{m}$ — no savings, equals plain minimax |
+| Random ordering | $\approx b^{3m/4}$ |
+| **Best ordering (best moves first)** | $\approx b^{\lceil m/2 \rceil} + b^{\lfloor m/2 \rfloor} - 1$ ≈ doubles searchable depth! |
+
+With perfect move ordering alpha-beta searches roughly **twice as deep** as minimax in the same time — why it powers every chess engine.
+
+## Inspected vs Pruned — Two Sides of One Trace
+
+Papers flip between asking which leaves were **pruned** (skipped) and which were **inspected** (evaluated). They're complements:
+
+$$\text{inspected} \cup \text{pruned} = \text{all horizon leaves}, \qquad \text{inspected} \cap \text{pruned} = \emptyset$$
+
+| Question phrasing | What to output |
+|-------------------|----------------|
+| "List the horizon nodes pruned by Alpha-Beta" | skipped leaves, sorted |
+| "First five horizon nodes pruned" | skipped leaves in **chronological cut order**, not alphabetical! |
+| "Leaf nodes inspected by Alpha-Beta" (25T2) | evaluated leaves — everything not pruned |
+| "Leaves not affecting the game value" (24T3) | leaves whose value cannot change the root under optimal play — typically deep pruned branches |
+
+The chronological variant matters when several cuts fire: order them by *when* the cutoff occurred during the left-to-right traversal, then sort alphabetically only within simultaneous cuts.
+
+### Cutoff Taxonomy
+
+When a forced eval triggers a stop, name it correctly:
+
+| Where the window closes | Node type | Cut name |
+|------------------------|-----------|----------|
+| value ≤ α reached | MIN node | **α-cutoff** |
+| value ≥ β reached | MAX node | **β-cutoff** |
+
+25T3 papers ask this directly: give a leaf eval that induces a cutoff at a named node, then classify it. Recipe: check whether the node is MIN or MAX; that fixes α-cut vs β-cut; solve the inequality for the leaf's smallest/largest feasible value.
+
+<Quiz
+  question="A paper asks for leaves 'inspected' by Alpha-Beta. You should list..."
+  options={[
+    { label: "A", text: "the pruned leaves" },
+    { label: "B", text: "the complement — every leaf actually evaluated" },
+    { label: "C", text: "only the root's children" },
+    { label: "D", text: "all leaves" },
+  ]}
+  correctAnswer="B"
+  explanation="Inspected ∪ Pruned = all leaves, disjointly. 25T2 papers ask the inspected set — don't accidentally answer with pruned."
+/>
+
+<Quiz
+  question="'First five horizon nodes pruned' must be ordered by..."
+  options={[
+    { label: "A", text: "alphabetical label" },
+    { label: "B", text: "chronological order of when each cut fired during traversal" },
+    { label: "C", text: "deepest first" },
+    { label: "D", text: "smallest value first" },
+  ]}
+  correctAnswer="B"
+  explanation="Temporal ordering — cuts fire in traversal sequence. Only ties get alphabetical treatment per the standard tie-breaker."
+/>
+
+<Quiz
+  question="Alpha-beta pruning returns a different move than full minimax when..."
+  options={[
+    { label: "A", text: "the tree is deeper than 5 levels" },
+    { label: "B", text: "never — the root result is always identical to minimax" },
+    { label: "C", text: "when more than half the leaves are pruned" },
+    { label: "D", text: "when the heuristic is inconsistent" },
+  ]}
+  correctAnswer="B"
+  explanation="Pruned branches are PROVEN irrelevant — they could never change the root's value or argmax. Same answer, less work."
+/>
+
+<Quiz
+  question="An α-cutoff occurs when..."
+  options={[
+    { label: "A", text: "a MAX node's value reaches ≥ β" },
+    { label: "B", text: "a MIN node's provisional value drops to ≤ α" },
+    { label: "C", text: "α becomes positive" },
+    { label: "D", text: "the depth limit is hit" },
+  ]}
+  correctAnswer="B"
+  explanation="At a MIN node, once its best offer is ≤ what MAX already has elsewhere (α), MIN's remaining replies can't help anyone — cut. Symmetrically, β-cutoffs happen at MAX nodes when value ≥ β."
+/>
+
+<Quiz
+  question="With PERFECT move ordering, alpha-beta examines roughly how many leaves vs minimax?"
+  options={[
+    { label: "A", text: "$b^m$ — identical" },
+    { label: "B", text: "$b^{m}/2$" },
+    { label: "C", text: "about $b^{m/2}$ — equivalent to doubling searchable depth" },
+    { label: "D", text: "$m^b$" },
+  ]}
+  correctAnswer="C"
+  explanation="Best-case complexity O(b^(m/2)) means in the same time budget you can search twice as deep — the entire practical value of alpha-beta in game engines."
+/>
+
+<Accordion title="Common Exam Pitfalls">
+1. **Not propagating the window correctly**: children inherit the CURRENT (α, β) of their parent's context — updated as ancestors' values tighten. Writing stale windows is the most common trace error.
+
+2. **Cutting too eagerly or too little**: the rule is exactly α ≥ β (some books write β ≤ α at MIN nodes). Equal counts! A value equal to the bound still triggers a cutoff.
+
+3. **Forgetting which side updates which bound**: MAX raises α; MIN lowers β. Swapping these scrambles every subsequent cutoff decision.
+
+4. **Miscounting pruned leaves in 'count the cuts' questions**: siblings AFTER the triggering child are pruned; the triggering child itself was examined. Draw an arrow where the cut fires.
+
+5. **Assuming SSS\* beats alpha-beta in node count**: SSS\* never evaluates MORE nodes than alpha-beta (it can evaluate fewer), but costs far more memory. See the SSS\* page for the comparison table.
+</Accordion>

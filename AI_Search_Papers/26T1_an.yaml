@@ -1,0 +1,597 @@
+file: JAN_26_AN.pdf
+year: 2026
+term: 1
+session: an
+subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
+questions:
+- id: 1
+  type: comprehension
+  label: SEARCH
+  description: |
+    Consider a water-jug puzzle with three jugs a, b and c of capacities 5L, 3L and 2L, respectively.
+
+    A state, encoded as a digit string ABC, denotes volume of water in jugs a, b and c, respectively.
+    For example, state 122 denotes that jugs a, b and c contain 1L, 2L and 2L of water, respectively.
+
+    The allowable moves (actions) are
+    - `xETy`: pick up jug $x$ and empty it into jug $y$ and jug $y$ is also topped up,
+    - `xEy`: pick up jug $x$ and empty it into jug $y$ and jug $y$ is still not topped up,
+    - `xTy`: pick up jug $x$ and top up jug $y$ and jug $x$ is still not emptied out.
+
+    For example: $122 \xrightarrow{cEa} 320 \xrightarrow{bETa} 500 \xrightarrow{aTb} 230$.
+
+    MoveGen takes a state ABC and returns a set of neighbours that are one move away from ABC.
+    For example, $\text{MoveGen}(122) = \{ 032, 302, 320, 131 \}$.
+  subquestions:
+  - sub_id: '1.1'
+    question_type: short_answer
+    question: |
+      Let 212 be the start state and 131 be the goal state, find the shortest path from start to goal. Enter the path starting with 212 as a comma separated list of states.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 212,230,500
+    correct_answer: 212,410,401,131
+  - sub_id: '1.2'
+    question_type: short_answer
+    question: |
+      Let 212 be the start state and 131 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: aEb,aTc,bETa,cETb
+    correct_answer: cEa,bEc,aTb
+- id: 2
+  type: comprehension
+  label: SEARCH ALGORITHMS
+  description: Answer the given subquestions.
+  subquestions:
+  - sub_id: '2.1'
+    question_type: multiple_choice
+    question: Under what cases does Depth First Iterative Deepening (DFID) guarantee to find the shortest path if one exists?
+    options:
+      A: When it inspects only new nodes.
+      B: When it inspects new as well as open nodes.
+      C: When it inspects new as well as closed nodes.
+      D: None of these
+    correct_option: C
+  - sub_id: '2.2'
+    question_type: multiple_select
+    question: Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
+    options:
+      A: Depth First Search
+      B: Breadth First Search
+      C: Dijkstra's algorithm
+      D: Branch and Bound Search
+      E: A*
+      F: WA* for some w
+      G: Sparse Memory Graph Search (SMGS)
+    correct_options:
+    - B
+    - C
+    - D
+  - sub_id: '2.3'
+    question_type: multiple_select
+    question: If w is set to a large value (tending to infinity) then wA* algorithm will __________ .
+    options:
+      A: behave like Best-First Search
+      B: behave like Dijkstra's algorithm
+      C: guarantee an optimal path if h is admissible
+      D: not guarantee an optimal path even if h is admissible
+    correct_options:
+    - A
+    - D
+- id: 3
+  type: comprehension
+  label: 'GAMES: ALPHA-BETA'
+  description: |
+    Consider a game tree with the root node as MAX, where an arbitrary path from the root reaches the subtree shown in the figure.
+
+    ```mermaid
+    graph TD
+        SubtreeRoot((" ")) ---|α, β| SquareLeft[" "]
+        SubtreeRoot --- SquareRight[" "]
+        SquareLeft --- A(("A: ?"))
+        SquareLeft --- B(("B: ?"))
+        SquareRight --- C(("C: ?"))
+        SquareRight --- D(("D: ?"))
+    ```
+
+    Each leaf node A to D takes a UNIQUE EVAL VALUE from the set $\{1, 2, 3, 4\}$.
+    Alpha-Beta algorithm is entering the subtree with $\alpha=1$ and $\beta=3$;
+    find an optimal eval assignment (for nodes A to D) that maximizes the number of leaves pruned;
+    find the minimax value, the type of cuts and the leaves pruned for that assignment.
+  subquestions:
+  - sub_id: '3.1'
+    question_type: short_answer
+    question: |
+      Enter the optimal eval assignment (evals of nodes A to D) in the text box.
+      Enter a comma separated list of evals.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 1,2,3,4
+    correct_answer: 3,1,4,2
+  - sub_id: '3.2'
+    question_type: short_answer
+    question: |
+      The minimax value of the subtree for the optimal eval assignment is __________ .
+      Enter an integer.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+    correct_answer: '3'
+  - sub_id: '3.3'
+    question_type: short_answer
+    question: |
+      Enter the number of alpha-cuts followed by the number of beta-cuts as a comma separated list.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 1,2
+    correct_answer: 0,2
+  - sub_id: '3.4'
+    question_type: short_answer
+    question: |
+      Enter the label of leaf nodes pruned by Alpha-Beta algorithm, or enter NIL if no leaves were pruned.
+      Enter a comma separated list of labels (A to D), or enter NIL.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: W,X,Y,Z
+    correct_answer: B,D
+- id: 4
+  type: comprehension
+  label: 'GAMES: SSS STAR'
+  description: |
+    The figure shows a game tree with evaluation function values at the horizon nodes.
+    The horizon nodes are labeled from A to J.
+    Where applicable, use these labels in short answers.
+
+    **Tie-breaker**:
+    When several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+    ```mermaid
+    graph TD
+        Root[" "] --- C1((" "))
+        Root --- C2((" "))
+        Root --- C3((" "))
+
+        C1 --- S11[" "]
+        C1 --- S12[" "]
+
+        C2 --- S21[" "]
+        C2 --- S22[" "]
+
+        C3 --- S31[" "]
+
+        S11 --- A(("A: 5"))
+        S11 --- B(("B: 0"))
+
+        S12 --- C(("C: 4"))
+        S12 --- D(("D: 9"))
+
+        S21 --- E(("E: 3"))
+        S21 --- F(("F: 8"))
+
+        S22 --- G(("G: 6"))
+        S22 --- H(("H: 7"))
+
+        S31 --- I(("I: 2"))
+        S31 --- J(("J: 1"))
+    ```
+
+    Run SSS* algorithm on the game tree, then answer the sub-questions.
+  subquestions:
+  - sub_id: '4.1'
+    question_type: short_answer
+    question: |
+      Find the horizon nodes that are assigned SOLVED status by SSS* algorithm. Enter the labels of those nodes in the textbox, or enter NIL if no nodes are assigned SOLVED status.
+
+      Enter node labels as a comma separated list in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,C,E,G,H,I,J
+  - sub_id: '4.2'
+    question_type: short_answer
+    question: |
+      Find the SOLVED horizon nodes that are pruned from the queue by SSS* algorithm, i.e., SOLVED horizon nodes removed from the queue when a MAX-ancestor is SOLVED. Enter the labels of those nodes in the textbox, or enter NIL if SOLVED nodes were never pruned.
+
+      Enter node labels as a comma separated list in alphabetical order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: A,E,I,J
+- id: 5
+  type: comprehension
+  label: PROBLEM DECOMPOSITION
+  description: |
+    The figure shows an AND-OR decomposition of problem S into smaller problems.
+    The nodes are uniquely identified by labels (S, A, B, C, …).
+    Each node shows the heuristic estimate of the cost of solving that node.
+    Nodes shown in double lines are primitive nodes and their values are actual costs.
+    A primitive node is added to the graph, with SOLVED status, when its parent is expanded. And therefore, a primitive node is never expanded.
+
+    The cost of each edge is 2 units.
+
+    **Tie-breaker 1**: If several nodes have the same cost then break the tie using node labels.
+    **Tie-breaker 2**: For AND nodes, select the unsolved branch with the highest cost.
+
+    ```mermaid
+    graph TD
+        S(("S: 10")) --- A(("A: 16"))
+        S --- B(("B: 20"))
+        S --- C(("C: 14"))
+
+        A --- D(("D: 14"))
+        A --- E(("E: 10"))
+
+        D --- G[["G (primitive): 20"]]
+        E --- H[["H (primitive): 10"]]
+
+        B --- E
+        B --- H
+
+        C --- E
+        C --- F(("F: 8"))
+
+        F --- H
+
+        linkStyle 3,4 stroke-width:2px;
+        linkStyle 7,8 stroke-width:2px;
+    ```
+
+    Use AO* algorithm to solve S, then answer the sub-questions.
+  subquestions:
+  - sub_id: '5.1'
+    question_type: short_answer
+    question: |
+      List the nodes expanded by AO* algorithm. List the nodes in the order they are expanded.
+      Observe that primitive nodes are not expanded.
+
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: S,X,Y,Z
+    correct_answer: S,C,A,B,F
+  - sub_id: '5.2'
+    question_type: short_answer
+    question: |
+      For each node expanded by AO* algorithm, determine the value propagated to the start node S.
+      Enter the values of S as a list.
+
+      Enter a comma separated list of numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12,42,17
+    correct_answer: 16,18,22,24,28
+  - sub_id: '5.3'
+    question_type: multiple_choice
+    question: What can you conclude about the given AND-OR decomposition?
+    options:
+      A: The heuristic is admissible.
+      B: The heuristic is inadmissible.
+      C: The heuristic is sometimes admissible and sometimes inadmissible.
+    correct_option: A
+- id: 6
+  type: comprehension
+  label: RULE BASED EXPERT SYSTEMS
+  description: |
+    A part of the Rete Net that classifies mushrooms (as edible or poisonous) is shown in the figure.
+    The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, …, R4 uniquely identify the nodes in the network.
+    When required, use the above label ordering to break ties and to enter short answers.
+
+    Note: `attribute <> x` is true when that attribute exists and its value is not equal to x.
+
+    ```mermaid
+    graph TD
+        WME --- A1["A1: CLASS = Mushroom"]
+        WME --- A2["A2: CLASS = Stalk"]
+        WME --- A3["A3: CLASS = Cap"]
+
+        A1 --- A4["A4: specimen = &lt;n&gt;"]
+        A4 --- A7["A7: odour = NONE"]
+        A4 --- A8["A8: odour = NONE"]
+        A4 --- A9["A9: habitat = LEAVES"]
+        A4 --- A10["A10: br-surface = SCALY"]
+
+        A7 --- A14["A14: sp-colour &lt;&gt; GREEN"]
+        A14 --- R1["R1"]
+
+        A8 --- B2["B2: = &lt;n&gt;"]
+        A9 --- B2
+        B2 --- R3["R3"]
+
+        A2 --- A5["A5: specimen = &lt;n&gt;"]
+        A5 --- A10
+        A5 --- A11["A11: root = BULBOUS"]
+        A5 --- A15["A15: ar-colour &lt;&gt; BROWN"]
+
+        A10 --- B1["B1: = &lt;n&gt;"]
+        A15 --- B1
+        B1 --- R2["R2"]
+
+        A3 --- A6["A6: specimen = &lt;n&gt;"]
+        A6 --- A12["A12: colour = WHITE"]
+        A6 --- A13["A13: surface = SMOOTH"]
+        A6 --- A16["A16: colour = RED"]
+
+        A11 --- B3["B3: = &lt;n&gt;"]
+        A12 --- B3
+        A13 --- B3
+        B3 --- R4["R4"]
+    ```
+
+    Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order.
+    Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
+
+    ```text
+    101. (Cap ^specimen C36 ^colour RED ^surface SMOOTH)
+    102. (Cap ^specimen A25 ^colour WHITE ^surface SMOOTH)
+    103. (Mushroom ^specimen X16 ^odour NONE ^habitat LEAVES)
+    104. (Mushroom ^specimen A25 ^odour NONE ^habitat LEAVES)
+    105. (Stalk ^specimen C36 ^root BULBOUS ^ar-colour WHITE)
+    106. (Stalk ^specimen X16 ^br-surface SCALY ^ar-colour WHITE)
+    107. (Mushroom ^specimen C36 ^odour NONE ^sp-colour WHITE)
+    108. (Mushroom ^specimen B49 ^odour ALMOND ^sp-colour BROWN)
+    109. (Stalk ^specimen B49 ^br-surface SMOOTH)
+    ```
+
+    For each WME identify its location (node label) in the Rete Net, and prepare the conflict set for the first cycle, then answer the sub-questions.
+  subquestions:
+  - sub_id: '6.1'
+    question_type: multiple_select
+    question: Which of the following rule-data tuples are in the conflict-set?
+    options:
+      A: R1,107
+      B: R2,102,104
+      C: R3,103,106
+      D: R4,101,105
+      E: R2,102,103
+      F: R3,104,106
+    correct_options:
+    - A
+    - B
+    - C
+    - D
+  - sub_id: '6.2'
+    question_type: multiple_select
+    question: If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+    options:
+      A: R1,107
+      B: R2,102,104
+      C: R3,103,106
+      D: R4,101,105
+      E: R2,102,103
+      F: R3,104,106
+    correct_options:
+    - C
+    - D
+  - sub_id: '6.3'
+    question_type: multiple_choice
+    question: If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+    options:
+      A: R1,107
+      B: R2,102,104
+      C: R3,103,106
+      D: R4,101,105
+      E: R2,102,103
+      F: R3,104,106
+    correct_option: A
+- id: 7
+  type: comprehension
+  label: AUTOMATED PLANNING 1
+  description: Answer the given subquestions.
+  subquestions:
+  - sub_id: '7.1'
+    question_type: multiple_select
+    question: Consider actions a and b and the two orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will make both of the orderings feasible?
+    options:
+      A: P is in pre(a) and also in pre(b).
+      B: P is in del-effects(a) and also in del-effects(b).
+      C: None of these.
+    correct_options:
+    - A
+    - B
+  - sub_id: '7.2'
+    question_type: multiple_select
+    question: In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ .
+    options:
+      A: if P in pre(a) and Q in pre(b) are mutex
+      B: if P is in pre(a), in del-effects(a), in pre(b) and also in del-effects(b)
+      C: only if every P in pre(a) is also present in del-effects(b)
+      D: only if every P in add-effects(a) is also present in del-effects(b)
+    correct_options:
+    - A
+    - B
+  - sub_id: '7.3'
+    question_type: multiple_select
+    question: In planning graphs constructed by GraphPlan, which of the following are true?
+    options:
+      A: If propositions P and Q are non mutex in layer zero then it will remain non mutex in all future layers.
+      B: If propositions P and Q are non mutex in a layer n then it will remain non mutex in all future layers.
+      C: If propositions P and Q are non mutex in a layer n then it can become mutex in a future layer.
+      D: None of these.
+    correct_options:
+    - A
+    - B
+- id: 8
+  type: comprehension
+  label: AUTOMATED PLANNING 2
+  description: |
+    The domain description of a Blocks World with a single one-armed robot is given below.
+
+    **PREDICATES**
+    - `armEmpty`: The arm is not holding any block, it is empty.
+    - `holding(X)`: The arm is holding X.
+    - `onTable(X)`: X is on the table.
+    - `clear(X)`: X has nothing above it, it is clear.
+    - `on(X,Y)`: X is directly placed on Y.
+
+    **OPERATORS**
+
+    `Pickup(X)`: pick up X from the table.
+    - Preconditions: `{ armEmpty, clear(X), onTable(X) }`
+    - Add Effects: `{ holding(X) }`
+    - Del Effects: `{ armEmpty, onTable(X) }`
+
+    `Putdown(X)`: place X on the table.
+    - Preconditions: `{ holding(X) }`
+    - Add Effects: `{ armEmpty, onTable(X) }`
+    - Del Effects: `{ holding(X) }`
+
+    `Unstack(X,Y)`: pick up X that is directly sitting on Y.
+    - Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
+    - Add Effects: `{ clear(Y), holding(X) }`
+    - Del Effects: `{ armEmpty, on(X,Y) }`
+
+    `Stack(X,Y)`: place X directly on top of Y.
+    - Preconditions: `{ holding(X), clear(Y) }`
+    - Add Effects: `{ armEmpty, on(X,Y) }`
+    - Del Effects: `{ holding(X), clear(Y) }`
+
+    **NOTE**: variables X and Y must bind to different objects.
+
+    Consider the following planning problem.
+
+    **Start State**: `{ onTable(A), onTable(B), on(C,A), on(E,B), clear(C), clear(E), clear(D), holding(D) }`
+
+    **Goal Description**: `{ on(D,E), on(A,D) }`
+
+    Based on the above data, answer the given subquestions.
+  subquestions:
+  - sub_id: '8.1'
+    question_type: multiple_select
+    question: Which of the following are applicable actions for FSSP?
+    options:
+      A: Putdown(D)
+      B: Stack(A,D)
+      C: Stack(D,E)
+      D: Stack(D,C)
+      E: Unstack(E,B)
+      F: Unstack(C,A)
+    correct_options:
+    - A
+    - C
+    - D
+  - sub_id: '8.2'
+    question_type: multiple_select
+    question: Which of the following are relevant actions for BSSP?
+    options:
+      A: Putdown(D)
+      B: Stack(A,D)
+      C: Stack(D,E)
+      D: Stack(D,C)
+      E: Unstack(E,B)
+      F: Unstack(C,A)
+    correct_options:
+    - B
+    - C
+  - sub_id: '8.3'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex action pairs in layer 1?
+    options:
+      A: Stack(D,E) and nop for armEmpty
+      B: Stack(D,E) and nop for clear(C)
+      C: Stack(D,E) and nop for holding(D)
+      D: Stack(D,E) and Putdown(D)
+    correct_options:
+    - C
+    - D
+  - sub_id: '8.4'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are mutex proposition pairs in layer 1?
+    options:
+      A: armEmpty and clear(C)
+      B: armEmpty and holding(D)
+      C: on(D,E) and clear(C)
+      D: on(D,E) and onTable(D)
+    correct_options:
+    - B
+    - D
+  - sub_id: '8.5'
+    question_type: multiple_select
+    question: In the planning graph, which of the following are applicable actions in layer 2?
+    options:
+      A: Pickup(D)
+      B: Putdown(C)
+      C: Unstack(E,B)
+      D: Unstack(C,A)
+    correct_options:
+    - A
+    - C
+    - D
+  - sub_id: '8.6'
+    question_type: multiple_choice
+    question: For the given planning problem, does a plan exist?
+    options:
+      A: 'Yes'
+      B: 'No'
+      C: Cannot be determined
+    correct_option: A
+  - sub_id: '8.7'
+    question_type: short_answer
+    question: |
+      For the given planning problem, the length of the plan found by GraphPlan is __________ .
+
+      Enter an integer or enter NIL if GraphPlan cannot find a plan.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12
+    correct_answer: '5'
+- id: 9
+  type: comprehension
+  label: CONSTRAINT SATISFACTION
+  description: |
+    Consider a CSP over 3 variables A, B, C where the domains and constraints are:
+
+    $$D_A = D_B = D_C = \{1,2,3,4\}$$
+    $$R_{AC}: A = \text{mod}(2C, 3)$$
+    $$R_{BA}: B = \text{mod}(2A, 7)$$
+    $$R_{CB}: C = \text{mod}(2B, 7)$$
+
+    where, $\text{mod}(n,d)$ returns the remainder after dividing $n$ by $d$, for example, $\text{mod}(8,3)=2$, $\text{mod}(6,7)=6$, $\text{mod}(8,7)=1$.
+
+    Compute the three relations to match the domain constraints, then draw the constraint graph and matching-diagram, and then answer the sub-questions.
+  subquestions:
+  - sub_id: '9.1'
+    question_type: multiple_select
+    question: Which of the following tuples occur in R_AC?
+    options:
+      A: (1,2)
+      B: (2,1)
+      C: (2,4)
+      D: (4,2)
+    correct_options:
+    - A
+    - B
+    - C
+  - sub_id: '9.2'
+    question_type: multiple_select
+    question: Which of the following tuples occur in R_BA?
+    options:
+      A: (1,4)
+      B: (2,1)
+      C: (3,1)
+      D: (4,2)
+    correct_options:
+    - A
+    - B
+    - D
+  - sub_id: '9.3'
+    question_type: multiple_choice
+    question: Is the given CSP arc-consistent?
+    options:
+      A: 'Yes'
+      B: 'No'
+      C: Cannot be determined
+    correct_option: B
+  - sub_id: '9.4'
+    question_type: multiple_choice
+    question: If the given CSP is not already arc-consistent, then make it arc-consistent, and then check if the resulting network is path consistent.
+    options:
+      A: It is path consistent.
+      B: It is not path consistent.
+      C: Path consistency does not apply because the constraint graph has a cycle.
+    correct_option: A
+  - sub_id: '9.5'
+    question_type: short_answer
+    question: |
+      Does the given CSP have a solution?
+
+      Enter the solution for the variables A,B,C as a comma separated list.
+      Enter NIL if there is no solution.
+
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 1,2,3
+    correct_answer: 2,4,1
