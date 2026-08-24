@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import LiteMarkdown, { renderInline } from "@/components/quiz/markdown-lite";
 import Mermaid from "@/components/ui/mermaid";
 import { cn } from "@/lib/utils";
@@ -55,7 +56,13 @@ function prettyAnswer(item: QuizItem): string {
 const btn =
   "rounded-md border border-foreground/[0.12] px-3 py-1.5 text-xs font-medium text-foreground/65 transition-colors hover:bg-foreground/[0.07] disabled:cursor-not-allowed disabled:opacity-30";
 
-export default function QuizRunner({ items }: { items: QuizItem[] }) {
+export default function QuizRunner({
+  items,
+  paper,
+}: {
+  items: QuizItem[];
+  paper?: string;
+}) {
   const [states, setStates] = useState<Record<string, AnswerState>>({});
   const [revealed, setRevealed] = useState(false);
   const [focusMode, setFocusMode] = useState(true);
@@ -151,6 +158,14 @@ export default function QuizRunner({ items }: { items: QuizItem[] }) {
             <span className="mt-0.5 rounded bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
               {item.label}
             </span>
+          )}
+          {paper && (
+            <Link
+              href={`/quiz/${paper}/answer/${item.id.split(".")[0]}`}
+              className="ml-auto shrink-0 rounded border border-indigo-500/30 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700 transition-colors hover:bg-indigo-500/10 dark:text-indigo-300"
+            >
+              Solution ↗
+            </Link>
           )}
         </div>
 

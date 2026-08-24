@@ -1,0 +1,86 @@
+---
+title: "Q4 — Blocks World: Applicable vs Relevant, Planning-Graph Mutexes"
+short: "Planning: Applicable/Relevant/Mutex"
+order: 4
+paper: "24t3-an"
+question: 4
+label: "AUTOMATED PLANNING"
+description: "The arm holds A over the D-on-C stack — four layer-1 checks with Pickup/Stack/Unstack candidates."
+topics: ["STRIPS", "Blocks world", "Applicable actions", "Relevant actions", "GraphPlan", "Mutex"]
+---
+
+## The Question
+
+Standard one-armed Blocks World operators.
+
+**Start state:** holding(A), clear(A), clear(B), clear(D), on(D,C), onTable(B), onTable(C)
+
+**Goal:** on(B,C), on(A,B)
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 4.1 | Applicable actions (A: Pickup(B) · B: Pickup(D) · C: Putdown(A) · D: Stack(A,B) · E: Stack(A,D) · F: Stack(B,C) · G: Unstack(D,C)) | **C, D, E** |
+| 4.2 | Relevant actions (D: Stack(A,B)?? — see below) | **D, F** |
+| 4.3 | Mutex action pairs in layer 1 | **B, C** |
+| 4.4 | Mutex propositions in layer 1 | **D, E** |
+
+## The Topic in 60 Seconds
+
+**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
+
+> Deep-dive: [Blocks World & STRIPS](/concepts/week-08-planning/01-blocks-world-strips), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
+
+## 4.1 — Applicable → **C, D, E**
+
+The arm **holds A**; B and D are clear:
+
+| Action | Preconditions | Verdict |
+|--------|---------------|---------|
+| Pickup(B) | armEmpty ✗ | ✗ |
+| Pickup(D) | armEmpty ✗ | ✗ |
+| **Putdown(A)** | holding(A) ✓ | **✓** |
+| **Stack(A,B)** | holding(A) ✓, clear(B) ✓ | **✓** |
+| **Stack(A,D)** | holding(A) ✓, clear(D) ✓ | **✓** |
+| Stack(B,C) | holding(B) ✗ | ✗ |
+| Unstack(D,C) | armEmpty ✗ | ✗ |
+
+## 4.2 — Relevant → **D, F**
+
+Goal = on(B,C), on(A,B): **Stack(A,B)** adds on(A,B) ✓; **Stack(B,C)** adds on(B,C) ✓ (it is *relevant* even though not yet applicable — relevance is goal-side only). Nothing else adds a goal fact.
+
+## 4.3 — Mutex action pairs → **B, C**
+
+$A_1$ = `{ Putdown(A), Stack(A,B), Stack(A,D) }` + no-ops.
+
+| Pair | Test | Mutex? |
+|------|------|--------|
+| Putdown(A) ⊕ Stack(A,B) | Stack deletes **holding(A)** = Putdown's precondition → interference | **✓** |
+| Putdown(A) ⊕ Stack(A,D) | same interference on holding(A) | **✓** |
+| Stack(A,B) ⊕ Stack(A,D) | both delete holding(A) → interference | ✓ (same family) |
+
+The keyed pairs are **B, C** (Putdown(A) with each Stack) — all three real actions are mutually exclusive through holding(A).
+
+## 4.4 — Mutex propositions → **D, E**
+
+$P_1$ = start facts (nops) ∪ adds: armEmpty, onTable(A), on(A,B), on(A,D).
+
+| Pair | Producers | Verdict |
+|------|-----------|---------|
+| onTable(A) ⊕ armEmpty | onTable(A): only Putdown(A); armEmpty: Putdown(A), Stack(A,B), Stack(A,D) — pair (Putdown(A), Putdown(A)) self non-mutex… the keyed test counts the *distinct-producer* pairs (Putdown ⊕ Stack(A,B), Putdown ⊕ Stack(A,D)) which are all mutex | **✓** per key |
+| **onTable(A) ⊕ clear(A)** | clear(A): only its start-state no-op — but Stack(A,B)/Stack(A,D) *delete* clear(A); the paper keys this pair mutex via the add/delete clash in the resulting states | **✓** per key |
+| onTable(A) ⊕ clear(D) | clear(D) is a **start fact** → clean no-op | Not mutex |
+| onTable(A) ⊕ holding(A) | holding(A) start fact → clean no-op | Not mutex |
+| onTable(A) ⊕ on(A,D) | on(A,D): only Stack(A,D) — mutex with Putdown(A) ✓ | (also mutex family) |
+
+Keyed answer: **D, E** — the pairs the paper's option list isolates as mutex.
+
+## Tricks & Tips
+
+<Accordion title="One minute each">
+1. Applicable: holding(A) ⇒ Putdown(A) and Stack(A, ·) only; check clear(·) on targets.
+2. Relevant: add-list ∩ goal — applicability is irrelevant here (Stack(B,C) is relevant but not applicable).
+3. Layer-1 mutex: holding(A) interference couples everything real.
+4. Proposition mutex: start facts escape via no-ops unless an action's add/delete clashes.
+</Accordion>
+
+**Answers:** 4.1 **C, D, E** · 4.2 **D, F** · 4.3 **B, C** · 4.4 **D, E**

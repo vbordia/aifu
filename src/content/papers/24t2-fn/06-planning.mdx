@@ -1,0 +1,77 @@
+---
+title: "Q6 — Blocks World: Applicable vs Relevant, Planning-Graph Mutexes"
+short: "Planning: Applicable/Relevant/Mutex"
+order: 6
+paper: "24t2-fn"
+question: 6
+label: "AUTOMATED PLANNING"
+description: "D stacks on A, E on B — the same start/goal as the AN paper with identical answers."
+topics: ["STRIPS", "Blocks world", "Applicable actions", "Relevant actions", "GraphPlan", "Mutex"]
+---
+
+## The Question
+
+Standard one-armed Blocks World operators.
+
+**Start state:** onTable(A), onTable(B), onTable(C), clear(D), clear(E), clear(C), on(D,A), on(E,B), armEmpty
+
+**Goal:** on(B,C), on(A,B)
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Applicable actions (A: Putdown(D) · B: Unstack(D,A) · C: Unstack(E,B) · D: Pickup(C) · E: Pickup(A) · F: Stack(A,B) · G: Stack(B,C)) | **B, C, D** |
+| 6.2 | Relevant actions | **F, G** |
+| 6.3 | Mutex action pairs in layer 1 (A: Unstack(D,A),Pickup(C) · B: Unstack(D,A),Unstack(E,B) · C: Pickup(C),Stack(A,B) · D: Pickup(C),Stack(B,C)) | **A, B** |
+| 6.4 | Mutex propositions in layer 1 (A: clear(A),holding(E) · B: clear(A),clear(B) · C: clear(C),on(D,A) · D: clear(C),holding(E)) | **A, B** |
+
+## The Topic in 60 Seconds
+
+**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
+
+> Deep-dive: [Blocks World & STRIPS](/concepts/week-08-planning/01-blocks-world-strips), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
+
+## 6.1 — Applicable → **B, C, D**
+
+armEmpty holds:
+
+| Action | Preconditions | Verdict |
+|--------|---------------|---------|
+| Putdown(D) | holding(D) ✗ | ✗ |
+| **Unstack(D,A)** | armEmpty ✓, clear(D) ✓, on(D,A) ✓ | **✓** |
+| **Unstack(E,B)** | armEmpty ✓, clear(E) ✓, on(E,B) ✓ | **✓** |
+| **Pickup(C)** | armEmpty ✓, clear(C) ✓, onTable(C) ✓ | **✓** |
+| Pickup(A) | clear(A) ✗ (D on A) | ✗ |
+| Stack(A,B) / Stack(B,C) | holding(·) ✗ | ✗ |
+
+## 6.2 — Relevant → **F, G**
+
+Goal = on(B,C), on(A,B): **Stack(B,C)** adds on(B,C) ✓; **Stack(A,B)** adds on(A,B) ✓. Nothing else adds a goal fact.
+
+## 6.3 — Mutex action pairs → **A, B**
+
+$A_1$ = `{ Unstack(D,A), Unstack(E,B), Pickup(C) }` + no-ops (options C, D name inapplicable Stacks → auto-wrong).
+
+- Unstack(D,A) ⊕ Pickup(C): both **delete armEmpty** → interference → mutex ✓
+- Unstack(D,A) ⊕ Unstack(E,B): same → mutex ✓
+
+## 6.4 — Mutex propositions → **A, B**
+
+$P_1$ = start facts (nops) ∪ adds: clear(A), clear(B), holding(D), holding(E), holding(C).
+
+| Pair | Producers | Verdict |
+|------|-----------|---------|
+| **clear(A) ⊕ holding(E)** | clear(A): only Unstack(D,A) (D sits on A — not a start fact); holding(E): only Unstack(E,B) — producers mutex (6.3) | **✓** |
+| **clear(A) ⊕ clear(B)** | clear(B): only Unstack(E,B) — same mutex pair | **✓** |
+| clear(C) ⊕ on(D,A) | clear(C) is a **start fact** → nop producer clean | Not mutex |
+| clear(C) ⊕ holding(E) | same clean no-op | Not mutex |
+
+## Tricks & Tips
+
+<Accordion title="One minute each">
+1. Applicable: armEmpty ⇒ unstacks/pickups only.
+2. Relevant: add-list ∩ goal.
+3. Layer-1 mutex: armEmpty interference; inapplicable options are free eliminations.
+4. Proposition mutex: start facts escape via no-ops; single-producer facts inherit their producer's mutex status.
+</Accordion>
+
+**Answers:** 6.1 **B, C, D** · 6.2 **F, G** · 6.3 **A, B** · 6.4 **A, B**

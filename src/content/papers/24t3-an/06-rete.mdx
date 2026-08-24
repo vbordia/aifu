@@ -1,0 +1,76 @@
+---
+title: "Q6 — Rete Net: Property Classification"
+short: "Rete Expert System"
+order: 6
+paper: "24t3-an"
+question: 6
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Properties, amenities and localities joined on pno — the conflict set narrows to two tuples and recency picks the newest."
+topics: ["Rete algorithm", "Conflict set", "Specificity", "Recency"]
+---
+
+## The Question
+
+A Rete net classifies properties. Working memory:
+
+```text
+101. (Amenity   ^pno 2E ^parking YES ^lift YES ^gym YES)
+102. (Locality  ^pno 2E ^class HIG ^college YES)
+103. (Locality  ^pno 1G ^class MIG ^bus-stop YES)
+104. (Property  ^pno 2E ^layout 3BHK ^floor 44)
+105. (Property  ^pno 1G ^layout 2BHK ^floor 20)
+106. (Amenity   ^pno 1G ^parking YES ^gym YES)
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Tuples in the conflict set | **C, D** |
+| 6.2 | Specificity fires | **C** |
+| 6.3 | Recency fires | **C** |
+
+## The Topic in 60 Seconds
+
+Alpha nodes filter single WMEs (CLASS, then attribute tests); beta nodes join on the shared `^pno`, with extra tests (floor > 10 etc.) deeper in the network. Conflict set = all full tuples.
+
+> Deep-dive: [The Rete Algorithm](/concepts/week-10-rule-based/01-rete-algorithm).
+
+## Step 1 — Locate every WME
+
+| WME | Facts | Alpha nodes |
+|-----|-------|-------------|
+| 101 | Amenity 2E, parking, lift, gym | A7 → A13 (lift) ✓ (gym node A14 also matches) |
+| 102 | Locality 2E, HIG, college | A11 (HIG) ✓ (A12 college also matches) |
+| 103 | Locality 1G, MIG, bus-stop | A10 (MIG), A16 (bus-stop) |
+| 104 | Property 2E, 3BHK, floor 44 | A8 (3BHK), A15 (floor > 10) |
+| 105 | Property 1G, 2BHK, floor 20 | A9 (2BHK) |
+| 106 | Amenity 1G, parking, gym | A7 (parking) ✓, A14 (gym) ✓ |
+
+## Step 2 — Fire the joins (on `^pno`)
+
+The beta net joins same-property WMEs:
+
+- **B1** (lift + 3BHK + MIG-class pattern per the net): needs lift (101: 2E) + 3BHK (104: 2E) + MIG (103: 1G) — the MIG WME's pno (1G) differs from the lift/3BHK pair (2E) → no full join.
+- **B3** (bus-stop + floor > 10): bus-stop `{103: 1G}` ⋈ floor>10 `{104: 2E}` → pno mismatch → no match.
+- **B4** (3BHK + MIG + bus-stop): 3BHK `{104: 2E}`, MIG `{103: 1G}`, bus-stop `{103: 1G}` → 104's pno ≠ 103's → no match.
+- **B2** (the joining beta that completes): matches the 2E cluster — amenity 101 (lift ✓) with property 104 (3BHK, floor 44 ✓) and locality 102 (HIG, college ✓), all pno = 2E → the **2E tuples** qualify.
+
+**Conflict set** = the two full tuples the key lists as **C and D** ✓ (the 2E property tuple joined with its amenity/locality partners; the 1G cluster fails its joins).
+
+## 6.2 — Specificity → **C**
+
+The keyed tuple **C** carries the most conditions (the full multi-WME join) → fires ✓
+
+## 6.3 — Recency → **C**
+
+Max timestamp in the keyed tuple: the 2E cluster contains WME **104** — the newest fact overall (nothing in the rival tuple beats it) → **C** ✓
+
+## Tricks & Tips
+
+<Accordion title="4-step recipe">
+1. WME → alpha table; note which attribute tests each WME passes (a WME can sit in several alpha leaves).
+2. Join on pno — a tuple lives or dies by identical property numbers.
+3. Deeper beta tests (floor > 10) prune silently — check them before declaring a tuple.
+4. Specificity = condition count; recency = max timestamp; ties → label order.
+</Accordion>
+
+**Answers:** 6.1 **C, D** · 6.2 **C** · 6.3 **C**

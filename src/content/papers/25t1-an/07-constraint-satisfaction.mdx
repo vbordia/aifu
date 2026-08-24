@@ -1,0 +1,135 @@
+---
+title: "Q7 — Waltz Line Labeling: Is the Drawing Consistent?"
+short: "Waltz Line Labeling"
+order: 7
+paper: "25-t1-an"
+question: 7
+label: "CONSTRAINT SATISFACTION"
+description: "Classify six junctions, propagate edge labels from the T-junction outward — and watch every branch die. NIL."
+topics: ["Waltz labeling", "Line drawings", "Constraint propagation", "Trihedral junctions"]
+---
+
+## The Question
+
+The paper's junction dictionary (each junction type with its legal labelings; in-plane rotations are valid too):
+
+| Type | Legal labelings (edges in order) |
+|------|----------------------------------|
+| **L** (2 edges) | L1: →,→ (both arrows *into* the corner) · L2: →,− · L3: −,→ · L4: ←,← (both arrows *away*) · L5: →,+ · L6: +,→ |
+| **W** (3 edges, fan) | W1: →,+,→ (arrows *into* on both diagonals, + on stem) · W2: −,+,− · W3: +,−,+ |
+| **Y** (3 edges, 120° apart) | Y1: →,→,− (arrows into on two edges, − on third) · Y2: −,−,− · Y3: +,+,+ |
+| **T** (occlusion) | T1: bar arrows out, stem arrow *into* the T · T2: bar arrows out, stem arrow *away* · T3: bar arrows out, stem + · T4: bar arrows out, stem − |
+
+(`+` convex, `−` concave, arrows = occluding edges.)
+
+**The drawing to label** — junctions 1–6, with two edges running off the page at 2 and 6:
+
+```text
+        3 ------------ 4 ------------- 5
+        |              |               |
+        |              |               |
+        |      1 (junction below 4)    |
+      2 ················1·············· 6
+   ~~↖ /                  \ ↗~~
+(dangling)                  (dangling)
+```
+
+Edges: 3–4, 4–5 (top bar) · 3–2, 5–6 (verticals) · 2–1, 1–6 (diagonals) · 1–4 (vertical) · plus **dangling edges** leaving the page at 2 (up-left) and 6 (up-right).
+
+Enter the junction labels for 1, 2, 3, 4 — or NIL.
+
+**Official answer: `NIL`** — the drawing has no consistent labeling.
+
+## The Topic in 60 Seconds
+
+Waltz labeling = constraint satisfaction over edges: each junction must realize **one** of its legal dictionary patterns, and an edge shared by two junctions must carry the **same label (and arrow direction)** at both ends. If any junction runs out of legal patterns, the whole drawing is **inconsistent → NIL**.
+
+> Deep-dive: [Waltz Line Labeling](/concepts/week-11-constraint-satisfaction/02-waltz-line-labeling), [Arc Consistency](/concepts/week-11-constraint-satisfaction/03-csp-relations-arc-consistency).
+
+## Step 1 — Classify every junction
+
+Count edges and angles:
+
+| Junction | Edges | Shape | Type |
+|----------|-------|-------|------|
+| 3 | 4 (right), 2 (down) | corner | **L** |
+| 4 | 3 (left), 5 (right), 1 (down) | two collinear + stem | **T** |
+| 5 | 4 (left), 6 (down) | corner | **L** |
+| 1 | 4 (up), 2 (down-left), 6 (down-right) | three edges ≈120° apart | **Y** |
+| 2 | 3 (up), 1 (up-right), dangling (up-left) | 3-edge fan | **W** |
+| 6 | 5 (up), 1 (up-left), dangling (up-right) | 3-edge fan | **W** |
+
+## Step 2 — The T-junction speaks first (it's the most constrained)
+
+In every T pattern, the **bar arrows point away from the T**. So:
+
+- Edge **3–4**: arrow pointing **into junction 3**
+- Edge **4–5**: arrow pointing **into junction 5**
+- Stem **1–4**: still free — arrow into 4 (T1), arrow away (T2), + (T3), or − (T4).
+
+## Step 3 — Boundary edges must be occluding arrows
+
+An edge that runs **off the page** cannot be `+` or `−`: those join two *visible faces* and must terminate at junctions on both ends. A dangling edge is an **occluding (arrow) edge** — the object continues behind whatever the drawing cuts off.
+
+Now look at the W dictionary for junction 2's dangling edge:
+
+- W2 and W3 put **− / +** on the diagonals — impossible for a boundary edge.
+- Only **W1** puts an arrow on a diagonal, pointing **into** the junction.
+
+Same at junction 6. So both W junctions are forced to **W1**:
+
+- At 2: dangling edge = arrow into 2 ⟹ **edge 2–1 = arrow into 2**, stem edge 2–3 = **+**
+- At 6: dangling edge = arrow into 6 ⟹ **edge 1–6 = arrow into 6**, stem edge 5–6 = **+**
+
+## Step 4 — Check the L junctions (they survive)
+
+- Junction 3 (L): edge 3–4 arrives as an arrow *into 3*; edge 2–3 is `+` → pattern **L5** (arrow-in + +) ✓ legal.
+- Junction 5 (L): edge 4–5 arrives as an arrow *into 5*; edge 5–6 is `+` → **L5/L6** ✓ legal.
+
+## Step 5 — Junction 1 kills everything → **NIL**
+
+Junction 1 is a **Y**. Its legal patterns are only:
+
+- **Y1**: arrows pointing **into** 1 on two edges, − on the third
+- **Y2**: all three edges `−`
+- **Y3**: all three edges `+`
+
+But from Step 3:
+
+- Edge **2–1** carries its arrowhead at the *2-end* — from junction 1 it is an arrow pointing **away**
+- Edge **1–6** carries its arrowhead at the *6-end* — again pointing **away** from 1
+
+No Y pattern allows arrows pointing *away* on two edges (Y1 wants them pointing in; Y2/Y3 want − / +). **Junction 1 has no legal labeling — the domain empties — the drawing is inconsistent.**
+
+$$\boxed{\text{Answer: NIL}}$$
+
+```mermaid
+graph TD
+    A["T(4): bar arrows forced<br/>3-4 →into 3, 4-5 →into 5"] --> B["Boundary edges must be arrows"]
+    B --> C["W(2), W(6) → forced to W1<br/>2-1 →into 2, 1-6 →into 6"]
+    C --> D{"Y(1): two arrows point AWAY from 1"}
+    D -->|"Y1 needs arrows INTO"| E["✗"]
+    D -->|"Y2 needs all −"| E
+    D -->|"Y3 needs all +"| E
+    E --> F["Domain empty → NIL"]
+    style F fill:#7f1d1d,stroke:#fca5a5,color:#fff
+    style A fill:#0b3d5c,stroke:#1d9ad6,color:#e6f4ff
+    style C fill:#0b3d5c,stroke:#1d9ad6,color:#e6f4ff
+```
+
+## Tricks & Tips for This Question Family
+
+<Accordion title="The 4-step Waltz exam method">
+1. **Classify junctions first** (2 edges = L; 3 edges with a 180° pair = T; 3-edge fan = W; 3 edges ≈120° = Y).
+2. **Start at the T-junction** — its bar arrows are always forced outward; that pins labels on two edges immediately.
+3. **Boundary/dangling edges are arrows** — and in W junctions that forces W1, which points the arrows *into* the W. This is the step most students miss.
+4. **Propagate and eliminate.** Each shared edge must agree at both ends; the moment a junction's domain empties → answer NIL. Don't enumerate all labelings — kill branches as early as possible.
+</Accordion>
+
+<Accordion title="Common pitfalls">
+- **Forgetting rotations:** the dictionary patterns hold at *any* in-plane rotation — match shapes, not absolute directions.
+- **Treating dangling edges as free:** they are arrows, and that constraint is exactly what makes this drawing NIL.
+- **Labeling edges differently at each end:** an arrow's head is at one specific junction; the other junction sees it pointing away.
+</Accordion>
+
+**Answer:** 7.1 `NIL`

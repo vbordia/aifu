@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   reactCompiler: true,
   output: "export",
+    allowedDevOrigins: ['192.168.29.57'],
+
 };
 
 const withMDX = createMDX({

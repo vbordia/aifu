@@ -205,6 +205,16 @@
   justify-content: center;
 }
 
+.mermaid-output {
+  display: flex;
+  justify-content: center;
+}
+
+.mermaid-output svg {
+  max-width: 100%;
+  height: auto;
+}
+
 .mermaid svg {
   max-width: 100%;
   height: auto;

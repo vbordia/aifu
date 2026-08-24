@@ -225,7 +225,7 @@ questions:
         B(("B (20)"))
         C(("C (35)"))
         D[["D (primitive): 20"]]
-        E(("E (10)"))
+        E[["E (primitive): 10"]]
         F[["F (primitive): 30"]]
         G[["G (primitive): 20"]]
 
@@ -239,6 +239,7 @@ questions:
         C ---|AND| F
         C ---|AND| G
     ```
+    AND arcs: S is solved by AND(A,B) or by C alone; B by AND(E,F); C by AND(F,G). A is an OR node with children D and E. All of D, E, F, G are primitive.
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer

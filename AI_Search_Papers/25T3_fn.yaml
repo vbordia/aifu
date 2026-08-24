@@ -114,16 +114,18 @@ questions:
 
     ```mermaid
     graph TD
-        Root[Root] --- L(( ))
-        Root --- R(( ))
-        L --- L1[ ]
-        L --- L2[ ]
-        R --- R1[ ]
-        R --- R2[ ]
-        L1 --- A(("A: 11"))
-        L2 --- B(("B: 70"))
-        R1 --- C(("C: 48"))
-        R2 --- D(("D: 54"))
+        Root[Root] --- L((MIN))
+        Root --- R((MIN))
+        L --- L1[MAX]
+        R --- R1[MAX]
+        L1 --- LA((MIN))
+        L1 --- LB((MIN))
+        R1 --- RA((MIN))
+        R1 --- RB((MIN))
+        LA --- A(("A: 11"))
+        LB --- B(("B: 70"))
+        RA --- C(("C: 48"))
+        RB --- D(("D: 54"))
     ```
   subquestions:
   - sub_id: '3.1'
@@ -165,22 +167,24 @@ questions:
 
     ```mermaid
     graph TD
-        S((S: 10)) --- A((A: 30))
-        S --- B((B: 6))
-        S --- C((C: 12))
+        S((S: 10)) ---|OR| A((A: 30))
+        S ---|AND| B((B: 6))
+        S ---|AND| C((C: 12))
         A --- D((D: 10))
-        A --- E((E: 4))
-        A --- I[[I: 4]]
-        E --- H[[H: 2]]
-        E --- I
-        B --- F((F: 1))
-        B --- G((G: 3))
+        A ---|AND| E((E: 4))
+        A ---|AND| I[[I: 4]]
+        E ---|AND| H[[H: 2]]
+        E ---|AND| I
+        B ---|AND| F((F: 1))
+        B ---|AND| G((G: 3))
+        B ---|OR| K[[K: 8]]
         F --- J[[J: 6]]
-        G --- J
-        G --- K[[K: 8]]
-        C --- K
-        C --- L[[L: 2]]
+        G ---|AND| J
+        G ---|AND| K
+        C ---|AND| K
+        C ---|AND| L[[L: 2]]
     ```
+    AND arcs: S is solved by AND(B,C) or by A alone; A by AND(E,I) or by D alone; E by AND(H,I); B by AND(F,G) or by K alone; G by AND(J,K); C by AND(K,L). Primitives: H, I, J, K, L.
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer

@@ -1,0 +1,75 @@
+---
+title: "Q2 — Alpha-Beta Mid-Flight: The Cutoff Value of N"
+short: "Alpha-Beta Mid-Flight"
+order: 2
+paper: "25t3-fn"
+question: 2
+label: "GAMES: ALPHA-BETA"
+description: "Even evals only — N = 2 slips under α = 4 at the MIN parent and cuts off its siblings: an α-cutoff."
+topics: ["Alpha-Beta pruning", "Alpha cutoff", "Beta cutoff", "Game trees"]
+---
+
+## The Question
+
+Alpha-Beta is mid-flight on a MAX-root tree. Evals along the current path (root → N): **2, 14, 4, 10, N** — all even, $0 < n < 15$.
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 2.1 | Eval of N that induces a cutoff (pruning N's siblings) | `2` |
+| 2.2 | Type of cutoff | **A** — Alpha cutoff |
+
+## The Topic in 60 Seconds
+
+Levels alternate from the MAX root: MAX(2) → MIN(14) → MAX(4) → MIN(10) → **N**.
+
+The window slides down the path:
+
+- $\alpha(\text{MAX}_1) = 2$
+- $\beta(\text{MIN}_2) = 14$
+- $\alpha(\text{MAX}_3) = \max(2, 4) = 4$
+- $\beta(\text{MIN}_4) = \min(14, 10) = 10$
+
+**N is a child of MIN₄**, whose window is $(\alpha, \beta) = (4, 10)$.
+
+> Deep-dive: [Alpha-Beta Pruning](/concepts/week-07-game-search/02-alpha-beta-pruning).
+
+## 2.1 — The cutoff value → `2`
+
+A cutoff at MIN₄ fires the moment a child's value drops to $\alpha = 4$ or below. N must satisfy:
+
+$$N \le \alpha = 4, \qquad N \text{ even}, \quad 0 < N < 15$$
+
+The smallest (and keyed) value that forces the prune: **N = 2** ✓ — MIN₄'s value collapses to 2, which MAX₃ (already holding 4) will never take, so N's siblings are pruned.
+
+## 2.2 — Cutoff type → **A (Alpha cutoff)**
+
+The cutoff happens at **MIN₄** — a MIN node crashing through $\alpha$. Per the course convention:
+
+| value reached | node type | cutoff name |
+|---------------|-----------|-------------|
+| $\ge \beta$ | MAX | β-cutoff |
+| $\le \alpha$ | MIN | **α-cutoff** ✓ |
+
+→ **Alpha cutoff** ✓
+
+```mermaid
+graph TD
+    A["MAX₁ = 2<br/>α=2"] --- B["MIN₂ = 14<br/>β=14"]
+    B --- C["MAX₃ = 4<br/>α=4"]
+    C --- D["MIN₄ = 10<br/>window (4, 10)"]
+    D --- E["N = 2 ≤ α ✂"]
+    D --- F["siblings ✂ pruned"]
+    style D fill:#b45309,stroke:#7c2d12,color:#fff
+    style E fill:#15803d,stroke:#166534,color:#fff
+    style F fill:#7f1d1d,stroke:#fca5a5,color:#fff
+```
+
+## Tricks & Tips
+
+<Accordion title="Fast method">
+1. Write the window down the path: α tightens at MAX nodes, β at MIN nodes.
+2. **N's parent type decides the test**: child of MIN → $N \le \alpha$ (α-cutoff); child of MAX → $N \ge \beta$ (β-cutoff).
+3. Pick the smallest qualifying value — the keyed boundary answer.
+</Accordion>
+
+**Answers:** 2.1 `2` · 2.2 **A (Alpha cutoff)**

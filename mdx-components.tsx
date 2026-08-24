@@ -19,6 +19,9 @@ import MinimaxViz from "@/components/mdx/minimax-viz";
 import AlphaBetaViz from "@/components/mdx/alphabeta-viz";
 import AOStarViz from "@/components/mdx/aostar-viz";
 import MinimaxTweakViz from "@/components/mdx/minimax-tweak-viz";
+import StepGraph from "@/components/mdx/step-graph";
+import PaperTrace from "@/components/mdx/paper-trace";
+import CytoscapeGraph from "@/components/ui/cytoscape";
 
 function isMermaidCode(children: React.ReactNode): string | null {
   if (!children || typeof children !== "object" || !("props" in children)) {
@@ -173,6 +176,9 @@ const components: MDXComponents = {
   AlphaBetaViz,
   AOStarViz,
   MinimaxTweakViz,
+  StepGraph,
+  PaperTrace,
+  Graph: CytoscapeGraph,
 };
 
 export function useMDXComponents(): MDXComponents {

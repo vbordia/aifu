@@ -1,0 +1,66 @@
+---
+title: "Q6 — Planning Theory: Orderings, Mutex Conditions, Non-Mutex"
+short: "Planning Theory"
+order: 6
+paper: "25t3-an"
+question: 6
+label: "AUTOMATED PLANNING 1"
+description: "Three definition questions — when orderings matter, the four action-mutex tests, and the ALL-producers rule flipped."
+topics: ["GraphPlan", "Mutex", "Action ordering", "Planning graphs"]
+---
+
+## The Question
+
+Three standalone theory questions on actions, orderings and planning graphs.
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Which condition makes only ONE of the orderings (a then b) / (b then a) feasible? (A: P ∈ pre(a) ∧ P ∈ del-effects(b) · B: P ∈ add-effects(a) ∧ P ∈ del-effects(b) · C: none) | **A** |
+| 6.2 | Actions a, b in layer n are mutex ___ (A: pre(a) ∋ P mutex with pre(b) ∋ Q · B: P ∈ pre(a), del(a), pre(b), del(b) · C: P ∈ pre(a) ∧ P ∈ del(b) · D: P ∈ add(a) ∧ P ∈ del(b)) | **A, B, C, D** |
+| 6.3 | Propositions P, Q in layer n are NON-mutex ___ (A: every producer pair non-mutex · B: at least one producer pair non-mutex · C: none) | **B** |
+
+## The Topic in 60 Seconds
+
+- **Action mutex** (ANY of): ① inconsistent effects (one adds p, other deletes p) ② interference (one deletes the other's precondition) ③ competing needs (preconditions mutually mutex).
+- **Proposition mutex** = **ALL** producer pairs mutex — so *non*-mutex needs just **one** clean producer pair.
+
+> Deep-dive: [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes), [Plan-Space Planning](/concepts/week-08-planning/03-plan-space-planning-pop).
+
+## 6.1 — Only one ordering feasible → **A**
+
+**Option A:** $P \in pre(a)$ and $P \in del(b)$:
+- (a then b): a runs first (P available ✓), then b deletes P → **feasible**.
+- (b then a): b deletes P first, then a's precondition P is gone → **infeasible**.
+
+Exactly one ordering survives → **A** ✓
+
+**Option B:** $P \in add(a)$ and $P \in del(b)$: (a then b): a adds P, b deletes P — both run ✓. (b then a): b deletes P, a re-adds P — both run ✓. **Both orderings feasible** (they merely produce different states) → not the answer.
+
+## 6.2 — All four are valid mutex conditions → **A, B, C, D**
+
+| Option | Which test? | Mutex? |
+|--------|-------------|--------|
+| A: P ∈ pre(a), Q ∈ pre(b), P ⊕ Q mutex | **competing needs** | ✓ |
+| B: P ∈ pre(a) ∩ del(a) ∩ pre(b) ∩ del(b) | inconsistent effects **and** interference both ways | ✓ |
+| C: P ∈ pre(a) ∧ P ∈ del(b) | **interference** (b kills a's precondition) | ✓ |
+| D: P ∈ add(a) ∧ P ∈ del(b) | **inconsistent effects** | ✓ |
+
+Every option instantiates one of the three mutex tests → **A, B, C, D** ✓
+
+## 6.3 — Non-mutex propositions → **B**
+
+Propositions are mutex iff **every** producer pair is mutex. Negating: non-mutex iff **at least one** producer pair is non-mutex → **B** ✓
+
+<Callout type="tip" title="The quantifier flip">
+Action mutex = ANY-condition test; proposition mutex = ALL-producers test. Questions love flipping the quantifier — 6.3 is just the ALL-test negated.
+</Callout>
+
+## Tricks & Tips
+
+<Accordion title="One-liners">
+1. Ordering feasibility: a deletion of a *precondition* blocks one order; a deletion of an *add* only changes the outcome.
+2. Memorize the three mutex tests as **effects / interference / needs** — every exam option maps to one.
+3. Proposition non-mutex = exhibit ONE clean producer pair (usually two no-ops of co-existing facts).
+</Accordion>
+
+**Answers:** 6.1 **A** · 6.2 **A, B, C, D** · 6.3 **B**

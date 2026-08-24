@@ -1,0 +1,124 @@
+---
+title: "Q5 — Rete Net: Diesel and Petrol Engines"
+short: "Rete Expert System"
+order: 5
+paper: "25t2-fn"
+question: 5
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Crankshafts, armatures and line counts — the conflict set has four tuples, and specificity and recency disagree."
+topics: ["Rete algorithm", "Conflict set", "Specificity", "Recency"]
+---
+
+## The Question
+
+A Rete net classifying engines/motors. Working memory:
+
+```text
+101. (Fuel  ^item M59 ^type diesel)
+102. (Fuel  ^item M26 ^type petrol)
+103. (Fuel  ^item M37)
+104. (BoM   ^item M48 ^part armature)
+105. (Power ^item M48 ^lines 1)
+106. (BoM   ^item M37 ^part armature)
+107. (BoM   ^item M15 ^part crankshaft)
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 5.1 | Tuples in the conflict set (A: (Diesel-Engine,101,107) · B: (Petrol-Engine,107,102) · C: (Engine,107) · D: (Single-Phase-Motor,105,104) · E: (Motor,104) · F: (Motor,106)) | **C, D, E, F** |
+| 5.2 | Specificity fires | **D** |
+| 5.3 | Recency fires | **C** |
+
+## The Topic in 60 Seconds
+
+Alpha nodes filter single WMEs; beta nodes join on the shared `^item` variable. Conflict set = all full tuples. **Specificity** = most WMEs wins; **Recency** = highest max-timestamp wins.
+
+> Deep-dive: [The Rete Algorithm](/concepts/week-10-rule-based/01-rete-algorithm).
+
+## The Rete Net (from the figure)
+
+```mermaid
+%% wide
+graph TD
+    WME(("WME")) --> A1["A1: CLASS = Fuel"]
+    WME --> A2["A2: CLASS = BoM"]
+    WME --> A3["A3: CLASS = Power"]
+    A1 --> A4["A4: item = x"]
+    A2 --> A5["A5: item = x"]
+    A3 --> A6["A6: item = x"]
+    A4 --> A7["A7: type = diesel"]
+    A4 --> A8["A8: part = crankshaft"]
+    A4 --> A9["A9: type = petrol"]
+    A5 --> A8
+    A5 --> A10["A10: part = blades"]
+    A5 --> A12["A12: part = armature"]
+    A6 --> A11["A11: lines = 1"]
+    A6 --> A12
+    A6 --> A13["A13: lines = 3"]
+    A7 --> B1(("B1: = x"))
+    A8 --> B1
+    B1 --> R1["R1: Diesel Engine"]
+    A8 --> R2["R2: Engine"]
+    A8 --> B2(("B2: = x"))
+    A9 --> B2
+    B2 --> R3["R3: Petrol Engine"]
+    A9 --> B3(("B3: = x"))
+    A10 --> B3
+    B3 --> R4["R4: Gas Turbine"]
+    A10 --> R5["R5: Turbine"]
+    A11 --> B4(("B4: = x"))
+    A12 --> B4
+    B4 --> R6["R6: Single Phase Motor"]
+    A12 --> R7["R7: Motor"]
+    A12 --> B5(("B5: = x"))
+    A13 --> B5
+    B5 --> R8["R8: Three Phase Motor"]
+```
+
+## Step 1 — Locate every WME
+
+| WME | Facts | Alpha node |
+|-----|-------|------------|
+| 101 | Fuel, M59, diesel | **A7** |
+| 102 | Fuel, M26, petrol | **A9** |
+| 103 | Fuel, M37 (no type/part) | **A4** |
+| 104 | BoM, M48, armature | **A12** |
+| 105 | Power, M48, lines 1 | **A11** |
+| 106 | BoM, M37, armature | **A12** |
+| 107 | BoM, M15, crankshaft | **A8** |
+
+## Step 2 — Fire the joins (on `^item`)
+
+- **R1 Diesel Engine** (diesel ⋈ crankshaft): 101 (M59) vs 107 (M15) → no match
+- **R2 Engine** (crankshaft alone): 107 → **(Engine, 107)** ✓
+- **R3 Petrol Engine** (crankshaft ⋈ petrol): no petrol → empty
+- **R4 Gas Turbine** (petrol ⋈ blades): empty
+- **R5 Turbine** (blades): none → empty
+- **R6 Single Phase Motor** (lines-1 ⋈ armature): 105 (M48) ⋈ 104 (M48) → **(SPM, 105, 104)** ✓
+- **R7 Motor** (armature alone): 104, 106 → **(Motor, 104)** ✓, **(Motor, 106)** ✓
+- **R8 Three Phase Motor** (armature ⋈ lines-3): no lines-3 → empty
+
+**Conflict set** = (Engine, 107), (SPM, 105, 104), (Motor, 104), (Motor, 106) → options **C, D, E, F** ✓
+
+## 5.2 — Specificity → **D**
+
+WME counts: (Engine,107) = 1; **(SPM, 105, 104) = 2**; (Motor,·) = 1 each. Most specific → **D**.
+
+## 5.3 — Recency → **C**
+
+Max timestamps: (Engine,107) → **107**; (SPM,·) → 105; (Motor,104) → 104; (Motor,106) → 106. Highest → **C**.
+
+<Callout type="tip" title="Same flip as the AN paper">
+Specificity loves the two-condition tuple; recency loves whatever holds the newest fact (107, the crankshaft BoM). When a fresh fact feeds a *general* rule, the two strategies split — that's the examiner's favourite trick.
+</Callout>
+
+## Tricks & Tips
+
+<Accordion title="4-step recipe">
+1. WME → alpha table first.
+2. Join betas on `^item`; mismatched ids die instantly ((Diesel-Engine,101,107): M59 ≠ M15).
+3. Don't forget **single-alpha rules** (R2 Engine, R7 Motor) — they produce tuples too.
+4. Specificity = count; recency = max timestamp; ties → rule label order.
+</Accordion>
+
+**Answers:** 5.1 **C, D, E, F** · 5.2 **D** · 5.3 **C**

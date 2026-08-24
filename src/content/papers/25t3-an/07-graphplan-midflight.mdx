@@ -1,0 +1,134 @@
+---
+title: "Q7 — GraphPlan Mid-Flight: Populating Layer k+1"
+short: "GraphPlan Mid-Flight"
+order: 7
+paper: "25t3-an"
+question: 7
+label: "AUTOMATED PLANNING 2"
+description: "Layer k carries mutex pairs, so it can't be a start state — then Pickup(B), Putdown(A) and Stack(A,B) populate layer k+1."
+topics: ["GraphPlan", "Planning graphs", "Mutex", "No-ops"]
+---
+
+## The Question
+
+GraphPlan mid-flight. Layer k facts: **onTable(A)** [nop-1], **holding(A)** [nop-2], **armEmpty** [nop-3], **clear(B)** [nop-4], **on(A,B)** [nop-5], **onTable(B)** [nop-6] — carried to layer k+1 by no-ops, plus newly added facts.
+
+Mutex pairs in layer k: (onTable(A), holding(A)), (holding(A), armEmpty), (clear(B), on(A,B)).
+
+```mermaid
+%% wide
+graph LR
+    subgraph Pk["Layer k"]
+        oTA["onTable(A)"]
+        hA["holding(A)"]
+        AE["armEmpty"]
+        cB["clear(B)"]
+        oAB["on(A,B)"]
+        oTB["onTable(B)"]
+    end
+    subgraph Ak1["Actions (k+1)"]
+        NOP1["nop-1"]
+        NOP2["nop-2"]
+        NOP3["nop-3"]
+        NOP4["nop-4"]
+        NOP5["nop-5"]
+        NOP6["nop-6"]
+        PB["Pickup(B)"]
+        PA["Putdown(A)"]
+        SAB["Stack(A,B)"]
+    end
+    subgraph Pk1["Layer k+1"]
+        oTA2["onTable(A)"]
+        hA2["holding(A)"]
+        AE2["armEmpty"]
+        cB2["clear(B)"]
+        oAB2["on(A,B)"]
+        oTB2["onTable(B)"]
+        hB["holding(B) ✦"]
+    end
+    oTA --> NOP1 --> oTA2
+    hA --> NOP2 --> hA2
+    AE --> NOP3 --> AE2
+    cB --> NOP4 --> cB2
+    oAB --> NOP5 --> oAB2
+    oTB --> NOP6 --> oTB2
+    AE --> PB
+    cB --> PB
+    oTB --> PB
+    PB --> hB
+    hA --> PA
+    PA --> AE2
+    PA --> oTA2
+    hA --> SAB
+    cB --> SAB
+    SAB --> oAB2
+    SAB --> AE2
+    style PB stroke:#b45309,stroke-width:3px
+    style PA stroke:#b45309,stroke-width:3px
+    style SAB stroke:#b45309,stroke-width:3px
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 7.1 | Layer k describes the start state? | **B** — cannot |
+| 7.2 | Applicable actions in layer k+1 (A: Pickup(B) · B: Putdown(A) · C: Stack(A,B) · D: Unstack(A,B)) | **A, B, C** |
+| 7.3 | Mutex pairs in layer k+1 (A: Putdown(A)⊕Pickup(B) · B: Pickup(B)⊕Stack(A,B) · C: nop-2⊕nop-3) | **A, B, C** |
+| 7.4 | holding(A) ⊕ armEmpty in k+1 are mutex because (A: nop-2⊕nop-3 · B: nop-2⊕Putdown(A) · C: nop-2⊕Stack(A,B) · D: nop-2⊕Pickup(B)) | **A, B, C** |
+
+## The Topic in 60 Seconds
+
+- A layer containing **any mutex pair cannot be a genuine state** (states are single worlds — everything co-exists).
+- Action in $A_{k+1}$ ⟺ all preconditions present in layer k **and pairwise non-mutex**.
+- Proposition mutex in $P_{k+1}$ = **every** producer pair mutex (no-ops included).
+
+> Deep-dive: [GraphPlan Mid-Flight Layers](/concepts/week-09-goal-trees/04-graphplan-midflight-layers), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
+
+## 7.1 — Layer k is not a start state → **B**
+
+A start state is a single reachable world — its facts hold **simultaneously**, so no two can be mutex. Layer k contains (onTable(A), holding(A)) etc. → **cannot be the start state** → **B** ✓
+
+## 7.2 — Applicable actions → **A, B, C**
+
+Test preconditions against layer k (and their mutex status):
+
+| Action | Preconditions | Verdict |
+|--------|---------------|---------|
+| **Pickup(B)** | armEmpty ✓, clear(B) ✓, onTable(B) ✓ — none of the three mutex pairs involves them | **✓** |
+| **Putdown(A)** | holding(A) ✓ | **✓** |
+| **Stack(A,B)** | holding(A) ✓, clear(B) ✓ — holding(A) ⊕ clear(B) is **not** a listed mutex pair | **✓** |
+| Unstack(A,B) | armEmpty ✓, on(A,B) ✓, **clear(A) ✗** — absent from layer k | ✗ |
+
+→ **A, B, C** ✓
+
+## 7.3 — Mutex pairs in layer k+1 → **A, B, C**
+
+| Pair | Test | Mutex? |
+|------|------|--------|
+| Putdown(A) ⊕ Pickup(B) | Pickup(B) **deletes armEmpty**; Putdown(A) **adds armEmpty** → inconsistent effects | **✓** |
+| Pickup(B) ⊕ Stack(A,B) | competing needs: Pickup needs armEmpty, Stack needs holding(A) — and armEmpty ⊕ holding(A) **is mutex in layer k** | **✓** |
+| nop-2 ⊕ nop-3 | nop-2 persists holding(A), nop-3 persists armEmpty — inherited from the layer-k mutex | **✓** |
+
+→ **A, B, C** ✓
+
+## 7.4 — Why holding(A) ⊕ armEmpty stay mutex → **A, B, C**
+
+Producers in k+1: holding(A) ← nop-2; armEmpty ← nop-3, Putdown(A), Stack(A,B). The ALL-producers test needs every pair mutex:
+
+| Pair | Reason |
+|------|--------|
+| nop-2 ⊕ nop-3 | inherited mutex (holding(A) ⊕ armEmpty in layer k) ✓ |
+| nop-2 ⊕ Putdown(A) | Putdown(A) **deletes holding(A)** → interference ✓ |
+| nop-2 ⊕ Stack(A,B) | Stack(A,B) **deletes holding(A)** → interference ✓ |
+
+All three producer pairs mutex → the propositions are mutex. Option D (nop-2 ⊕ Pickup(B)) is **not a producer pair** — Pickup(B) *deletes* armEmpty, it doesn't produce it — so it plays no part in the justification → **A, B, C** ✓
+
+## Tricks & Tips
+
+<Accordion title="Fast method">
+1. "Any mutex pair in layer ⇒ not a start state" — instant answer for 7.1-type questions.
+2. Applicability = preconditions present **and** pairwise non-mutex; check the *given* mutex list before rejecting.
+3. New mutexes in k+1: inconsistent effects first (add vs delete of the same fact), then competing needs against the layer-k mutex list.
+4. "Because" questions: only **producer** pairs count — a deleter (Pickup(B) for armEmpty) is never part of the justification.
+</Accordion>
+
+**Answers:** 7.1 **B** · 7.2 **A, B, C** · 7.3 **A, B, C** · 7.4 **A, B, C**

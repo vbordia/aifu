@@ -101,7 +101,7 @@ questions:
 - id: 3
   type: comprehension
   label: 'GAMES: SSS STAR'
-  description: "The figure shows a game tree with evaluation function values at the horizon nodes. \nThe horizon nodes are labeled from A to D. \nUse these labels to enter a horizon node or a list of horizon nodes in short answers.\n\n**Tie-breaker**:\nWhen several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.\n\nRun SSS* algorithm on the game tree, then answer the sub-questions.\n\n```mermaid\ngraph TD\n    Root[\"Square (MAX)\"] --- N1[\"Circle (MIN)\"]\n    Root --- N2[\"Circle (MIN)\"]\n    N1 --- SQ1[\"Square (MAX)\"]\n    N2 --- SQ2[\"Square (MAX)\"]\n    SQ1 --- C1[\"Circle (MIN)\"]\n    SQ2 --- C2[\"Circle (MIN)\"]\n    C1 --- A[\"A: 11\"]\n    C1 --- B[\"B: 70\"]\n    C2 --- C[\"C: 48\"]\n    C2 --- D[\"D: 54\"]\n```\n"
+  description: "The figure shows a game tree with evaluation function values at the horizon nodes. \nThe horizon nodes are labeled from A to D. \nUse these labels to enter a horizon node or a list of horizon nodes in short answers.\n\n**Tie-breaker**:\nWhen several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.\n\nRun SSS* algorithm on the game tree, then answer the sub-questions.\n\n```mermaid\ngraph TD\n    Root[\"Square (MAX)\"] --- N1[\"Circle (MIN)\"]\n    N1 --- SQ1[\"Square (MAX)\"]\n    N1 --- SQ2[\"Square (MAX)\"]\n    SQ1 --- C1[\"Circle (MIN)\"]\n    SQ2 --- C2[\"Circle (MIN)\"]\n    C1 --- A[\"A: 11\"]\n    C1 --- B[\"B: 70\"]\n    C2 --- C[\"C: 48\"]\n    C2 --- D[\"D: 54\"]\n```\n"
   subquestions:
   - sub_id: '3.1'
     question_type: short_answer

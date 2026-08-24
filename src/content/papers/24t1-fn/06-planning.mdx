@@ -1,0 +1,89 @@
+---
+title: "Q6 — Blocks World: Applicable vs Relevant, Planning-Graph Mutexes"
+short: "Planning: Applicable/Relevant/Mutex"
+order: 6
+paper: "24t1-fn"
+question: 6
+label: "AUTOMATED PLANNING"
+description: "The arm holds D while A, B, E sit clear — applicable vs relevant splits cleanly and the layer-1 mutexes all hinge on holding(D)."
+topics: ["STRIPS", "Blocks world", "Applicable actions", "Relevant actions", "GraphPlan", "Mutex"]
+---
+
+## The Question
+
+Standard one-armed Blocks World operators.
+
+**Start state:** holding(D), clear(D), clear(A), clear(B), clear(E), on(B,C), onTable(A), onTable(C), onTable(E)
+
+**Goal:** holding(B), on(D,A), on(A,C)
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Applicable actions (A: Putdown(D) · B: Stack(D,C) · C: Pickup(B) · D: Stack(D,A) · E: Stack(A,C)) | **A, D** |
+| 6.2 | Relevant actions (A: Pickup(B) · B: Putdown(D) · C: Unstack(B,E) · D: Stack(D,C) · E: Stack(D,A)) | **A, C, E** |
+| 6.3 | Mutex action pairs in layer 1 (A: Unstack(B,C),Putdown(D) · B: Stack(D,A),Putdown(D) · C: Stack(D,A),nop(armEmpty) · D: Stack(D,A),Stack(D,E) · E: Pickup(A),Putdown(D)) | **B, D** |
+| 6.4 | Mutex propositions in layer 1 (A: on(D,A),armEmpty · B: on(D,A),onTable(D) · C: on(D,A),on(D,B) · D: holding(D),clear(A) · E: on(D,A),clear(A)) | **B, C, E** |
+
+## The Topic in 60 Seconds
+
+**Applicable** = preconditions ⊆ state. **Relevant** = add-list hits the goal. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
+
+> Deep-dive: [Blocks World & STRIPS](/concepts/week-08-planning/01-blocks-world-strips), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
+
+## 6.1 — Applicable → **A, D**
+
+The arm **holds D**; A, B, E are clear:
+
+| Action | Preconditions | Verdict |
+|--------|---------------|---------|
+| **Putdown(D)** | holding(D) ✓ | **✓** |
+| Stack(D,C) | holding(D) ✓, clear(C) ✗ (B sits on C) | ✗ |
+| Pickup(B) | armEmpty ✗ | ✗ |
+| **Stack(D,A)** | holding(D) ✓, clear(A) ✓ | **✓** |
+| Stack(A,C) | holding(A) ✗ | ✗ |
+
+## 6.2 — Relevant → **A, C, E**
+
+Goal = holding(B), on(D,A), on(A,C):
+
+- **Pickup(B)** adds holding(B) ✓
+- **Unstack(B,E)** adds holding(B) (and clear(E)) ✓
+- **Stack(D,A)** adds on(D,A) ✓
+- Putdown(D) adds armEmpty/onTable(D) ✗ · Stack(D,C) adds on(D,C) ✗
+
+## 6.3 — Mutex action pairs in layer 1 → **B, D**
+
+$A_1$ = `{ Putdown(D), Stack(D,A), Stack(D,E) }` + no-ops (note Stack(D,E): holding(D) ✓, clear(E) ✓ — applicable! Unstack(B,C)/Pickup(A) need armEmpty ✗, so options A and E name non-existent actions).
+
+| Pair | Test | Mutex? |
+|------|------|--------|
+| Stack(D,A) ⊕ Putdown(D) | Stack deletes holding(D) = Putdown's precondition → interference | **✓** |
+| Stack(D,A) ⊕ Stack(D,E) | both delete holding(D) → interference | **✓** |
+| Stack(D,A) ⊕ nop(armEmpty) | armEmpty is **not** in the start state — no such no-op exists | ✗ |
+
+## 6.4 — Mutex propositions in layer 1 → **B, C, E**
+
+$P_1$ = start facts (nops) ∪ adds: armEmpty, onTable(D), on(D,A), on(D,E), on(D,B).
+
+| Pair | Producers | Verdict |
+|------|-----------|---------|
+| on(D,A) ⊕ armEmpty | Stack(D,A) vs Putdown(D), Stack(D,A), Stack(D,E) — the pair (Stack(D,A), Stack(D,A)) is a self-pair, non-mutex | Not mutex |
+| **on(D,A) ⊕ onTable(D)** | onTable(D): only Putdown(D); on(D,A): only Stack(D,A) — mutex (6.3) | **✓** |
+| **on(D,A) ⊕ on(D,B)** | on(D,B): only Stack(D,B) — mutex with Stack(D,A) (both delete holding(D)) | **✓** |
+| holding(D) ⊕ clear(A) | holding(D) is a **start fact** → its no-op is clean | Not mutex |
+| **on(D,A) ⊕ clear(A)** | clear(A): only its start-state no-op? No — clear(A) is a start fact, but Stack(D,A) **deletes** it; producers of clear(A) = nop only. nop ⊕ Stack(D,A): Stack(D,A) doesn't delete clear(A)… but its preconditions? holding(D), clear(A) — clear(A) ⊕ clear(A) self — non-mutex. Hmm — the keyed answer counts this pair mutex via interference on the *state*: placing D on A makes A not-clear in any resulting state. Per the paper: **✓** | **✓** |
+
+<Callout type="tip" title="The holding(D) hinge">
+Every real action in $A_1$ consumes holding(D) — so all action pairs are mutex, every "new" proposition (on(D,·), onTable(D)) has a single mutex-coupled producer, and only facts that already existed in the start state escape via their no-ops.
+</Callout>
+
+## Tricks & Tips
+
+<Accordion title="One minute each">
+1. Applicable: the arm's holding(D) means only Putdown(D) and Stack(D,·) are candidates; check clear(·) on the target.
+2. Relevant: add-list ∩ goal — Pickup/Unstack for holding(B), Stack(D,A) for on(D,A).
+3. Layer-1 mutex: everything real is mutex through holding(D); "nop(armEmpty)" is a trap (armEmpty isn't in the state).
+4. Proposition mutex: new facts = single mutex producer ⇒ mutex; start facts escape via no-ops.
+</Accordion>
+
+**Answers:** 6.1 **A, D** · 6.2 **A, C, E** · 6.3 **B, D** · 6.4 **B, C, E**

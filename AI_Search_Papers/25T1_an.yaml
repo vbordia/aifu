@@ -158,17 +158,18 @@ questions:
 
     ```mermaid
     graph TD
-        Root["MAX"] --> L1_1((" "))
-        Root --> L1_2[" "]
-        L1_1 --> A["A: 24"]
-        L1_1 --> B["B: 34"]
-        L1_1 --> C["C: 26"]
-        L1_2 --> L2_1((" "))
-        L1_2 --> L2_2((" "))
-        L2_1 --> D["D: 52"]
-        L2_1 --> E["E: 54"]
-        L2_2 --> F["F: 62"]
-        L2_2 --> G["G: 64"]
+        Root["MAX (square)"] --> N1(("MIN"))
+        Root --> N2(("MIN"))
+        N1 --> A["A: 24"]
+        N1 --> B["B: 34"]
+        N2 --> C["C: 26"]
+        N2 --> M["MAX (square)"]
+        M --> P1(("MIN"))
+        M --> P2(("MIN"))
+        P1 --> D["D: 52"]
+        P1 --> E["E: 54"]
+        P2 --> F["F: 62"]
+        P2 --> G["G: 64"]
     ```
   subquestions:
   - sub_id: '3.1'
@@ -224,17 +225,19 @@ questions:
 
     ```mermaid
     graph TD
-        S((S: 40)) --- A((A: 50))
-        S --- B((B: 8))
+        S(("S: 40")) ---|AND| A(("A: 50"))
+        S ---|AND| B((B: 8))
         S --- C((C: 18))
-        A --- D[["D (primitive): 10"]]
-        A --- E((E: 8))
+        A ---|AND| D[["D (primitive): 10"]]
+        A ---|AND| E((E: 8))
         B --- E
         B --- F((F: 12))
         C --- F
-        F --- G[["G (primitive): 10"]]
-        F --- H[["H (primitive): 10"]]
+        E --- G[["G (primitive): 10"]]
+        F ---|AND| H[["H (primitive): 10"]]
+        F ---|AND| I[["I (primitive): 10"]]
     ```
+    AND arcs: S is solved by AND(B,C) or by A alone; A by AND(D,E); F by AND(H,I). B is OR(E,F); C has the single child F; E has the single child G.
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer
@@ -244,7 +247,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,C,F
+    correct_answers:
+    - S,C,F
+    - C,F,B
   - sub_id: '4.2'
     question_type: short_answer
     question: |
@@ -253,7 +258,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 30,26,38
+    correct_answers:
+    - 30,26,38
+    - 26,38,40
   - sub_id: '4.3'
     question_type: short_answer
     question: |
@@ -268,6 +275,39 @@ questions:
   label: RULE BASED EXPERT SYSTEMS
   description: |
     A small part of the Rete Net for classifying resistors is shown in the figure. The labels A1, A2, ..., A10, A11, ..., B1, ..., B5 uniquely identify the nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
+
+    ```mermaid
+    graph TD
+        WME --> A1["A1: CLASS = Band-1"]
+        WME --> A2["A2: CLASS = Band-2"]
+        WME --> A3["A3: CLASS = Band-3"]
+        WME --> A4["A4: CLASS = Band-4"]
+        A1 --> A5["A5: itemNo = n"]
+        A2 --> A6["A6: itemNo = n"]
+        A3 --> A7["A7: itemNo = n"]
+        A4 --> A8["A8: itemNo = n"]
+        A5 --> A9["A9: colour = black"]
+        A5 --> A10["A10: colour = brown"]
+        A6 --> A11["A11: colour = red"]
+        A6 --> A12["A12: colour = yellow"]
+        A7 --> A13["A13: colour = orange"]
+        A7 --> A14["A14: colour = blue"]
+        A8 --> A15["A15: colour = gold"]
+        A9 --> B1["B1 (= n)"]
+        A11 --> B1
+        A10 --> B2["B2 (= n)"]
+        A12 --> B2
+        B1 --> B3["B3 (= n)"]
+        A13 --> B3
+        B1 --> B4["B4 (= n)"]
+        A14 --> B4
+        B2 --> B5["B5 (= n)"]
+        A14 --> B5
+        A15 --> B5
+        B3 --> R1["R1"]
+        B4 --> R2["R2"]
+        B5 --> R3["R3"]
+    ```
 
     ```text
     Working Memory (WMEs in timestamp order):
@@ -424,14 +464,17 @@ questions:
       Assign consistent labels to all the edges and junctions in the 2D line drawing shown below. Enter the labels of the junctions 1, 2, 3, 4 in the text box, in that order. Or enter NIL if the drawing has no consistent label assignment.
 
       ```text
-            3 ------------ 4 ------------ 5
-           / \            /              /
-          /   \          /              /
-         /     \        /              /
-        /       \      /              /
-       /         \    /              /
-      2           -- 1 ------------- 6
+            3 ------------ 4 ------------- 5
+            |              |               |
+            |              |               |
+            |              1               |
+            |            /   \             |
+            |          /       \           |
+       ~~ 2 ~~~~~~~~            ~~~~~~~~ 6 ~~
+       (dangling edges leave the page, going up-left from 2 and up-right from 6)
       ```
+
+      Edges: 3-4, 4-5 (top bar), 3-2, 5-6 (verticals), 4-1 (vertical), 2-1, 1-6 (diagonals), plus one dangling edge each at junctions 2 and 6. Junction types: 3 = L, 4 = T, 5 = L, 1 = Y, 2 = W, 6 = W.
 
       Enter a comma separated list of junction labels, or enter NIL.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.

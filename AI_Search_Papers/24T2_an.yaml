@@ -222,7 +222,9 @@ questions:
       Enter a comma separated list of node labels in alphabetical order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: A,D,E,G
+    correct_answers:
+    - A,D,E,G
+    - A,D,G,E
 - id: 4
   type: comprehension
   label: PROBLEM DECOMPOSITION
@@ -240,16 +242,17 @@ questions:
 
     ```mermaid
     graph TD
-        S((S: 10)) --> A((A: 10))
-        S --> B((B: 10))
-        S --> C((C: 14))
-        A --> D[["D (primitive): 30"]]
-        A --> E[["E (primitive): 20"]]
-        B --> E
-        B --> F[["F (primitive): 16"]]
-        C --> F
-        C --> G[["G (primitive): 18"]]
+        S((S: 10)) ---|OR| A((A: 10))
+        S ---|AND| B((B: 10))
+        S ---|AND| C((C: 14))
+        A ---|AND| D[["D (primitive): 30"]]
+        A ---|AND| E[["E (primitive): 20"]]
+        B ---|AND| E
+        B ---|AND| F[["F (primitive): 16"]]
+        C --- F
+        C --- G[["G (primitive): 18"]]
     ```
+    AND arcs: S = AND(B,C) or OR(A); A = AND(D,E); B = AND(E,F); C = OR(F,G) (no arc at C). Primitives: D, E, F, G.
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer
@@ -259,7 +262,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,A,C
+    correct_answers:
+    - S,A,C
+    - A,C,B
   - sub_id: '4.2'
     question_type: short_answer
     question: |
@@ -268,7 +273,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 28,32,56
+    correct_answers:
+    - 28,32,56
+    - 22,28,32
   - sub_id: '4.3'
     question_type: short_answer
     question: |

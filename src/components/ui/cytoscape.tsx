@@ -67,7 +67,7 @@ export default function CytoscapeGraph({
     if (isLargeNode) {
       baseNodeStyle["text-wrap"] = "wrap";
       baseNodeStyle["text-max-width"] = nw - 12;
-      baseNodeStyle["text-line-height"] = 1.25;
+      baseNodeStyle["line-height"] = 1.25;
     }
 
     if (cyRef.current) {
@@ -126,6 +126,35 @@ export default function CytoscapeGraph({
             "background-color": dark ? "#075985" : "#0369a1",
             "border-color": dark ? "#38bdf8" : "#075985",
             "border-width": 3,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'max']",
+          style: {
+            shape: "round-rectangle",
+            "background-color": dark ? "#0c4a6e" : "#0369a1",
+            "border-color": dark ? "#38bdf8" : "#0c4a6e",
+            "border-width": 2,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'min']",
+          style: {
+            shape: "ellipse",
+            "background-color": dark ? "#7c2d12" : "#b45309",
+            "border-color": dark ? "#fbbf24" : "#7c2d12",
+            "border-width": 2,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'primitive']",
+          style: {
+            "background-color": dark ? "#3f3f46" : "#52525b",
+            "border-color": dark ? "#a1a1aa" : "#27272a",
+            "border-width": 4,
             color: "#ffffff",
           },
         },

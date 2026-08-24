@@ -1,0 +1,68 @@
+---
+title: "Q6 — Planning Theory: Orderings, Mutex Conditions, All-Producers"
+short: "Planning Theory"
+order: 6
+paper: "25t3-fn"
+question: 6
+label: "AUTOMATED PLANNING 1"
+description: "The mirror of the AN paper: which condition makes the two orderings disagree, and the ALL-producers test stated positively."
+topics: ["GraphPlan", "Mutex", "Action ordering", "Planning graphs"]
+---
+
+## The Question
+
+Three standalone theory questions on actions, orderings and planning graphs.
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Which condition makes the two feasible orderings (a then b) / (b then a) produce **different outcomes**? (A: P ∈ pre(a) ∧ P ∈ del-effects(b) · B: P ∈ add-effects(a) ∧ P ∈ del-effects(b) · C: none) | **B** |
+| 6.2 | Actions a, b in layer n are mutex ___ (A: pre(a) ∋ P mutex with pre(b) ∋ Q · B: P ∈ pre(a), del(a), pre(b), del(b) · C: P ∈ pre(a) ∧ P ∈ del(b) · D: P ∈ add(a) ∧ P ∈ del(b)) | **A, B, C, D** |
+| 6.3 | Propositions P, Q in layer n are mutex ___ (A: every producer pair (a,b) with P ∈ add(a), Q ∈ add(b) is mutex · B: at least one such pair is mutex · C: none) | **A** |
+
+## The Topic in 60 Seconds
+
+- **Action mutex** (ANY of): ① inconsistent effects ② interference (deletes other's precondition) ③ competing needs (mutex preconditions).
+- **Proposition mutex** = **ALL** producer pairs mutex.
+
+> Deep-dive: [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes), [Plan-Space Planning](/concepts/week-08-planning/03-plan-space-planning-pop).
+
+## 6.1 — Different outcomes per ordering → **B**
+
+**Option B:** $P \in add(a)$ and $P \in del(b)$:
+- (a then b): a adds P → b deletes P → final state **without** P.
+- (b then a): b deletes P → a re-adds P → final state **with** P.
+
+Both orderings are *feasible* but the outcomes **differ** → **B** ✓
+
+**Option A** ($P \in pre(a) \cap del(b)$): (b then a) is **infeasible** outright — only one ordering survives, so there are not "two feasible orderings with different outcomes" (that was the AN paper's 6.1, answer A). Here the question asks about *different outcomes for two feasible orderings* → **B** ✓
+
+<Callout type="important" title="Same options, different question — read carefully!">
+The AN paper asked "which makes only ONE ordering feasible" (answer: pre ∩ del). The FN paper asks "which makes two feasible orderings produce DIFFERENT outcomes" (answer: add ∩ del). The options are identical; the question verb is not.
+</Callout>
+
+## 6.2 — All four are valid mutex conditions → **A, B, C, D**
+
+| Option | Which test? | Mutex? |
+|--------|-------------|--------|
+| A: P ∈ pre(a), Q ∈ pre(b), P ⊕ Q mutex | **competing needs** | ✓ |
+| B: P ∈ pre(a) ∩ del(a) ∩ pre(b) ∩ del(b) | inconsistent effects + interference | ✓ |
+| C: P ∈ pre(a) ∧ P ∈ del(b) | **interference** | ✓ |
+| D: P ∈ add(a) ∧ P ∈ del(b) | **inconsistent effects** | ✓ |
+
+→ **A, B, C, D** ✓
+
+## 6.3 — Proposition mutex → **A**
+
+Propositions P, Q are mutex iff **every** producer pair $(a, b)$ with $P \in add(a)$, $Q \in add(b)$ is mutex — the ALL-producers test stated directly → **A** ✓
+
+(One non-mutex producer pair — usually two no-ops of co-existing facts — breaks the mutex.)
+
+## Tricks & Tips
+
+<Accordion title="One-liners">
+1. pre ∩ del ⇒ feasibility blocked; add ∩ del ⇒ outcome flipped. The question verb tells you which.
+2. The three mutex tests: **effects / interference / needs** — every option maps to one.
+3. Proposition mutex = ALL producers; non-mutex = one clean pair.
+</Accordion>
+
+**Answers:** 6.1 **B** · 6.2 **A, B, C, D** · 6.3 **A**

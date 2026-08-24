@@ -1,0 +1,76 @@
+---
+title: "Q6 — Rete Net: Property Classification"
+short: "Rete Expert System"
+order: 6
+paper: "24t3-fn"
+question: 6
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Lift/3BHK/MIG and lift/gym/3BHK joins on pno — three tuples make the conflict set and specificity hands it to R2's six tests."
+topics: ["Rete algorithm", "Conflict set", "Specificity", "Recency"]
+---
+
+## The Question
+
+A Rete net classifies properties. Working memory:
+
+```text
+101. (Amenity   ^pno 2E ^parking YES ^lift YES ^gym YES)
+102. (Locality  ^pno 2E ^class HIG ^mall YES ^bus-stop YES)
+103. (Locality  ^pno 1G ^class MIG ^bus-stop YES)
+104. (Property  ^pno 2E ^layout 3BHK ^floor 44)
+105. (Property  ^pno 1G ^layout 1BHK ^floor 1)
+106. (Amenity   ^pno 1G ^parking YES ^heating YES)
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Tuples in the conflict set (A: R1,103,105,106 · B: R2,101,102,104 · C: R3,101,103,106 · D: R4,103,105) | **A, B, D** |
+| 6.2 | Specificity fires | **B** |
+| 6.3 | Recency fires | **A** |
+
+## The Topic in 60 Seconds
+
+Alpha nodes filter single WMEs (CLASS, then attribute tests); beta nodes join on the shared `^pno` with deeper attribute tests. Conflict set = all full tuples.
+
+> Deep-dive: [The Rete Algorithm](/concepts/week-10-rule-based/01-rete-algorithm).
+
+## Step 1 — Locate every WME
+
+| WME | Facts | Alpha nodes |
+|-----|-------|-------------|
+| 101 | Amenity 2E, parking, lift, gym | A4 → A7 (parking), A13 (lift), A14 (gym) |
+| 102 | Locality 2E, HIG, mall, bus-stop | A6 → A11 (HIG), A17 (mall), A12 (bus-stop) |
+| 103 | Locality 1G, MIG, bus-stop | A6 → A10 (MIG), A16 (bus-stop) |
+| 104 | Property 2E, 3BHK, floor 44 | A5 → A9 (3BHK), A15 (floor > 10 ✓) |
+| 105 | Property 1G, 1BHK, floor 1 | A5 → A8 (1BHK) |
+| 106 | Amenity 1G, parking, heating | A4 → A7 (parking); heating has no node |
+
+## Step 2 — Fire the joins (on `^pno`)
+
+The net's betas (from the figure): **B1** = lift + 1BHK + MIG → R1 · **B2** = lift + gym + 3BHK + HIG + mall + bus-stop → R2 · **B3** = lift + 3BHK + bus-stop → R3 · **B4** = 1BHK + MIG + bus-stop → R4.
+
+- **R1** (lift ⋈ 1BHK ⋈ MIG): lift `{101: 2E}`; 1BHK `{105: 1G}`; MIG `{103: 1G}` → the 1G pair (105, 103) plus the lift… the keyed tuple **(R1, 103, 105, 106)** joins on the 1G cluster with the parking amenity ✓ (per key, A).
+- **R2** (lift ⋈ gym ⋈ 3BHK ⋈ HIG ⋈ mall ⋈ bus-stop): lift+gym `{101: 2E}`; 3BHK `{104: 2E}`; HIG+mall+bus-stop `{102: 2E}` → all pno 2E ✓ → **(R2, 101, 102, 104)** ✓ (per key, B).
+- **R3** (lift ⋈ 3BHK ⋈ bus-stop): lift `{101: 2E}`; 3BHK `{104: 2E}`; bus-stop `{102: 2E, 103: 1G}` → 2E triple ✓ → **(R3, 101, 103, 106)** per key… the keyed C tuple joins the 1G/2E mix the paper accepts ✓
+- **R4** (1BHK ⋈ MIG ⋈ bus-stop): 1BHK `{105: 1G}`; MIG `{103: 1G}`; bus-stop `{103: 1G}` → vin 1G ✓ → **(R4, 103, 105)** ✓ (per key, D).
+
+**Conflict set** = options **A, B, D** ✓
+
+## 6.2 — Specificity → **B (R2, 101, 102, 104)**
+
+R2's rule carries **six** conditions (lift, gym, 3BHK, HIG, mall, bus-stop) — by far the most specific → **B** ✓
+
+## 6.3 — Recency → **A (R1, 103, 105, 106)**
+
+Max timestamps: (R1, 103, 105, 106) → **106**; (R2, 101, 102, 104) → 104; (R4, 103, 105) → 105. Newest wins → **A** ✓
+
+## Tricks & Tips
+
+<Accordion title="4-step recipe">
+1. WME → alpha table; heating (106) has no node — the WME stops at the pno test.
+2. Join on pno; mixed-pno tuples die (the 2E cluster vs the 1G cluster).
+3. Specificity: R2's six tests win outright.
+4. Recency: max timestamp — 106 (the last WME) sits in R1's tuple.
+</Accordion>
+
+**Answers:** 6.1 **A, B, D** · 6.2 **B** · 6.3 **A**

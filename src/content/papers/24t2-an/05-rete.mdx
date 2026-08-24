@@ -1,0 +1,67 @@
+---
+title: "Q5 — Rete Net: Vehicle Classification"
+short: "Rete Expert System"
+order: 5
+paper: "24t2-an"
+question: 5
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Same vehicle net as the 2025 papers — Luxury-Car, Minivan and Truck all match; Truck's three conditions win specificity, Luxury's ts-107 wins recency."
+topics: ["Rete algorithm", "Conflict set", "Specificity", "Recency"]
+---
+
+## The Question
+
+A Rete net classifies machines. Working memory:
+
+```text
+101. (Cargo     ^vin A1 ^bed flat)
+102. (Passenger ^vin A1 ^limit 2)
+103. (Passenger ^vin B2 ^limit 8)
+104. (Passenger ^vin C3 ^limit 2)
+105. (Power     ^vin A1 ^hp 400)
+106. (Power     ^vin B2 ^hp 250)
+107. (Power     ^vin C3 ^hp 900)
+108. (Wheel     ^vin B2 ^tyre regular)
+109. (Wheel     ^vin C3 ^tyre regular)
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 5.1 | Tuples in the conflict set (A: Luxury-Car,104,107 · B: Minivan,103,106 · C: Truck,101,102,105 · D: Minivan,103,106,108) | **A, B, C** |
+| 5.2 | Specificity fires | **C** |
+| 5.3 | Recency fires | **A** |
+
+## The Topic in 60 Seconds
+
+Alpha nodes filter single WMEs; beta nodes join on the shared `^vin`. Conflict set = all full tuples. **Specificity** = most conditions; **Recency** = newest max-timestamp.
+
+> Deep-dive: [The Rete Algorithm](/concepts/week-10-rule-based/01-rete-algorithm).
+
+## The joins (net: Luxury = limit-2 ⋈ hp ≥ 700 · Minivan = limit-8 ⋈ hp ≤ 300 · Truck = bed ⋈ limit-2 ⋈ hp ≤ 500)
+
+| Rule | Join check | Tuple |
+|------|------------|-------|
+| Luxury-Car | limit-2 `{102: A1, 104: C3}` ⋈ hp≥700 `{107: C3}` → vin C3 | **(Luxury-Car, 104, 107)** ✓ |
+| Minivan | limit-8 `{103: B2}` ⋈ hp≤300 `{106: B2}` → vin B2 | **(Minivan, 103, 106)** ✓ |
+| Truck | bed `{101: A1}` ⋈ limit-2 `{102: A1}` ⋈ hp≤500 `{105: A1}` → vin A1 | **(Truck, 101, 102, 105)** ✓ |
+
+**Conflict set** = options **A, B, C** ✓ (D is invalid — Minivan has no Wheel condition, so 108 can't appear.)
+
+## 5.2 — Specificity → **C**
+
+Condition counts: Luxury = 2, Minivan = 2, **Truck = 3** → most conditions → **(Truck, 101, 102, 105)** → option **C** ✓
+
+## 5.3 — Recency → **A**
+
+Max timestamps: Luxury → **107**; Minivan → 106; Truck → 105. Newest wins → **(Luxury-Car, 104, 107)** → option **A** ✓
+
+## Tricks & Tips
+
+<Accordion title="4-step recipe">
+1. WME → alpha table (108/109 are Wheel WMEs — no Wheel rule here, they stay unused).
+2. Join on vin; option D mixes Minivan with a Wheel WME — invalid.
+3. Specificity: count conditions (Truck = 3 beats 2).
+4. Recency: max timestamp (107 → Luxury-Car).
+</Accordion>
+
+**Answers:** 5.1 **A, B, C** · 5.2 **C** · 5.3 **A**

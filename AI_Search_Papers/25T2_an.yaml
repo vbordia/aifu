@@ -147,7 +147,9 @@ questions:
       Enter a comma separated list of cities (city labels).
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: A,B,C
-    correct_answer: A,B,D,C,E
+    correct_answers:
+    - A,B,D,C,E
+    - A,E,C,D,B
 - id: 3
   type: comprehension
   label: GAMES
@@ -161,29 +163,28 @@ questions:
 
     ```mermaid
     graph TD
-        Root["MAX"] --> MIN1["MIN"]
-        Root --> MIN2["MIN"]
-        Root --> MIN3["MIN"]
+        Root["MAX"] --> MIN1(("MIN"))
+        Root --> MIN2(("MIN"))
+        Root --> MIN3(("MIN"))
 
+        MIN1 --> A["A: 56"]
         MIN1 --> MAX1["MAX"]
-        MAX1 --> A["A: 56"]
-        MAX1 --> MIN11["MIN"]
-        MIN11 --> B["B: 63"]
-        MIN11 --> MIN12["MIN"]
-        MIN12 --> C["C: 77"]
-        MIN12 --> D["D: 70"]
+        MAX1 --> B["B: 63"]
+        MAX1 --> MIN11(("MIN"))
+        MIN11 --> C["C: 77"]
+        MIN11 --> D["D: 70"]
 
         MIN2 --> E["E: 49"]
         MIN2 --> MAX2["MAX"]
         MAX2 --> F["F: 84"]
-        MAX2 --> MIN21["MIN"]
+        MAX2 --> MIN21(("MIN"))
         MIN21 --> G["G: 42"]
         MIN21 --> H["H: 14"]
 
         MIN3 --> I["I: 35"]
-        MIN3 --> MIN31["MIN"]
-        MIN31 --> J["J: 28"]
-        MIN31 --> K["K: 21"]
+        MIN3 --> MAX3["MAX"]
+        MAX3 --> J["J: 28"]
+        MAX3 --> K["K: 21"]
     ```
   subquestions:
   - sub_id: '3.1'
@@ -241,15 +242,16 @@ questions:
 
     ```mermaid
     graph TD
-        S((S: 20)) --- A((A: 35))
-        S --- B((B: 20))
-        S --- C((C: 10))
-        A --- D[["D (primitive): 20"]]
-        A --- E[["E (primitive): 30"]]
-        B --- E
-        B --- F[["F (primitive): 10"]]
+        S(("S: 20")) ---|OR| A(("A: 35"))
+        S ---|AND| B(("B: 20"))
+        S ---|AND| C((C: 10))
+        A ---|AND| D[["D (primitive): 20"]]
+        A ---|AND| E[["E (primitive): 30"]]
+        B ---|AND| E
+        B ---|AND| F[["F (primitive): 10"]]
         C --- G[["G (primitive): 20"]]
     ```
+    AND arcs: S is solved by AND(B,C) or by A alone; A by AND(D,E); B by AND(E,F). C has the single child G. All of D, E, F, G are primitive.
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer

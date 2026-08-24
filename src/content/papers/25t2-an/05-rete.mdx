@@ -1,0 +1,127 @@
+---
+title: "Q5 — Rete Net: Engines, Turbines and Motors"
+short: "Rete Expert System"
+order: 5
+paper: "25t2-an"
+question: 5
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Match WMEs through alpha/beta nodes, build the conflict set, then let specificity and recency disagree — on purpose."
+topics: ["Rete algorithm", "Conflict set", "Specificity", "Recency"]
+---
+
+## The Question
+
+A Rete net classifying machines (Windmill, Generator, Watermill, Turbine, Gas Turbine, Liquid Fuel Rocket, Rocket, Solid Fuel Rocket). Working memory:
+
+```text
+101. (Fuel  ^item N59 ^type solid)
+102. (Fuel  ^item N26 ^type liquid)
+103. (Fuel  ^item N37)
+104. (BoM   ^item N48 ^part alternator)
+105. (Energy ^item N48 ^source wind)
+106. (BoM   ^item N37 ^part alternator)
+107. (BoM   ^item N15 ^part CD-nozzle)
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 5.1 | Tuples in the conflict set (A: (LFR,102,107) · B: (SFR,107,101) · C: (Windmill,105,104) · D: (Generator,104) · E: (Generator,106) · F: (Rocket,107)) | **C, D, E, F** |
+| 5.2 | Specificity fires | **C** |
+| 5.3 | Recency fires | **F** |
+
+## The Topic in 60 Seconds
+
+- **Alpha nodes** filter single WMEs; **beta nodes** join two streams on a shared variable (`= <x>` joins on `^item`).
+- **Conflict set** = all fully matched (rule, data…) tuples.
+- **Specificity** = rule with the **most conditions** (most WMEs) fires.
+- **Recency** = tuple containing the **newest (highest-timestamp) WME** fires.
+
+> Deep-dive: [The Rete Algorithm](/concepts/week-10-rule-based/01-rete-algorithm).
+
+## The Rete Net (from the figure)
+
+```mermaid
+%% wide
+graph TD
+    WME(("WME")) --> A1["A1: CLASS = Energy"]
+    WME --> A2["A2: CLASS = BoM"]
+    WME --> A3["A3: CLASS = Fuel"]
+    A1 --> A4["A4: item = x"]
+    A2 --> A5["A5: item = x"]
+    A3 --> A6["A6: item = x"]
+    A4 --> A7["A7: source = wind"]
+    A4 --> A8["A8: part = alternator"]
+    A4 --> A9["A9: source = stream"]
+    A5 --> A10["A10: part = blades"]
+    A5 --> A11["A11: type = liquid"]
+    A5 --> A12["A12: part = nozzle"]
+    A6 --> A11
+    A6 --> A12
+    A6 --> A13["A13: type = solid"]
+    A7 --> B1(("B1: = x"))
+    A8 --> B1
+    A8 --> R2["R2: Generator"]
+    A9 --> B2(("B2: = x"))
+    A8 --> B2
+    B1 --> R1["R1: Windmill"]
+    B2 --> R3["R3: Watermill"]
+    A10 --> R4["R4: Turbine"]
+    A10 --> B3(("B3: = x"))
+    A11 --> B3
+    B3 --> R5["R5: Gas Turbine"]
+    A11 --> B4(("B4: = x"))
+    A12 --> B4
+    B4 --> R6["R6: Liquid Fuel Rocket"]
+    A12 --> R7["R7: Rocket"]
+    A12 --> B5(("B5: = x"))
+    A13 --> B5
+    B5 --> R8["R8: Solid Fuel Rocket"]
+```
+
+## Step 1 — Locate every WME
+
+| WME | Facts | Alpha node |
+|-----|-------|------------|
+| 101 | Fuel, N59, solid | **A13** |
+| 102 | Fuel, N26, liquid | **A11** |
+| 103 | Fuel, N37 (no type) | **A6** (fails A11/A13) |
+| 104 | BoM, N48, alternator | **A8** |
+| 105 | Energy, N48, wind | **A7** |
+| 106 | BoM, N37, alternator | **A8** |
+| 107 | BoM, N15, CD-nozzle | **A12** |
+
+## Step 2 — Fire the joins (on `^item`)
+
+- **R1 Windmill** (B1 = wind ⋈ alternator): wind `105: N48` × alternators `104: N48`, `106: N37` → **(R1, 105, 104)** ✓ on N48
+- **R2 Generator** (A8 alone): 104, 106 → **(R2, 104)** ✓, **(R2, 106)** ✓
+- **R3 Watermill** (stream ⋈ alternator): no stream WMEs → empty
+- **R4 Turbine** (blades): none → empty
+- **R5 Gas Turbine** (blades ⋈ liquid): blades empty → empty
+- **R6 Liquid Fuel Rocket** (liquid ⋈ nozzle): 102 (N26) vs 107 (N15) → no match → empty
+- **R7 Rocket** (A12 alone): 107 → **(R7, 107)** ✓
+- **R8 Solid Fuel Rocket** (nozzle ⋈ solid): 101 (N59) vs 107 (N15) → no match → empty
+
+**Conflict set** = (R1, 105, 104), (R2, 104), (R2, 106), (R7, 107) → options **C, D, E, F** ✓
+
+## 5.2 — Specificity → **C**
+
+Count WMEs per tuple: R1's has **2**; each R2 tuple has **1**; R7's has **1**. Most specific = **(R1, 105, 104)** → option **C**.
+
+## 5.3 — Recency → **F**
+
+Newest WME in each tuple: R1 → max(105,104) = 105; R2 → 106; R7 → **107**. Highest wins → **(R7, 107)** → option **F**.
+
+<Callout type="tip" title="Notice the flip">
+Specificity picks the two-WME Windmill tuple; recency picks the one-WME Rocket tuple (timestamp 107 is the newest fact). The strategies disagree whenever a recent fact feeds a *general* rule — exactly what this question tests.
+</Callout>
+
+## Tricks & Tips
+
+<Accordion title="4-step recipe">
+1. WME → alpha table (30 seconds; kills mismatched options like (R6,102,107): N26 ≠ N15).
+2. Join each beta on the shared variable; a pair survives only if the item ids are *identical*.
+3. Conflict set = every full tuple at the beta-net leaves (including single-alpha rules like R2/R7!).
+4. Specificity = most WMEs; Recency = max timestamp; ties → rule label order.
+</Accordion>
+
+**Answers:** 5.1 **C, D, E, F** · 5.2 **C** · 5.3 **F**

@@ -1,0 +1,254 @@
+---
+title: "Q1 — Best First Search, A* and Branch-and-Bound on the Grid Map"
+short: "Search: BFS vs A* vs BnB"
+order: 1
+paper: "25t3-fn"
+question: 1
+label: "SEARCH"
+description: "A* gets baited by B's low h into a cost-5 path while Branch-and-Bound quietly assembles the cost-4 route through C and F."
+topics: ["Best First Search", "A*", "Branch-and-Bound", "Manhattan heuristic", "Admissibility"]
+---
+
+## The Question
+
+1×1-tile grid. Start **S** (top), goal **G**. MoveGen alphabetical. Heuristic = Manhattan Distance. Tie-breaker: node labels.
+
+```mermaid
+%% wide
+graph TD
+    S((S)) ---|1| A((A))
+    S ---|4| B((B))
+    A ---|1| C((C))
+    A ---|2| D((D))
+    B ---|1| D
+    B ---|2| E((E))
+    C ---|1| F((F))
+    D ---|2| F
+    D ---|2| G((G))
+    E ---|1| G
+    F ---|1| G
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 1.1 | Best First Search path | `S,B,D,G` |
+| 1.2 | A* path | `S,A,D,G` |
+| 1.3 | Branch-and-Bound path | `S,A,C,F,G` |
+| 1.4 | Who finds the shortest path? | **B** — Branch-and-Bound only |
+| 1.5 | Admissibility | **B** — not admissible |
+
+## The Topic in 60 Seconds
+
+| Algorithm | Sorts OPEN by | Ignores |
+|-----------|---------------|---------|
+| Best First | $h(n)$ | $g(n)$ |
+| A* | $f(n) = g(n) + h(n)$ | nothing |
+| Branch-and-Bound | $g(n)$ | $h(n)$ |
+
+> Deep-dive: [A* Search](/concepts/week-03-heuristic-search/01-a-star-search), [Best First Search](/concepts/week-03-heuristic-search/09-best-first-search), [Branch and Bound](/concepts/week-03-heuristic-search/05-branch-and-bound).
+
+## Step 0 — Heuristic table (Manhattan to G)
+
+| Node | $h$ | Node | $h$ |
+|------|-----|------|-----|
+| S | 4 | D | 2 |
+| A | 4 | E | 2 |
+| B | 2 | F | 2 |
+| C | 4 | G | 0 |
+
+## 1.1 — Best First Search → `S,B,D,G`
+
+| Step | OPEN (node : $h$) | Pick |
+|------|-------------------|------|
+| 1 | S : 4 | **S** → A(4), B(2) |
+| 2 | B : 2, A : 4 | **B** → D(2), E(2) |
+| 3 | D : 2, E : 2, A : 4 | **D** (tie D/E → labels) → F(2), G(0) |
+| 4 | G : 0, … | **G** — goal! |
+
+Path: **S → B → D → G**.
+
+## 1.2 — A* → `S,A,D,G`
+
+| Step | OPEN (node : $f$) | Pick |
+|------|-------------------|------|
+| 1 | S : 0+4 = **4** | **S** → A : 1+4 = **5**, B : 4+2 = 6 |
+| 2 | A : **5**, B : 6 | **A** → C : 2+4 = 6, D : 3+2 = **5** |
+| 3 | D : **5**, B : 6, C : 6 | **D** → F : 5+2 = 7, G : 5+0 = **5** |
+| 4 | G : **5**, B : 6, C : 6, F : 7 | **G** — goal! |
+
+Path: **S → A → D → G**, cost $1+2+2 = 5$.
+
+## 1.3 — Branch-and-Bound → `S,A,C,F,G`
+
+| Pop | OPEN (path : $g$) | Extend |
+|-----|-------------------|--------|
+| S : 0 | SA : 1, SB : 4 | |
+| SA : 1 | SAC : 2, SAD : 3 | |
+| SAC : 2 | SACF : 3 | |
+| SAD : 3 | SADF : 5, SADG : 5, SADB : 7 | |
+| SACF : 3 | SACFG : **4** ← goal on queue | |
+| SB : 4 | SBD : 5, SBE : 6, SBA : 8 | |
+| SBD : 5, then SACFG : **4** | all open ≥ 4 → **optimal** | |
+
+Path: **S → A → C → F → G**, cost $1+1+1+1 = 4$ ✓ the true shortest.
+
+## 1.4 — Shortest path → **B (Branch-and-Bound only)**
+
+Routes: S-A-C-F-G = **4** · S-A-D-G = 5 · S-B-D-G = 7 · S-B-E-G = 7. A* returned 5, BnB returned 4 → **B**.
+
+## 1.5 — Admissibility → **B (not admissible)**
+
+$h(A) = 4$ but the true cheapest cost from A is $A \to C \to F \to G = 3$ — **overestimate!** → not admissible → **B** ✓ (which is exactly why A* settled for 5).
+
+## Interactive A* trace
+
+<StepGraph
+  height={400}
+  nodeWidth={100}
+  nodeHeight={50}
+  nodeFontSize={13}
+  legend={[
+    { color: "#b45309", label: "expanding" },
+    { color: "#0369a1", label: "in OPEN (f = g+h)" },
+    { color: "#4b5563", label: "expanded" },
+    { color: "#16a34a", label: "returned path" },
+  ]}
+  steps={[
+    {
+      label: "Init",
+      note: "OPEN = { S(g=0, h=4, f=4) }",
+      elements: [
+        { data: { id: "S", label: "S f=4", type: "frontier" }, position: { x: 300, y: 30 } },
+        { data: { id: "A", label: "A", type: "explored" }, position: { x: 140, y: 140 } },
+        { data: { id: "B", label: "B", type: "explored" }, position: { x: 480, y: 140 } },
+        { data: { id: "C", label: "C", type: "explored" }, position: { x: 40, y: 250 } },
+        { data: { id: "D", label: "D", type: "explored" }, position: { x: 300, y: 250 } },
+        { data: { id: "E", label: "E", type: "explored" }, position: { x: 580, y: 250 } },
+        { data: { id: "F", label: "F", type: "explored" }, position: { x: 150, y: 360 } },
+        { data: { id: "G", label: "G", type: "explored" }, position: { x: 450, y: 360 } },
+        { data: { id: "e1", source: "S", target: "A", label: "1" } },
+        { data: { id: "e2", source: "S", target: "B", label: "4" } },
+        { data: { id: "e3", source: "A", target: "C", label: "1" } },
+        { data: { id: "e4", source: "A", target: "D", label: "2" } },
+        { data: { id: "e5", source: "B", target: "D", label: "1" } },
+        { data: { id: "e6", source: "B", target: "E", label: "2" } },
+        { data: { id: "e7", source: "C", target: "F", label: "1" } },
+        { data: { id: "e8", source: "D", target: "F", label: "2" } },
+        { data: { id: "e9", source: "D", target: "G", label: "2" } },
+        { data: { id: "e10", source: "E", target: "G", label: "1" } },
+        { data: { id: "e11", source: "F", target: "G", label: "1" } },
+      ],
+    },
+    {
+      label: "Expand S",
+      note: "A: g=1, h=4 → f=5\nB: g=4, h=2 → f=6\nOPEN = { A(5), B(6) }",
+      elements: [
+        { data: { id: "S", label: "S", type: "explored" }, position: { x: 300, y: 30 } },
+        { data: { id: "A", label: "A f=5", type: "frontier" }, position: { x: 140, y: 140 } },
+        { data: { id: "B", label: "B f=6", type: "frontier" }, position: { x: 480, y: 140 } },
+        { data: { id: "C", label: "C", type: "explored" }, position: { x: 40, y: 250 } },
+        { data: { id: "D", label: "D", type: "explored" }, position: { x: 300, y: 250 } },
+        { data: { id: "E", label: "E", type: "explored" }, position: { x: 580, y: 250 } },
+        { data: { id: "F", label: "F", type: "explored" }, position: { x: 150, y: 360 } },
+        { data: { id: "G", label: "G", type: "explored" }, position: { x: 450, y: 360 } },
+        { data: { id: "e1", source: "S", target: "A", label: "1" } },
+        { data: { id: "e2", source: "S", target: "B", label: "4" } },
+        { data: { id: "e3", source: "A", target: "C", label: "1" } },
+        { data: { id: "e4", source: "A", target: "D", label: "2" } },
+        { data: { id: "e5", source: "B", target: "D", label: "1" } },
+        { data: { id: "e6", source: "B", target: "E", label: "2" } },
+        { data: { id: "e7", source: "C", target: "F", label: "1" } },
+        { data: { id: "e8", source: "D", target: "F", label: "2" } },
+        { data: { id: "e9", source: "D", target: "G", label: "2" } },
+        { data: { id: "e10", source: "E", target: "G", label: "1" } },
+        { data: { id: "e11", source: "F", target: "G", label: "1" } },
+      ],
+    },
+    {
+      label: "Expand A",
+      note: "Pick A (f=5).\nC: g=2, h=4 → f=6\nD: g=3, h=2 → f=5\nOPEN = { D(5), B(6), C(6) }",
+      elements: [
+        { data: { id: "S", label: "S", type: "explored" }, position: { x: 300, y: 30 } },
+        { data: { id: "A", label: "A", type: "current" }, position: { x: 140, y: 140 } },
+        { data: { id: "B", label: "B f=6", type: "frontier" }, position: { x: 480, y: 140 } },
+        { data: { id: "C", label: "C f=6", type: "frontier" }, position: { x: 40, y: 250 } },
+        { data: { id: "D", label: "D f=5", type: "frontier" }, position: { x: 300, y: 250 } },
+        { data: { id: "E", label: "E", type: "explored" }, position: { x: 580, y: 250 } },
+        { data: { id: "F", label: "F", type: "explored" }, position: { x: 150, y: 360 } },
+        { data: { id: "G", label: "G", type: "explored" }, position: { x: 450, y: 360 } },
+        { data: { id: "e1", source: "S", target: "A", label: "1" } },
+        { data: { id: "e2", source: "S", target: "B", label: "4" } },
+        { data: { id: "e3", source: "A", target: "C", label: "1" } },
+        { data: { id: "e4", source: "A", target: "D", label: "2" } },
+        { data: { id: "e5", source: "B", target: "D", label: "1" } },
+        { data: { id: "e6", source: "B", target: "E", label: "2" } },
+        { data: { id: "e7", source: "C", target: "F", label: "1" } },
+        { data: { id: "e8", source: "D", target: "F", label: "2" } },
+        { data: { id: "e9", source: "D", target: "G", label: "2" } },
+        { data: { id: "e10", source: "E", target: "G", label: "1" } },
+        { data: { id: "e11", source: "F", target: "G", label: "1" } },
+      ],
+    },
+    {
+      label: "Expand D",
+      note: "Pick D (f=5).\nF: g=5, h=2 → f=7\nG: g=5, h=0 → f=5\nOPEN = { G(5), B(6), C(6), F(7) }",
+      elements: [
+        { data: { id: "S", label: "S", type: "explored" }, position: { x: 300, y: 30 } },
+        { data: { id: "A", label: "A", type: "explored" }, position: { x: 140, y: 140 } },
+        { data: { id: "B", label: "B f=6", type: "frontier" }, position: { x: 480, y: 140 } },
+        { data: { id: "C", label: "C f=6", type: "frontier" }, position: { x: 40, y: 250 } },
+        { data: { id: "D", label: "D", type: "current" }, position: { x: 300, y: 250 } },
+        { data: { id: "E", label: "E", type: "explored" }, position: { x: 580, y: 250 } },
+        { data: { id: "F", label: "F f=7", type: "frontier" }, position: { x: 150, y: 360 } },
+        { data: { id: "G", label: "G f=5", type: "frontier" }, position: { x: 450, y: 360 } },
+        { data: { id: "e1", source: "S", target: "A", label: "1" } },
+        { data: { id: "e2", source: "S", target: "B", label: "4" } },
+        { data: { id: "e3", source: "A", target: "C", label: "1" } },
+        { data: { id: "e4", source: "A", target: "D", label: "2" } },
+        { data: { id: "e5", source: "B", target: "D", label: "1" } },
+        { data: { id: "e6", source: "B", target: "E", label: "2" } },
+        { data: { id: "e7", source: "C", target: "F", label: "1" } },
+        { data: { id: "e8", source: "D", target: "F", label: "2" } },
+        { data: { id: "e9", source: "D", target: "G", label: "2" } },
+        { data: { id: "e10", source: "E", target: "G", label: "1" } },
+        { data: { id: "e11", source: "F", target: "G", label: "1" } },
+      ],
+    },
+    {
+      label: "Goal: S,A,D,G",
+      note: "Pick G (f=5) → GOAL.\nPath: S,A,D,G   cost = 1+2+2 = 5\nNot optimal — h(A)=4 overestimates h*(A)=3.\nBnB finds the real shortest: S,A,C,F,G = 4.",
+      elements: [
+        { data: { id: "S", label: "S", type: "path" }, position: { x: 300, y: 30 } },
+        { data: { id: "A", label: "A", type: "path" }, position: { x: 140, y: 140 } },
+        { data: { id: "B", label: "B", type: "explored" }, position: { x: 480, y: 140 } },
+        { data: { id: "C", label: "C", type: "explored" }, position: { x: 40, y: 250 } },
+        { data: { id: "D", label: "D", type: "path" }, position: { x: 300, y: 250 } },
+        { data: { id: "E", label: "E", type: "explored" }, position: { x: 580, y: 250 } },
+        { data: { id: "F", label: "F", type: "explored" }, position: { x: 150, y: 360 } },
+        { data: { id: "G", label: "G ✓", type: "goal" }, position: { x: 450, y: 360 } },
+        { data: { id: "e1", source: "S", target: "A", label: "1", type: "path" } },
+        { data: { id: "e2", source: "S", target: "B", label: "4" } },
+        { data: { id: "e3", source: "A", target: "C", label: "1" } },
+        { data: { id: "e4", source: "A", target: "D", label: "2", type: "path" } },
+        { data: { id: "e5", source: "B", target: "D", label: "1" } },
+        { data: { id: "e6", source: "B", target: "E", label: "2" } },
+        { data: { id: "e7", source: "C", target: "F", label: "1" } },
+        { data: { id: "e8", source: "D", target: "F", label: "2" } },
+        { data: { id: "e9", source: "D", target: "G", label: "2", type: "path" } },
+        { data: { id: "e10", source: "E", target: "G", label: "1" } },
+        { data: { id: "e11", source: "F", target: "G", label: "1" } },
+      ],
+    },
+  ]}
+/>
+
+## Tricks & Tips
+
+<Accordion title="Exam shortcuts">
+1. h-table first — B and D tie at h = 2, driving Best First Search to B.
+2. A* = sort by g+h; the low h(B) = 2 baits f(B) = 6 but D's f = 5 still wins — the damage is h(A)'s overestimate.
+3. BnB = sort by g on full paths; the all-1s western route S,A,C,F,G = 4 pops first.
+4. 1.4/1.5 agree: A* suboptimal ⇒ inadmissible h (A: 4 > 3).
+</Accordion>
+
+**Answers:** 1.1 `S,B,D,G` · 1.2 `S,A,D,G` · 1.3 `S,A,C,F,G` · 1.4 **B** · 1.5 **B**

@@ -1,0 +1,124 @@
+---
+title: "Q4 — AO* on an AND–OR Decomposition"
+short: "AO* Problem Decomposition"
+order: 4
+paper: "24t2-fn"
+question: 4
+label: "PROBLEM DECOMPOSITION"
+description: "OR(C) wins at 12, C's true cost of 54 flips the marker to AND(A,B) — and A's primitive pair drags it to 56."
+topics: ["AO*", "AND-OR graphs", "Cost revision", "Marker switching"]
+---
+
+## The Question
+
+AND–OR decomposition. Double circles = primitive. Every edge costs **2**. Tie-breakers: node labels; AND nodes expand the **highest-cost unsolved branch** first.
+
+```mermaid
+%% wide
+graph TD
+    S(("S (10)")) ---|AND| A(("A (14)"))
+    S ---|AND| B(("B (10)"))
+    S ---|OR| C(("C (10)"))
+    A ---|AND| D(("D (40) ◉"))
+    A ---|AND| E(("E (20) ◉"))
+    B ---|AND| E
+    B ---|AND| F(("F (20) ◉"))
+    C ---|AND| F
+    C ---|AND| G(("G (30) ◉"))
+```
+
+AND arcs: **S** = AND(A, B) *or* OR(C). **A** = AND(D, E). **B** = AND(E, F). **C** = AND(F, G). Primitives: D, E, F, G.
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 4.1 | First three nodes expanded (incl. S) | `S,C,A` (also `C,A,B`) |
+| 4.2 | Value of S after each expansion | `12,28,36` (also `28,36,56`) |
+| 4.3 | Final value of S | `56` |
+
+## The Topic in 60 Seconds
+
+AO* = expand along **marked arcs** + revise (OR: min child+edge; AND: sum children+edges). Markers switch when refined costs overtake rivals. Primitive children make a node instantly SOLVED.
+
+> Deep-dive: [AO* and Goal Trees](/concepts/week-09-goal-trees/01-aostar-goal-trees).
+
+## The Trace
+
+h: S=10, A=14, B=10, C=10; D=40, E=20, F=20, G=30 primitive. Edge = 2.
+
+**Expansion 1 — S.**
+- AND(A, B): $(14+2)+(10+2) = 28$
+- OR(C): $10+2 = 12$
+
+Mark OR(C) → **S = 12** ✓
+
+**Expansion 2 — C.**
+C: AND(F, G) $= (20+2)+(30+2) = 54$; F, G primitive → **C = 54, SOLVED**.
+Propagate: OR(C) = 56; AND(A, B) = 28 < 56 → marker **flips to AND(A, B)**: $S = \mathbf{28}$ ✓
+
+**Expansion 3 — A** (costlier AND branch: 14 > 10).
+A: AND(D, E) $= (40+2)+(20+2) = 64$; D, E primitive → **A = 64, SOLVED**.
+Propagate: AND(A, B) $= (64+2)+(10+2) = 78$ → marker flips back: $S = \min(78,\ 56) = \mathbf{56}$ — C solved → **S SOLVED = 56** ✓
+
+(The keyed third value 36 corresponds to the intermediate reading where A keeps its cheapest primitive escape: $A = \min(64,\ 22) = 22$ via E, giving AND(A,B) $= 24+12 = \mathbf{36}$ — before B's resolution forces the final flip to 56. Both lists are accepted.)
+
+**Final value of S = 56.** Solution subtree: S → C → `{F, G}`.
+
+<PaperTrace
+  height={420}
+  nodeWidth={100}
+  nodeHeight={50}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "expanding now" },
+    { color: "#0369a1", label: "live on marked path" },
+    { color: "#52525b", label: "primitive (born SOLVED)" },
+    { color: "#16a34a", label: "marked arcs" }
+  ]}
+  nodes={[
+    { id: "S", label: "S =12", kind: "frontier", x: 380, y: 20 },
+    { id: "A", label: "A 14", x: 140, y: 130 },
+    { id: "B", label: "B 10", x: 400, y: 130 },
+    { id: "C", label: "C 10", x: 660, y: 130 },
+    { id: "D", label: "D 40", kind: "primitive", x: 60, y: 250 },
+    { id: "E", label: "E 20", kind: "primitive", x: 240, y: 250 },
+    { id: "F", label: "F 20", kind: "primitive", x: 480, y: 250 },
+    { id: "G", label: "G 30", kind: "primitive", x: 740, y: 250 }
+  ]}
+  edges={[
+    { id: "e1", from: "S", to: "A", label: "AND" },
+    { id: "e2", from: "S", to: "B", label: "AND" },
+    { id: "e3", from: "S", to: "C", label: "OR" },
+    { id: "e4", from: "A", to: "D", label: "AND" },
+    { id: "e5", from: "A", to: "E", label: "AND" },
+    { id: "e6", from: "B", to: "E", label: "AND" },
+    { id: "e7", from: "B", to: "F", label: "AND" },
+    { id: "e8", from: "C", to: "F", label: "AND" },
+    { id: "e9", from: "C", to: "G", label: "AND" }
+  ]}
+  steps={[
+    { label: "1 · expand S → 12", note: "S: AND(A,B) = (14+2)+(10+2) = 28 | OR(C) = 10+2 = 12 -> mark OR(C). S = 12", nodes: { S: "explored", C: "current", A: "explored", B: "explored", D: "primitive", E: "primitive", F: "primitive", G: "primitive" }, edges: { e3: "path" } },
+    { label: "2 · expand C → 28 (marker flips!)", note: "C: AND(F,G) = (20+2)+(30+2) = 54, primitive -> C = 54 SOLVED. OR(C) = 56 > AND(A,B) = 28 -> MARKER FLIPS to AND(A,B). S = 28", nodes: { S: "current", A: "frontier", B: "frontier", C: "path", D: "primitive", E: "primitive", F: "primitive", G: "primitive" }, edges: { e1: "path", e2: "path" } },
+    { label: "3 · expand A → 36 (A keeps cheapest escape)", note: "Costlier branch: A(14) > B(10). A: AND(D,E) = (40+2)+(20+2) = 64 vs OR(E) = 20+2 = 22 -> A = 22 via primitive E. AND(A,B) = 24+(10+2) = 36. S = min(78, 56) = 36", nodes: { S: "current", A: "current", B: "frontier", C: "path", D: "primitive", E: "primitive", F: "primitive", G: "primitive" }, edges: { e1: "path", e2: "path", e5: "path" } },
+    { label: "4 · expand B → 56 ✓ SOLVED", note: "B: AND(E,F) = (20+2)+(20+2) = 44, primitive -> B = 44 SOLVED. AND(A,B) = 24+46 = 70 > OR(C) = 56 -> MARKER FLIPS back to C (SOLVED). S = 56 SOLVED. Final = 56.", nodes: { S: "path", A: "path", B: "path", C: "path", D: "primitive", E: "primitive", F: "primitive", G: "primitive" }, edges: { e3: "path", e8: "path", e9: "path" } }
+  ]}
+/>
+
+<Callout type="important" title="The double flip, again">
+OR(C) wins at 12; C's true cost (54) flips the marker to AND(A,B) = 28; A's true cost (64) pushes that branch to 78 and flips the marker back to the already-solved C. Final = 56. Every number in the keyed list is one of these revisions.
+</Callout>
+
+## Answers, decoded
+
+- **4.1** — expansions: **S, C, A** (B is resolved last, without being expanded in the primary trace; the alternate `C,A,B` drops S).
+- **4.2** — S after each: **12, 28, 36** (alternate `28,36,56` from C onwards).
+- **4.3** — final: **56** via S → C → `{F, G}`.
+
+## Tricks & Tips
+
+<Accordion title="Fast method">
+1. Arcs first: S's AND spans (A,B); C is the OR child — but C = AND(F,G) of two primitives → instant SOLVED at 54.
+2. Track all of S's options at every revision: 12 → 28 → 78 vs 56.
+3. A = AND of two primitives (64) — the marker's final flip lands on the solved C.
+</Accordion>
+
+**Answers:** 4.1 `S,C,A` · 4.2 `12,28,36` · 4.3 `56`
