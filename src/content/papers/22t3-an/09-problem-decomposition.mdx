@@ -1,0 +1,95 @@
+---
+title: "Q9 — PROBLEM DECOMPOSITION"
+short: "PROBLEM DECOMPOSITION"
+order: 9
+paper: "22t3-an"
+question: 9
+label: "PROBLEM DECOMPOSITION"
+description: "Problem Decomposition question"
+topics: ["PROBLEM DECOMPOSITION"]
+---
+
+## The Question
+
+The figure shows an AND-OR graph that depicts how a problem $S$ can be decomposed and transformed into one or more simpler problems. Nodes are uniquely identified by labels ($S, A, B, \dots$). The number in each node is the heuristic estimate of the cost of solving that node.
+
+Nodes with double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as **SOLVED** and it will not be expanded subsequently.
+
+- **Tie-breaker 1**: For nodes with the same cost, expand in the ascending order of node labels.
+- **Tie-breaker 2**: For AND nodes, expand the unsolved branch with the highest cost.
+- Each edge has a unit cost. Solve for $S$.
+
+```mermaid
+graph TD
+    S["S: 100"]
+    A[["A (primitive): 20"]]
+    B["B: 200"]
+    C["C: 100"]
+    D["D: 160"]
+    E[["E (primitive): 40"]]
+    F[["F (primitive): 60"]]
+    G["G: 80"]
+    H[["H (primitive): 100"]]
+    I[["I (primitive): 140"]]
+    J[["J (primitive): 100"]]
+    K[["K (primitive): 90"]]
+
+    S ---|AND| A
+    S ---|AND| B
+    S --- C
+    S --- D
+    B ---|AND| E
+    B ---|AND| F
+    C ---|AND| G
+    C ---|AND| H
+    D ---|AND| I
+    D ---|AND| H
+    G --- J
+    G --- K
+```
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 9.1 | List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expan... | `S,C,D` / `S,C,D,G` |
+| 9.2 | Determine the value of the start node S after each node expansion. List the first three values of S that correspond to the first three node expansions. | `101,161,183` / `101,161,183,194` |
+| 9.3 | What is the final value of the start node S? | `194` |
+| 9.4 | In the given AND-OR graph, is the heuristic admissible? | **A** |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**9.1** — List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+
+**Answer:** `S,C,D` / `S,C,D,G`
+
+**9.2** — Determine the value of the start node S after each node expansion. List the first three values of S that correspond to the first three node expansions.
+
+**Answer:** `101,161,183` / `101,161,183,194`
+
+**9.3** — What is the final value of the start node S?
+
+**Answer:** `194`
+
+**9.4** — In the given AND-OR graph, is the heuristic admissible?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | No |
+| **B** | Yes |
+| **C** | Cannot be determined |
+
+**Answer:** **A**
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

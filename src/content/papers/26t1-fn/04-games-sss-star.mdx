@@ -1,0 +1,111 @@
+---
+title: "Q4 — GAMES: SSS STAR"
+short: "GAMES: SSS STAR"
+order: 4
+paper: "26t1-fn"
+question: 4
+label: "GAMES: SSS STAR"
+description: "Games: Sss Star question"
+topics: ["GAMES: SSS STAR"]
+---
+
+## The Question
+
+The figure shows a game tree with evaluation function values at the horizon nodes. 
+The horizon nodes are labeled from A to J.
+Where applicable, use these labels in short answers.
+
+**Tie-breaker**:
+When several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+```mermaid
+graph TD
+    R["Root (MIN)"]
+    N1["Circle 1 (MAX)"]
+    N2["Circle 2 (MAX)"]
+    N3["Circle 3 (MAX)"]
+
+    R --- N1
+    R --- N2
+    R --- N3
+
+    S1["Square 1 (MIN)"]
+    S2["Square 2 (MIN)"]
+    N1 --- S1
+    N1 --- S2
+
+    S3["Square 3 (MIN)"]
+    N2 --- S3
+
+    S4["Square 4 (MIN)"]
+    S5["Square 5 (MIN)"]
+    N3 --- S4
+    N3 --- S5
+
+    C1["Circle (MAX)"]
+    S1 --- C1
+    A["A: 4"]
+    B["B: 0"]
+    C1 --- A
+    C1 --- B
+
+    C2["Circle (MAX)"]
+    S2 --- C2
+    C["C: 9"]
+    D["D: 8"]
+    C2 --- C
+    C2 --- D
+
+    C3["Circle (MAX)"]
+    C4["Circle (MAX)"]
+    S3 --- C3
+    S3 --- C4
+    E["E: 5"]
+    F["F: 7"]
+    C3 --- E
+    C4 --- F
+
+    C5["Circle (MAX)"]
+    S4 --- C5
+    G["G: 2"]
+    H["H: 6"]
+    C5 --- G
+    C5 --- H
+
+    C6["Circle (MAX)"]
+    S5 --- C6
+    I["I: 3"]
+    J["J: 1"]
+    C6 --- I
+    C6 --- J
+```
+
+Run SSS* algorithm on the game tree, then answer the sub-questions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 4.1 | Find the horizon nodes that are assigned SOLVED status by SSS* algorithm. Enter the labels of those nodes in the textbox, or enter NIL if no nodes are assign... | `A,E,F,G` |
+| 4.2 | Find the SOLVED horizon nodes that are pruned from the queue by SSS* algorithm, i.e., SOLVED horizon nodes removed from the queue when a MAX-ancestor is SOLV... | `A,E,G` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**4.1** — Find the horizon nodes that are assigned SOLVED status by SSS* algorithm. Enter the labels of those nodes in the textbox, or enter NIL if no nodes are assigned SOLVED status.
+
+**Answer:** `A,E,F,G`
+
+**4.2** — Find the SOLVED horizon nodes that are pruned from the queue by SSS* algorithm, i.e., SOLVED horizon nodes removed from the queue when a MAX-ancestor is SOLVED. Enter the labels of those nodes in the textbox, or enter NIL if SOLVED nodes were never pruned.
+
+**Answer:** `A,E,G`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

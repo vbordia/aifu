@@ -1,0 +1,170 @@
+---
+title: "Q8 — AUTOMATED PLANNING 2"
+short: "AUTOMATED PLANNING 2"
+order: 8
+paper: "26t1-fn"
+question: 8
+label: "AUTOMATED PLANNING 2"
+description: "Automated Planning 2 question"
+topics: ["AUTOMATED PLANNING 2"]
+---
+
+## The Question
+
+The domain description of a Blocks World with a single one-armed robot is given below.
+
+```text
+PREDICATES
+
+armEmpty      The arm is not holding any block, it is empty.
+holding(X)    The arm is holding X.
+onTable(X)    X is on the table.
+clear(X)      X has nothing above it, it is clear.
+on(X,Y)       X is directly placed on Y.
+
+OPERATORS
+
+Pickup(X): pick up X from the table.
+  Preconditions: { armEmpty, clear(X), onTable(X) }
+  Add Effects  : { holding(X) }
+  Del Effects  : { armEmpty, onTable(X) }
+
+Putdown(X): place X on the table.
+  Preconditions: { holding(X) }
+  Add Effects  : { armEmpty, onTable(X) }
+  Del Effects  : { holding(X) }
+
+Unstack(X,Y): pick up X that is directly sitting on Y.
+  Preconditions: { armEmpty, clear(X), on(X,Y) }
+  Add Effects  : { clear(Y), holding(X) }
+  Del Effects  : { armEmpty, on(X,Y) }
+
+Stack(X,Y): place X directly on top of Y.
+  Preconditions: { holding(X), clear(Y) }
+  Add Effects  : { armEmpty, on(X,Y) }
+  Del Effects  : { holding(X), clear(Y) }
+
+NOTE: variables X and Y must bind to different objects.
+
+Consider the following planning problem.
+
+Start State: { onTable(A), onTable(B),
+               on(D,A), on(E,B),
+               clear(D), clear(E),
+               holding(C)
+             }
+
+Goal Description: { on(C,D), on(B,C) }
+```
+
+Based on the above data, answer the given subquestions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 8.1 | Which of the following are applicable actions for FSSP? | **A**, **C**, **D** |
+| 8.2 | Which of the following are relevant actions for BSSP? | **B**, **C** |
+| 8.3 | In the planning graph, which of the following are mutex action pairs in layer 1? | **C**, **D** |
+| 8.4 | In the planning graph, which of the following are mutex proposition pairs in layer 1? | **B**, **D** |
+| 8.5 | In the planning graph, which of the following are applicable actions in layer 2? | **B**, **C**, **D** |
+| 8.6 | For the given planning problem, does a plan exist? | **B** |
+| 8.7 | For the given planning problem, the length of the plan found by GraphPlan is __________ . | `NIL` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**8.1** — Which of the following are applicable actions for FSSP?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Putdown(C) |
+| **B** | Stack(B,C) |
+| **C** | Stack(C,D) |
+| **D** | Stack(C,E) |
+| **E** | Unstack(D,A) |
+| **F** | Unstack(E,B) |
+
+**Answer:** **A**, **C**, **D**
+
+**8.2** — Which of the following are relevant actions for BSSP?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Putdown(C) |
+| **B** | Stack(B,C) |
+| **C** | Stack(C,D) |
+| **D** | Stack(C,E) |
+| **E** | Unstack(D,A) |
+| **F** | Unstack(E,B) |
+
+**Answer:** **B**, **C**
+
+**8.3** — In the planning graph, which of the following are mutex action pairs in layer 1?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Stack(C,D) and nop for armEmpty |
+| **B** | Stack(C,D) and nop for clear(E) |
+| **C** | Stack(C,D) and nop for holding(C) |
+| **D** | Stack(C,D) and Putdown(C) |
+
+**Answer:** **C**, **D**
+
+**8.4** — In the planning graph, which of the following are mutex proposition pairs in layer 1?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | armEmpty and clear(E) |
+| **B** | armEmpty and holding(C) |
+| **C** | on(C,D) and clear(E) |
+| **D** | on(C,D) and onTable(C) |
+
+**Answer:** **B**, **D**
+
+**8.5** — In the planning graph, which of the following are applicable actions in layer 2?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Pickup(C) |
+| **B** | Putdown(C) |
+| **C** | Unstack(D,A) |
+| **D** | Unstack(E,B) |
+
+**Answer:** **B**, **C**, **D**
+
+**8.6** — For the given planning problem, does a plan exist?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Yes |
+| **B** | No |
+| **C** | Cannot be determined |
+
+**Answer:** **B**
+
+**8.7** — For the given planning problem, the length of the plan found by GraphPlan is __________ .
+
+**Answer:** `NIL`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

@@ -1,0 +1,55 @@
+---
+title: "Q1 — SEARCH"
+short: "SEARCH"
+order: 1
+paper: "26t1-an"
+question: 1
+label: "SEARCH"
+description: "Search question"
+topics: ["SEARCH"]
+---
+
+## The Question
+
+Consider a water-jug puzzle with three jugs a, b and c of capacities 5L, 3L and 2L, respectively.
+
+A state, encoded as a digit string ABC, denotes volume of water in jugs a, b and c, respectively.
+For example, state 122 denotes that jugs a, b and c contain 1L, 2L and 2L of water, respectively.
+
+The allowable moves (actions) are
+- `xETy`: pick up jug $x$ and empty it into jug $y$ and jug $y$ is also topped up,
+- `xEy`: pick up jug $x$ and empty it into jug $y$ and jug $y$ is still not topped up,
+- `xTy`: pick up jug $x$ and top up jug $y$ and jug $x$ is still not emptied out.
+
+For example: $122 \xrightarrow{cEa} 320 \xrightarrow{bETa} 500 \xrightarrow{aTb} 230$.
+
+MoveGen takes a state ABC and returns a set of neighbours that are one move away from ABC.
+For example, $\text{MoveGen}(122) = \{ 032, 302, 320, 131 \}$.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 1.1 | Let 212 be the start state and 131 be the goal state, find the shortest path from start to goal. Enter the path starting with 212 as a comma separated list o... | `212,410,401,131` |
+| 1.2 | Let 212 be the start state and 131 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of mov... | `cEa,bEc,aTb` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**1.1** — Let 212 be the start state and 131 be the goal state, find the shortest path from start to goal. Enter the path starting with 212 as a comma separated list of states.
+
+**Answer:** `212,410,401,131`
+
+**1.2** — Let 212 be the start state and 131 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.
+
+**Answer:** `cEa,bEc,aTb`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

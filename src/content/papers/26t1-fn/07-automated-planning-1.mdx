@@ -1,0 +1,73 @@
+---
+title: "Q7 — AUTOMATED PLANNING 1"
+short: "AUTOMATED PLANNING 1"
+order: 7
+paper: "26t1-fn"
+question: 7
+label: "AUTOMATED PLANNING 1"
+description: "Automated Planning 1 question"
+topics: ["AUTOMATED PLANNING 1"]
+---
+
+## The Question
+
+Answer the given subquestions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 7.1 | Consider actions a and b and two feasible orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will produce diff... | **A**, **B** |
+| 7.2 | In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ . | **C**, **D** |
+| 7.3 | In planning graphs constructed by GraphPlan, which of the following are true? | **A** |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**7.1** — Consider actions a and b and two feasible orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will produce different outcomes for each ordering?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | P is in pre(a) and Q is in del-effects(b). |
+| **B** | P is in add-effects(a) and also in del-effects(b). |
+| **C** | None of these. |
+
+**Answer:** **A**, **B**
+
+**7.2** — In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ .
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | only if every P in pre(a) is mutex with every Q in pre(b) |
+| **B** | only if every P in pre(a) is present in del-effects(b) |
+| **C** | if P is in pre(a) and also in del-effects(b) |
+| **D** | if P is in add-effects(a) and also in del-effects(b) |
+
+**Answer:** **C**, **D**
+
+**7.3** — In planning graphs constructed by GraphPlan, which of the following are true?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | If actions A and B are non mutex in a layer n then it will remain non mutex in all future layers. |
+| **B** | If actions A and B are non mutex in a layer n then it can become mutex in some future layer. |
+| **C** | If actions A and B are non mutex in a layer n then it must be mutex in a past layer. |
+| **D** | None of these. |
+
+**Answer:** **A**
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

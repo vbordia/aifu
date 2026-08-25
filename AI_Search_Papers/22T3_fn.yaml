@@ -1,3 +1,7 @@
+file: 2022T3_AI_Search_Methods_for_Problem_Solving_FN.pdf
+year: 2022
+term: 3
+session: fn
 subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
 questions:
 - id: 1
@@ -205,6 +209,8 @@ questions:
     Process the variables, and their values, in ALPHABETIC order.
 
     Based on the above data, answer the given subquestions.
+
+    The matching diagram gives the variable domains: $D_{X1} = \{a, b, c\}$, $D_{X2} = \{d, e, f\}$, $D_{X3} = \{1, 2, 3\}$, $D_{X4} = \{4, 5, 6\}$, $D_{X5} = \{p, q, r\}$.
   subquestions:
   - sub_id: '8.1'
     question_type: short_answer
@@ -214,7 +220,9 @@ questions:
       Enter a comma separated list of values.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: a,6,1,p
-    correct_answer: d,1,2,3
+    correct_answers:
+    - d,1,2,3
+    - d,3,4,q
   - sub_id: '8.2'
     question_type: short_answer
     question: |
@@ -234,17 +242,18 @@ questions:
 
     ```mermaid
     graph TD
-        S["S: 100"] --- A["A: 80"]
-        S --- B["B: 40"]
+        S["S: 100"] ---|AND| A["A: 80"]
+        S ---|AND| B["B: 40"]
         S --- C["C: 200"]
         S --- D["D: 100"]
         S --- E["E: 120"]
 
-        B --- F[["F (primitive): 100"]]
-        C --- G[["G (primitive): 50"]]
-        C --- H["H: 150"]
-        D --- H
-        D --- I[["I (primitive): 200"]]
+        A --- F[["F (primitive): 100"]]
+        B --- G[["G (primitive): 50"]]
+        C ---|AND| G
+        C ---|AND| H["H: 150"]
+        D ---|AND| H
+        D ---|AND| I[["I (primitive): 200"]]
         E --- I
     ```
 
@@ -261,7 +270,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,D,E
+    correct_answers:
+    - S,D,E
+    - S,D,E,A,B
   - sub_id: '9.2'
     question_type: short_answer
     question: |
@@ -270,7 +281,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 110,130,140
+    correct_answers:
+    - 110,130,140
+    - 110,130,140,170,190
   - sub_id: '9.3'
     question_type: short_answer
     question: |
@@ -293,6 +306,51 @@ questions:
   label: RULE BASED EXPERT SYSTEMS
   description: |
     A Rete Net for classification of machines is shown in the figure. The labels A1, A2, A3, ..., A10, A11, A12, A13, ..., B1, B2, ..., B5, R1, R2, ..., R8, uniquely identify the nodes in the network. When required, use the given label ordering to break ties and to enter your answers.
+
+    ```mermaid
+    graph TD
+        WME --- A1["A1: CLASS = Fuel"]
+        WME --- A2["A2: CLASS = BoM"]
+        WME --- A3["A3: CLASS = Power"]
+
+        A1 --- A4["A4: item = &lt;x&gt;"]
+        A2 --- A5["A5: item = &lt;x&gt;"]
+        A3 --- A6["A6: item = &lt;x&gt;"]
+
+        A4 --- A7["A7: type = diesel"]
+        A4 --- A9["A9: type = petrol"]
+        A5 --- A8["A8: part = crankshaft"]
+        A5 --- A10["A10: part = turbine-blades"]
+        A5 --- A12["A12: part = armature"]
+        A6 --- A11["A11: lines = 1"]
+        A6 --- A13["A13: lines = 3"]
+
+        A7 --- B1["B1: = &lt;x&gt;"]
+        A8 --- B1
+        B1 --- R1["Diesel Engine (R1)"]
+
+        A8 --- R2["Engine (R2)"]
+
+        A9 --- B2["B2: = &lt;x&gt;"]
+        A8 --- B2
+        B2 --- R3["Petrol Engine (R3)"]
+
+        A9 --- B3["B3: = &lt;x&gt;"]
+        A10 --- B3
+        B3 --- R4["Gas Turbine (R4)"]
+
+        A10 --- R5["Turbine (R5)"]
+
+        A11 --- B4["B4: = &lt;x&gt;"]
+        A12 --- B4
+        B4 --- R6["Single Phase Motor (R6)"]
+
+        A12 --- R7["Motor (R7)"]
+
+        A13 --- B5["B5: = &lt;x&gt;"]
+        A12 --- B5
+        B5 --- R8["Three Phase Motor (R8)"]
+    ```
 
     Run the Rete algorithm for the Working Memory shown below, where the WMEs are in timestamp order. Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
 
@@ -334,7 +392,9 @@ questions:
       Enter a comma separated list with a rule label followed by timestamps in sorted order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: R1,101,102,103
-    correct_answer: R1,101,107
+    correct_answers:
+    - R1,101,107
+    - R1,107,101
   - sub_id: '10.3'
     question_type: short_answer
     question: |
@@ -343,7 +403,9 @@ questions:
       Enter a comma separated list with a rule label followed by timestamps in sorted order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: R1,101,102,103
-    correct_answer: R1,101,107
+    correct_answers:
+    - R1,101,107
+    - R1,107,101
 - id: 11
   type: comprehension
   label: AUTOMATED PLANNING

@@ -1,379 +1,472 @@
-﻿subject: "DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING"
+file: 2022T3_AI_Search_Methods_for_Problem_Solving_AN.pdf
+year: 2022
+term: 3
+session: an
+subject: 'DEGREE LEVEL: AI: SEARCH METHODS FOR PROBLEM SOLVING'
 questions:
-  - id: 1
-    type: comprehension
-    label: "SEARCH"
-    description: |
-      Consider a 5-4-1 water jug puzzle with three jugs $a$, $b$, $c$ of capacity 5L, 4L, 1L, respectively. A state is represented as a three digit string $ABC$, where $A, B, C$ denote the volume of water present in the jugs $a, b, c$, respectively. For example, 140 denotes a state where jug $a$ has 1 liter of water, jug $b$ has 4 liters of water and jug $c$ is empty.
+- id: 1
+  type: comprehension
+  label: SEARCH
+  description: |
+    Consider a 5-4-1 water jug puzzle with three jugs $a$, $b$, $c$ of capacity 5L, 4L, 1L, respectively. A state is represented as a three digit string $ABC$, where $A, B, C$ denote the volume of water present in the jugs $a, b, c$, respectively. For example, 140 denotes a state where jug $a$ has 1 liter of water, jug $b$ has 4 liters of water and jug $c$ is empty.
 
-      Two types of moves (state transitions) are allowed:
-      - `xEy`: pick up jug $x$ and empty it into jug $y$
-      - `xFy`: pick up jug $x$ and fill up (top up) jug $y$
+    Two types of moves (state transitions) are allowed:
+    - `xEy`: pick up jug $x$ and empty it into jug $y$
+    - `xFy`: pick up jug $x$ and fill up (top up) jug $y$
 
-      So the possible moves are: `aEb`, `aEc`, `aFb`, `aFc`, `bEa`, `bEc`, `bFa`, `bFc`, `cEa`, `cEb`, `cFa`, `cFb`.
+    So the possible moves are: `aEb`, `aEc`, `aFb`, `aFc`, `bEa`, `bEc`, `bFa`, `bFc`, `cEa`, `cEb`, `cFa`, `cFb`.
 
-      **Tie-breaker**: in some states, both `xEy` and `xFy` may produce the same output state, in such cases, choose `xEy` to break the tie. For example, from the 140 state, both `aEc` and `aFc` produce the same output state 041, therefore, to break the tie choose `aEc` as the move.
+    **Tie-breaker**: in some states, both `xEy` and `xFy` may produce the same output state, in such cases, choose `xEy` to break the tie. For example, from the 140 state, both `aEc` and `aFc` produce the same output state 041, therefore, to break the tie choose `aEc` as the move.
 
-      For the 5-4-1 water jug puzzle, the `MoveGen` function takes a state $ABC$ and returns a set of states that can be produced in one move. For example, $\text{MoveGen}(500)$ returns $\{140, 401\}$.
-    subquestions:
-      - sub_id: 1.1
-        question_type: short_answer
-        question: "Let 500 be the start state and 221 be the goal state, find the shortest path from start to goal. Enter the path starting with 500 as a comma separated list of states.\n\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: 500,411,747"
-        correct_answer: "500,140,131,230,221"
+    For the 5-4-1 water jug puzzle, the `MoveGen` function takes a state $ABC$ and returns a set of states that can be produced in one move. For example, $\text{MoveGen}(500)$ returns $\{140, 401\}$.
+  subquestions:
+  - sub_id: 1.1
+    question_type: short_answer
+    question: |-
+      Let 500 be the start state and 221 be the goal state, find the shortest path from start to goal. Enter the path starting with 500 as a comma separated list of states.
 
-      - sub_id: 1.2
-        question_type: short_answer
-        question: "Let 500 be the start state and 221 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.\n\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: aFc,cFb,aEc"
-        correct_answer: "aFb,bFc,cEa,bFc"
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 500,411,747
+    correct_answer: 500,140,131,230,221
+  - sub_id: 1.2
+    question_type: short_answer
+    question: |-
+      Let 500 be the start state and 221 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.
 
-  - id: 2
-    type: multiple_choice
-    label: "SEARCH FOR OPTIMAL SOLUTION"
-    question: "Under what cases does Depth First Iterative Deepening (DFID) guarantee an optimal solution?"
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: aFc,cFb,aEc
+    correct_answer: aFb,bFc,cEa,bFc
+- id: 2
+  type: multiple_choice
+  label: SEARCH FOR OPTIMAL SOLUTION
+  question: Under what cases does Depth First Iterative Deepening (DFID) guarantee an optimal solution?
+  options:
+    A: When it inspects only new nodes
+    B: When it inspects new as well as open nodes
+    C: When it inspects new as well as closed nodes
+    D: None of these
+  correct_option: C
+- id: 3
+  type: multiple_choice
+  label: SEARCH FOR OPTIMAL SOLUTION
+  question: |
+    In the map, nodes are placed on a grid where each tile is $10 \times 10$ in size, is the Manhattan distance heuristic admissible?
+
+    ```mermaid
+    graph LR
+        S((S)) ---|12| B((B))
+        S ---|12| A((A))
+        S ---|24| C((C))
+        B ---|12| D((D))
+        B ---|12| C
+        B ---|24| G((G))
+        A ---|12| C
+        C ---|12| G
+        D ---|12| G
+    ```
+  options:
+    A: 'Yes'
+    B: 'No'
+    C: Cannot be determined
+  correct_option: A
+- id: 4
+  type: multiple_select
+  label: SEARCH FOR OPTIMAL SOLUTION
+  question: Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
+  options:
+    A: Depth First Search
+    B: Breadth First Search
+    C: Dijkstra's algorithm
+    D: Branch and Bound Search
+    E: A*
+    F: WA* for some w
+    G: Sparse Memory Graph Search (SMGS)
+  correct_options:
+  - B
+  - C
+  - D
+- id: 5
+  type: multiple_select
+  label: SEARCH FOR OPTIMAL SOLUTION
+  question: Given a state space with Euclidean edge costs, and with the best admissible heuristics, which of the following algorithms will find the optimal path?
+  options:
+    A: Depth First Search
+    B: Breadth First Search
+    C: Dijkstra's algorithm
+    D: Branch and Bound Search
+    E: A*
+    F: WA* for some w
+    G: Sparse Memory Graph Search (SMGS)
+  correct_options:
+  - C
+  - D
+  - E
+  - G
+- id: 6
+  type: multiple_select
+  label: SEARCH FOR OPTIMAL SOLUTION
+  question: Which of the following are true about the Branch-and-Bound method (discussed in the lecture) that is used for finding optimal tours for the Traveling Salesman Problem?
+  options:
+    A: The root of the search tree represents all possible tours.
+    B: The root of the search tree represents the shortest/optimal tour.
+    C: Each node in the search tree represents a set of tours.
+    D: Each node in the search tree represents a single tour.
+    E: The costs of the search tree nodes monotonically INCREASE from the root to leaf.
+    F: The costs of the search tree nodes monotonically DECREASE from the root to leaf.
+  correct_options:
+  - A
+  - C
+  - E
+- id: 7
+  type: comprehension
+  label: GAMES
+  description: |
+    The figure shows a 4-ply game tree with evaluation function values at the horizon. The nodes in the horizon are assigned labels A, B, C, ..., P. Use these labels when asked to enter a horizon node or a list of horizon nodes.
+
+    **Tie-breaker**: when several nodes qualify then select the left most node, if tie persists then select the deepest node among the left most nodes.
+
+    ```mermaid
+    graph TD
+        Root["MAX"] --> L1_1["MIN (circle)"]
+        Root --> L1_2["MIN (circle)"]
+
+        L1_1 --> L2_1["MAX (square)"]
+        L1_1 --> L2_2["MAX (square)"]
+        L1_2 --> L2_3["MAX (square)"]
+        L1_2 --> L2_4["MAX (square)"]
+
+        L2_1 --> L3_1["MIN (circle)"]
+        L2_1 --> L3_2["MIN (circle)"]
+        L2_2 --> L3_3["MIN (circle)"]
+        L2_2 --> L3_4["MIN (circle)"]
+        L2_3 --> L3_5["MIN (circle)"]
+        L2_3 --> L3_6["MIN (circle)"]
+        L2_4 --> L3_7["MIN (circle)"]
+        L2_4 --> L3_8["MIN (circle)"]
+
+        L3_1 --> A["A: 45"]
+        L3_1 --> B["B: 82"]
+        L3_2 --> C["C: 81"]
+        L3_2 --> D["D: 59"]
+        L3_3 --> E["E: 99"]
+        L3_3 --> F["F: 99"]
+        L3_4 --> G["G: 30"]
+        L3_4 --> H["H: 57"]
+        L3_5 --> I["I: 37"]
+        L3_5 --> J["J: 54"]
+        L3_6 --> K["K: 55"]
+        L3_6 --> L["L: 93"]
+        L3_7 --> M["M: 76"]
+        L3_7 --> N["N: 34"]
+        L3_8 --> O["O: 43"]
+        L3_8 --> P["P: 87"]
+    ```
+  subquestions:
+  - sub_id: 7.1
+    question_type: multiple_select
+    question: Which of the following are strategies for MAX?
     options:
-      A: "When it inspects only new nodes"
-      B: "When it inspects new as well as open nodes"
-      C: "When it inspects new as well as closed nodes"
-      D: "None of these"
-    correct_option: "C"
-
-  - id: 3
-    type: multiple_choice
-    label: "SEARCH FOR OPTIMAL SOLUTION"
-    question: |
-      In the map, nodes are placed on a grid where each tile is $10 \times 10$ in size, is the Manhattan distance heuristic admissible?
-
-      ```mermaid
-      graph LR
-          S((S)) ---|12| B((B))
-          S ---|12| A((A))
-          S ---|24| C((C))
-          B ---|12| D((D))
-          B ---|12| C
-          B ---|24| G((G))
-          A ---|12| C
-          C ---|12| G
-          D ---|12| G
-      ```
-    options:
-      A: "Yes"
-      B: "No"
-      C: "Cannot be determined"
-    correct_option: "A"
-
-  - id: 4
-    type: multiple_select
-    label: "SEARCH FOR OPTIMAL SOLUTION"
-    question: "Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?"
-    options:
-      A: "Depth First Search"
-      B: "Breadth First Search"
-      C: "Dijkstra's algorithm"
-      D: "Branch and Bound Search"
-      E: "A*"
-      F: "WA* for some w"
-      G: "Sparse Memory Graph Search (SMGS)"
+      A: A,B,E,F
+      B: C,D,G,H
+      C: A,C,I,J
+      D: B,D,J,L
     correct_options:
-      - "B"
-      - "C"
-      - "D"
+    - A
+    - B
+  - sub_id: 7.2
+    question_type: short_answer
+    question: |-
+      List the horizon nodes in the best strategy for MAX. Enter the nodes in the ascending order of node labels.
 
-  - id: 5
-    type: multiple_select
-    label: "SEARCH FOR OPTIMAL SOLUTION"
-    question: "Given a state space with Euclidean edge costs, and with the best admissible heuristics, which of the following algorithms will find the optimal path?"
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: C,D,E,F
+  - sub_id: 7.3
+    question_type: short_answer
+    question: |-
+      List the first five horizon nodes pruned by Alpha-Beta.
+
+      Enter a comma separated sorted list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answer: G,H,J,L,M
+- id: 8
+  type: comprehension
+  label: CONSTRAINT SATISFACTION
+  description: |
+    The figure shows a constraint graph of a Binary CSP and a part of the matching diagram. When a pair of variables (like, X1 and X5) do not have a constraint in the constraint graph then assume a **UNIVERSAL RELATION** in the matching diagram.
+
+    Process the variables, and their values, in **ALPHABETIC order**.
+
+    ```mermaid
+    graph LR
+        subgraph Constraint Graph
+            X1 --- X2
+            X1 --- X4
+            X2 --- X4
+            X2 --- X5
+            X5 --- X3
+            X4 --- X3
+        end
+    ```
+
+    The matching diagram gives the variable domains: $D_{X1} = \{a, b, c\}$, $D_{X2} = \{d, e, f\}$, $D_{X3} = \{1, 2, 3\}$, $D_{X4} = \{4, 5, 6\}$, $D_{X5} = \{p, q, r\}$.
+  subquestions:
+  - sub_id: 8.1
+    question_type: short_answer
+    question: |-
+      The Forward-Checking algorithm begins by assigning X1=a. What are the NEXT four values assigned to variables by the Forward-Checking algorithm? List the values as a comma separated list in the order they are assigned.
+
+      Enter a comma separated list of values.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a,6,1,p
+    correct_answers:
+    - d,e,1,2
+    - e,2,5,p
+  - sub_id: 8.2
+    question_type: short_answer
+    question: |-
+      What is the first solution found by the Forward-Checking algorithm?
+
+      Enter a comma separated list of values.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: a,6,1,p
+    correct_answer: a,e,2,5,p
+- id: 9
+  type: comprehension
+  label: PROBLEM DECOMPOSITION
+  description: |
+    The figure shows an AND-OR graph that depicts how a problem $S$ can be decomposed and transformed into one or more simpler problems. Nodes are uniquely identified by labels ($S, A, B, \dots$). The number in each node is the heuristic estimate of the cost of solving that node.
+
+    Nodes with double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as **SOLVED** and it will not be expanded subsequently.
+
+    - **Tie-breaker 1**: For nodes with the same cost, expand in the ascending order of node labels.
+    - **Tie-breaker 2**: For AND nodes, expand the unsolved branch with the highest cost.
+    - Each edge has a unit cost. Solve for $S$.
+
+    ```mermaid
+    graph TD
+        S["S: 100"]
+        A[["A (primitive): 20"]]
+        B["B: 200"]
+        C["C: 100"]
+        D["D: 160"]
+        E[["E (primitive): 40"]]
+        F[["F (primitive): 60"]]
+        G["G: 80"]
+        H[["H (primitive): 100"]]
+        I[["I (primitive): 140"]]
+        J[["J (primitive): 100"]]
+        K[["K (primitive): 90"]]
+
+        S ---|AND| A
+        S ---|AND| B
+        S --- C
+        S --- D
+        B ---|AND| E
+        B ---|AND| F
+        C ---|AND| G
+        C ---|AND| H
+        D ---|AND| I
+        D ---|AND| H
+        G --- J
+        G --- K
+    ```
+  subquestions:
+  - sub_id: 9.1
+    question_type: short_answer
+    question: |-
+      List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+
+      Enter a comma separated list of node labels.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: X,Y,Z
+    correct_answers:
+    - S,C,D
+    - S,C,D,G
+  - sub_id: 9.2
+    question_type: short_answer
+    question: |-
+      Determine the value of the start node S after each node expansion. List the first three values of S that correspond to the first three node expansions.
+
+      Enter a comma separated list of numbers.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 12,42,17
+    correct_answers:
+    - 101,161,183
+    - 101,161,183,194
+  - sub_id: 9.3
+    question_type: short_answer
+    question: |-
+      What is the final value of the start node S?
+
+      Enter a number.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: 42
+    correct_answer: '194'
+  - sub_id: 9.4
+    question_type: multiple_choice
+    question: In the given AND-OR graph, is the heuristic admissible?
     options:
-      A: "Depth First Search"
-      B: "Breadth First Search"
-      C: "Dijkstra's algorithm"
-      D: "Branch and Bound Search"
-      E: "A*"
-      F: "WA* for some w"
-      G: "Sparse Memory Graph Search (SMGS)"
-    correct_options:
-      - "C"
-      - "D"
-      - "E"
-      - "G"
+      A: 'No'
+      B: 'Yes'
+      C: Cannot be determined
+    correct_option: A
+- id: 10
+  type: comprehension
+  label: RULE BASED EXPERT SYSTEMS
+  description: |
+    A Rete Net for classification of machines is given. The labels A1, A2, A3, ..., A13, B1, ..., B5, R1, ..., R8 uniquely identify the nodes in the network. When required, use label ordering to break ties.
 
-  - id: 6
-    type: multiple_select
-    label: "SEARCH FOR OPTIMAL SOLUTION"
-    question: "Which of the following are true about the Branch-and-Bound method (discussed in the lecture) that is used for finding optimal tours for the Traveling Salesman Problem?"
+    ```mermaid
+    graph TD
+        WME --- A1["A1: CLASS = Energy"]
+        WME --- A2["A2: CLASS = BoM"]
+        WME --- A3["A3: CLASS = Fuel"]
+
+        A1 --- A4["A4: item = &lt;x&gt;"]
+        A2 --- A5["A5: item = &lt;x&gt;"]
+        A3 --- A6["A6: item = &lt;x&gt;"]
+
+        A4 --- A7["A7: source = wind"]
+        A4 --- A9["A9: source = stream"]
+        A5 --- A8["A8: part = alternator"]
+        A5 --- A10["A10: part = turbine-blades"]
+        A5 --- A12["A12: part = CD-nozzle"]
+        A6 --- A11["A11: type = liquid"]
+        A6 --- A13["A13: type = solid"]
+
+        A7 --- B1["B1: = &lt;x&gt;"]
+        A8 --- B1
+        B1 --- R1["Windmill (R1)"]
+
+        A8 --- R2["Generator (R2)"]
+
+        A9 --- B2["B2: = &lt;x&gt;"]
+        A8 --- B2
+        B2 --- R3["Watermill (R3)"]
+
+        A10 --- R4["Turbine (R4)"]
+
+        A11 --- B3["B3: = &lt;x&gt;"]
+        A10 --- B3
+        B3 --- R5["Gas Turbine (R5)"]
+
+        A11 --- B4["B4: = &lt;x&gt;"]
+        A12 --- B4
+        B4 --- R6["Liquid Fuel Rocket (R6)"]
+
+        A12 --- R7["Rocket (R7)"]
+
+        A13 --- B5["B5: = &lt;x&gt;"]
+        A12 --- B5
+        B5 --- R8["Solid Fuel Rocket (R8)"]
+    ```
+
+    Run the Rete algorithm for the Working Memory shown below, where the WMEs are in timestamp order:
+    - `101.` (Fuel ^item machine5 ^type solid)
+    - `102.` (Fuel ^item machine2 ^type liquid)
+    - `103.` (Fuel ^item machine3)
+    - `104.` (BoM ^item machine4 ^part alternator)
+    - `105.` (Energy ^item machine4 ^source wind)
+    - `106.` (BoM ^item machine3 ^part alternator)
+    - `107.` (BoM ^item machine1 ^part CD-nozzle)
+  subquestions:
+  - sub_id: 10.1
+    question_type: multiple_select
+    question: Which of the following rule-data tuples are in the conflict-set?
     options:
-      A: "The root of the search tree represents all possible tours."
-      B: "The root of the search tree represents the shortest/optimal tour."
-      C: "Each node in the search tree represents a set of tours."
-      D: "Each node in the search tree represents a single tour."
-      E: "The costs of the search tree nodes monotonically INCREASE from the root to leaf."
-      F: "The costs of the search tree nodes monotonically DECREASE from the root to leaf."
+      A: R1,104,105
+      B: R2,104
+      C: R2,106
+      D: R7,107
+      E: R1,104,106
+      F: R3,104,106
+      G: R6,102,107
     correct_options:
-      - "A"
-      - "C"
-      - "E"
+    - A
+    - B
+    - C
+    - D
+  - sub_id: 10.2
+    question_type: short_answer
+    question: |-
+      If the Inference Engine uses Specificity as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one.
 
-  - id: 7
-    type: comprehension
-    label: "GAMES"
-    description: |
-      The figure shows a 4-ply game tree with evaluation function values at the horizon. The nodes in the horizon are assigned labels A, B, C, ..., P. Use these labels when asked to enter a horizon node or a list of horizon nodes.
+      Enter a comma separated list with a rule label followed by timestamps in sorted order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: R1,101,102,103
+    correct_answers:
+    - R1,104,105
+    - R1,105,104
+  - sub_id: 10.3
+    question_type: short_answer
+    question: |-
+      If the Inference Engine uses Recency as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one.
 
-      **Tie-breaker**: when several nodes qualify then select the left most node, if tie persists then select the deepest node among the left most nodes.
+      Enter a comma separated list with a rule label followed by timestamps in sorted order.
+      NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
+      Answer format: R1,101,102,103
+    correct_answer: R7,107
+- id: 11
+  type: comprehension
+  label: AUTOMATED PLANNING
+  description: |
+    The domain description of a Blocks World with a single one-armed robot is given below:
 
-      ```mermaid
-      graph TD
-          Root["MAX"] --> L1_1["MIN (circle)"]
-          Root --> L1_2["MIN (circle)"]
+    **PREDICATES**
+    - `armEmpty`: The arm is not holding any block, it is empty.
+    - `holding(X)`: The arm is holding X.
+    - `onTable(X)`: X is on the table.
+    - `clear(X)`: X has nothing above it, it is clear.
+    - `on(X,Y)`: X is directly placed on Y.
 
-          L1_1 --> L2_1["MAX (square)"]
-          L1_1 --> L2_2["MAX (square)"]
-          L1_2 --> L2_3["MAX (square)"]
-          L1_2 --> L2_4["MAX (square)"]
+    **OPERATORS**
+    - `Pickup(X)`: Pick up X from the table.
+      - Preconditions: `{ armEmpty, clear(X), onTable(X) }`
+      - Add Effects: `{ holding(X) }`
+      - Del Effects: `{ armEmpty, onTable(X) }`
+    - `Putdown(X)`: Place X on the table.
+      - Preconditions: `{ holding(X) }`
+      - Add Effects: `{ armEmpty, onTable(X) }`
+      - Del Effects: `{ holding(X) }`
+    - `Unstack(X,Y)`: Pick up X that is directly sitting on Y.
+      - Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
+      - Add Effects: `{ clear(Y), holding(X) }`
+      - Del Effects: `{ armEmpty, on(X,Y) }`
+    - `Stack(X,Y)`: Place X directly on top of Y.
+      - Preconditions: `{ holding(X), clear(Y) }`
+      - Add Effects: `{ armEmpty, on(X,Y) }`
+      - Del Effects: `{ holding(X), clear(Y) }`
 
-          L2_1 --> L3_1["MIN (circle)"]
-          L2_1 --> L3_2["MIN (circle)"]
-          L2_2 --> L3_3["MIN (circle)"]
-          L2_2 --> L3_4["MIN (circle)"]
-          L2_3 --> L3_5["MIN (circle)"]
-          L2_3 --> L3_6["MIN (circle)"]
-          L2_4 --> L3_7["MIN (circle)"]
-          L2_4 --> L3_8["MIN (circle)"]
-
-          L3_1 --> A["A: 45"]
-          L3_1 --> B["B: 82"]
-          L3_2 --> C["C: 81"]
-          L3_2 --> D["D: 59"]
-          L3_3 --> E["E: 99"]
-          L3_3 --> F["F: 99"]
-          L3_4 --> G["G: 30"]
-          L3_4 --> H["H: 57"]
-          L3_5 --> I["I: 37"]
-          L3_5 --> J["J: 54"]
-          L3_6 --> K["K: 55"]
-          L3_6 --> L["L: 93"]
-          L3_7 --> M["M: 76"]
-          L3_7 --> N["N: 34"]
-          L3_8 --> O["O: 43"]
-          L3_8 --> P["P: 87"]
-      ```
-    subquestions:
-      - sub_id: 7.1
-        question_type: multiple_select
-        question: "Which of the following are strategies for MAX?"
-        options:
-          A: "A,B,E,F"
-          B: "C,D,G,H"
-          C: "A,C,I,J"
-          D: "B,D,J,L"
-        correct_options:
-          - "A"
-          - "B"
-
-      - sub_id: 7.2
-        question_type: short_answer
-        question: "List the horizon nodes in the best strategy for MAX. Enter the nodes in the ascending order of node labels.\n\nEnter a comma separated list of node labels.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: X,Y,Z"
-        correct_answer: "C,D,E,F"
-
-      - sub_id: 7.3
-        question_type: short_answer
-        question: "List the first five horizon nodes pruned by Alpha-Beta.\n\nEnter a comma separated sorted list of node labels.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: X,Y,Z"
-        correct_answer: "G,H,J,L,M"
-
-  - id: 8
-    type: comprehension
-    label: "CONSTRAINT SATISFACTION"
-    description: |
-      The figure shows a constraint graph of a Binary CSP and a part of the matching diagram. When a pair of variables (like, X1 and X5) do not have a constraint in the constraint graph then assume a **UNIVERSAL RELATION** in the matching diagram.
-
-      Process the variables, and their values, in **ALPHABETIC order**.
-
-      ```mermaid
-      graph LR
-          subgraph Constraint Graph
-              X1 --- X2
-              X1 --- X4
-              X2 --- X4
-              X2 --- X5
-              X5 --- X3
-              X4 --- X3
-          end
-      ```
-    subquestions:
-      - sub_id: 8.1
-        question_type: short_answer
-        question: "The Forward-Checking algorithm begins by assigning X1=a. What are the NEXT four values assigned to variables by the Forward-Checking algorithm? List the values as a comma separated list in the order they are assigned.\n\nEnter a comma separated list of values.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: a,6,1,p"
-        correct_answer: "e,2,5,p"
-
-      - sub_id: 8.2
-        question_type: short_answer
-        question: "What is the first solution found by the Forward-Checking algorithm?\n\nEnter a comma separated list of values.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: a,6,1,p"
-        correct_answer: "a,e,2,5,p"
-
-  - id: 9
-    type: comprehension
-    label: "PROBLEM DECOMPOSITION"
-    description: |
-      The figure shows an AND-OR graph that depicts how a problem $S$ can be decomposed and transformed into one or more simpler problems. Nodes are uniquely identified by labels ($S, A, B, \dots$). The number in each node is the heuristic estimate of the cost of solving that node.
-
-      Nodes with double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as **SOLVED** and it will not be expanded subsequently.
-
-      - **Tie-breaker 1**: For nodes with the same cost, expand in the ascending order of node labels.
-      - **Tie-breaker 2**: For AND nodes, expand the unsolved branch with the highest cost.
-      - Each edge has a unit cost. Solve for $S$.
-
-      ```mermaid
-      graph TD
-          S["S: 100"]
-          A[["A (primitive): 20"]]
-          B["B: 200"]
-          C["C: 100"]
-          D["D: 160"]
-          E[["E (primitive): 40"]]
-          F[["F (primitive): 60"]]
-          G["G: 80"]
-          H[["H (primitive): 100"]]
-          I[["I (primitive): 140"]]
-          J[["J (primitive): 100"]]
-          K[["K (primitive): 90"]]
-
-          S --- A
-          S --- B
-          S --- C
-          S --- D
-          D --- I
-          B --- E
-          B --- F
-          C --- G
-          C --- H
-          G --- J
-          G --- K
-      ```
-    subquestions:
-      - sub_id: 9.1
-        question_type: short_answer
-        question: "List the first three nodes (including S) expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.\n\nEnter a comma separated list of node labels.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: X,Y,Z"
-        correct_answer: "S,C,D"
-
-      - sub_id: 9.2
-        question_type: short_answer
-        question: "Determine the value of the start node S after each node expansion. List the first three values of S that correspond to the first three node expansions.\n\nEnter a comma separated list of numbers.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: 12,42,17"
-        correct_answer: "101,161,183"
-
-      - sub_id: 9.3
-        question_type: short_answer
-        question: "What is the final value of the start node S?\n\nEnter a number.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: 42"
-        correct_answer: "194"
-
-      - sub_id: 9.4
-        question_type: multiple_choice
-        question: "In the given AND-OR graph, is the heuristic admissible?"
-        options:
-          A: "No"
-          B: "Yes"
-          C: "Cannot be determined"
-        correct_option: "A"
-
-  - id: 10
-    type: comprehension
-    label: "RULE BASED EXPERT SYSTEMS"
-    description: |
-      A Rete Net for classification of machines is given. The labels A1, A2, A3, ..., A13, B1, ..., B5, R1, ..., R8 uniquely identify the nodes in the network. When required, use label ordering to break ties.
-
-      Run the Rete algorithm for the Working Memory shown below, where the WMEs are in timestamp order:
-      - `101.` (Fuel ^item machine5 ^type solid)
-      - `102.` (Fuel ^item machine2 ^type liquid)
-      - `103.` (Fuel ^item machine3)
-      - `104.` (BoM ^item machine4 ^part alternator)
-      - `105.` (Energy ^item machine4 ^source wind)
-      - `106.` (BoM ^item machine3 ^part alternator)
-      - `107.` (BoM ^item machine1 ^part CD-nozzle)
-    subquestions:
-      - sub_id: 10.1
-        question_type: multiple_select
-        question: "Which of the following rule-data tuples are in the conflict-set?"
-        options:
-          A: "R1,104,105"
-          B: "R2,104"
-          C: "R2,106"
-          D: "R7,107"
-          E: "R1,104,106"
-          F: "R3,104,106"
-          G: "R6,102,107"
-        correct_options:
-          - "A"
-          - "B"
-          - "C"
-          - "D"
-
-      - sub_id: 10.2
-        question_type: short_answer
-        question: "If the Inference Engine uses Specificity as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one.\n\nEnter a comma separated list with a rule label followed by timestamps in sorted order.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: R1,101,102,103"
-        correct_answer: "R1,104,105"
-
-      - sub_id: 10.3
-        question_type: short_answer
-        question: "If the Inference Engine uses Recency as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one.\n\nEnter a comma separated list with a rule label followed by timestamps in sorted order.\nNO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.\nAnswer format: R1,101,102,103"
-        correct_answer: "R7,107"
-
-  - id: 11
-    type: comprehension
-    label: "AUTOMATED PLANNING"
-    description: |
-      The domain description of a Blocks World with a single one-armed robot is given below:
-
-      **PREDICATES**
-      - `armEmpty`: The arm is not holding any block, it is empty.
-      - `holding(X)`: The arm is holding X.
-      - `onTable(X)`: X is on the table.
-      - `clear(X)`: X has nothing above it, it is clear.
-      - `on(X,Y)`: X is directly placed on Y.
-
-      **OPERATORS**
-      - `Pickup(X)`: Pick up X from the table.
-        - Preconditions: `{ armEmpty, clear(X), onTable(X) }`
-        - Add Effects: `{ holding(X) }`
-        - Del Effects: `{ armEmpty, onTable(X) }`
-      - `Putdown(X)`: Place X on the table.
-        - Preconditions: `{ holding(X) }`
-        - Add Effects: `{ armEmpty, onTable(X) }`
-        - Del Effects: `{ holding(X) }`
-      - `Unstack(X,Y)`: Pick up X that is directly sitting on Y.
-        - Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
-        - Add Effects: `{ clear(Y), holding(X) }`
-        - Del Effects: `{ armEmpty, on(X,Y) }`
-      - `Stack(X,Y)`: Place X directly on top of Y.
-        - Preconditions: `{ holding(X), clear(Y) }`
-        - Add Effects: `{ armEmpty, on(X,Y) }`
-        - Del Effects: `{ holding(X), clear(Y) }`
-
-      **Start State**: `{ onTable(A), onTable(B), onTable(D), on(C,B), clear(A), clear(C), clear(D), armEmpty }`
-      **Goal Description**: `{ on(D,B), holding(C) }`
-    subquestions:
-      - sub_id: 11.1
-        question_type: multiple_select
-        question: "Which of the following are applicable actions for the given problem?"
-        options:
-          A: "Pickup(A)"
-          B: "Pickup(D)"
-          C: "Unstack(C,B)"
-          D: "Pickup(C)"
-          E: "Stack(D,B)"
-          F: "Unstack(D,B)"
-        correct_options:
-          - "A"
-          - "B"
-          - "C"
-
-      - sub_id: 11.2
-        question_type: multiple_select
-        question: "Which of the following are relevant actions for the given problem?"
-        options:
-          A: "Pickup(A)"
-          B: "Pickup(D)"
-          C: "Unstack(C,B)"
-          D: "Pickup(C)"
-          E: "Stack(D,B)"
-          F: "Unstack(D,B)"
-        correct_options:
-          - "C"
-          - "E"
+    **Start State**: `{ onTable(A), onTable(B), onTable(D), on(C,B), clear(A), clear(C), clear(D), armEmpty }`
+    **Goal Description**: `{ on(D,B), holding(C) }`
+  subquestions:
+  - sub_id: 11.1
+    question_type: multiple_select
+    question: Which of the following are applicable actions for the given problem?
+    options:
+      A: Pickup(A)
+      B: Pickup(D)
+      C: Unstack(C,B)
+      D: Pickup(C)
+      E: Stack(D,B)
+      F: Unstack(D,B)
+    correct_options:
+    - A
+    - B
+    - C
+  - sub_id: 11.2
+    question_type: multiple_select
+    question: Which of the following are relevant actions for the given problem?
+    options:
+      A: Pickup(A)
+      B: Pickup(D)
+      C: Unstack(C,B)
+      D: Pickup(C)
+      E: Stack(D,B)
+      F: Unstack(D,B)
+    correct_options:
+    - C
+    - E

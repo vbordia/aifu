@@ -1,0 +1,73 @@
+---
+title: "Q7 — AUTOMATED PLANNING 1"
+short: "AUTOMATED PLANNING 1"
+order: 7
+paper: "26t1-an"
+question: 7
+label: "AUTOMATED PLANNING 1"
+description: "Automated Planning 1 question"
+topics: ["AUTOMATED PLANNING 1"]
+---
+
+## The Question
+
+Answer the given subquestions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 7.1 | Consider actions a and b and the two orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will make both of the ... | **A**, **B** |
+| 7.2 | In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ . | **A**, **B** |
+| 7.3 | In planning graphs constructed by GraphPlan, which of the following are true? | **A**, **B** |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**7.1** — Consider actions a and b and the two orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will make both of the orderings feasible?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | P is in pre(a) and also in pre(b). |
+| **B** | P is in del-effects(a) and also in del-effects(b). |
+| **C** | None of these. |
+
+**Answer:** **A**, **B**
+
+**7.2** — In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ .
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | if P in pre(a) and Q in pre(b) are mutex |
+| **B** | if P is in pre(a), in del-effects(a), in pre(b) and also in del-effects(b) |
+| **C** | only if every P in pre(a) is also present in del-effects(b) |
+| **D** | only if every P in add-effects(a) is also present in del-effects(b) |
+
+**Answer:** **A**, **B**
+
+**7.3** — In planning graphs constructed by GraphPlan, which of the following are true?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | If propositions P and Q are non mutex in layer zero then it will remain non mutex in all future layers. |
+| **B** | If propositions P and Q are non mutex in a layer n then it will remain non mutex in all future layers. |
+| **C** | If propositions P and Q are non mutex in a layer n then it can become mutex in a future layer. |
+| **D** | None of these. |
+
+**Answer:** **A**, **B**
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

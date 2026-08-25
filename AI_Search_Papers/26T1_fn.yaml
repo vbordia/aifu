@@ -88,9 +88,9 @@ questions:
 
     ```mermaid
     graph TD
-        Root["MIN Node<br/>(α=2, β=4)"]
-        N1["MAX Node 1"]
-        N2["MAX Node 2"]
+        Root["MAX Node<br/>(α=2, β=4)"]
+        N1(("MIN Node 1"))
+        N2(("MIN Node 2"))
         A["A (?)"]
         B["B (?)"]
         C["C (?)"]
@@ -119,7 +119,11 @@ questions:
       Enter a comma separated list of evals.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 1,2,3,4
-    correct_answer: 1,3,2,4
+    correct_answers:
+    - 1,3,2,4
+    - 1,4,2,3
+    - 2,3,1,4
+    - 2,4,1,3
   - sub_id: '3.2'
     question_type: short_answer
     question: |
@@ -144,11 +148,14 @@ questions:
       Enter a comma separated list of labels (A to D), or enter NIL.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: W,X,Y,Z
-    correct_answer: B,D
+    correct_answers:
+    - B,D
+    - D,B
 - id: 4
   type: comprehension
   label: 'GAMES: SSS STAR'
-  description: "The figure shows a game tree with evaluation function values at the horizon nodes. \nThe horizon nodes are labeled from A to J.\nWhere applicable, use these labels in short answers.\n\n**Tie-breaker**:\nWhen several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.\n\n```mermaid\ngraph TD\n    R[\"Root (MIN)\"]\n    N1[\"Circle 1 (MAX)\"]\n    N2[\"Circle 2 (MAX)\"]\n    N3[\"Circle 3 (MAX)\"]\n\n    R --- N1\n    R --- N2\n    R --- N3\n\n    S1[\"Square 1 (MIN)\"]\n    S2[\"Square 2 (MIN)\"]\n    N1 --- S1\n    N1 --- S2\n\n    S3[\"Square 3 (MIN)\"]\n    N2 --- S3\n\n    S4[\"Square 4 (MIN)\"]\n    S5[\"Square 5 (MIN)\"]\n    N3 --- S4\n    N3 --- S5\n\n    C1[\"Circle (MAX)\"]\n    S1 --- C1\n    A[\"A: 4\"]\n    B[\"B: 0\"]\n    C1 --- A\n    C1 --- B\n\n    C2[\"Circle (MAX)\"]\n    S2 --- C2\n    C[\"C: 9\"]\n    D[\"D: 8\"]\n    C2 --- C\n    C2 --- D\n\n    C3[\"Circle (MAX)\"]\n    C4[\"Circle (MAX)\"]\n    S3 --- C3\n    S3 --- C4\n    E[\"E: 5\"]\n    F[\"F: 7\"]\n    C3 --- E\n    C4 --- F\n\n    C5[\"Circle (MAX)\"]\n    S4 --- C5\n    G[\"G: 2\"]\n    H[\"H: 6\"]\n    C5 --- G\n    C5 --- H\n\n    C6[\"Circle (MAX)\"]\n    S5 --- C6\n    I[\"I: 3\"]\n    J[\"J: 1\"]\n    C6 --- I\n    C6 --- J\n```\n\nRun SSS* algorithm on the game tree, then answer the sub-questions.\n"
+  description: "The figure shows a game tree with evaluation function values at the horizon nodes. \nThe horizon nodes are labeled from A to J.\nWhere applicable, use these labels in short answers.\n\n**Tie-breaker**:\nWhen several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.\n\n```mermaid\ngraph TD\n    R[\"Root (MIN)\"]\n    N1[\"Circle 1 (MAX)\"]\n    N2[\"Circle 2 (MAX)\"]\n    N3[\"Circle 3 (MAX)\"]\n\n    R --- N1\n    R --- N2\n    R --- N3\n\n    S1[\"Square 1 (MIN)\"]\n    S2[\"Square 2 (MIN)\"]\n    N1 --- S1\n    N1 --- S2\n\n    S3[\"Square 3 (MIN)\"]\n    N2 --- S3\n\n    S4[\"Square 4 (MIN)\"]\n    S5[\"Square 5 (MIN)\"]\n    N3 --- S4\n    N3 --- S5\n\n    C1[\"Circle (MAX)\"]\n    S1 --- C1\n    A[\"A: 4\"]\n    B[\"B: 0\"]\n    C1 --- A\n    C1 --- B\n\n    C2[\"Circle (MAX)\"]\n    S2 --- C2\n    C[\"C: 9\"]\n    D[\"D: 8\"]\n    C2 --- C\n    C2 --- D\n\n    C3[\"Circle (MAX)\"\
+    ]\n    C4[\"Circle (MAX)\"]\n    S3 --- C3\n    S3 --- C4\n    E[\"E: 5\"]\n    F[\"F: 7\"]\n    C3 --- E\n    C4 --- F\n\n    C5[\"Circle (MAX)\"]\n    S4 --- C5\n    G[\"G: 2\"]\n    H[\"H: 6\"]\n    C5 --- G\n    C5 --- H\n\n    C6[\"Circle (MAX)\"]\n    S5 --- C6\n    I[\"I: 3\"]\n    J[\"J: 1\"]\n    C6 --- I\n    C6 --- J\n```\n\nRun SSS* algorithm on the game tree, then answer the sub-questions.\n"
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer
@@ -222,7 +229,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: S,X,Y,Z
-    correct_answer: S,B,A,C,F
+    correct_answers:
+    - S,B,A,C,F
+    - B,A,C,F
   - sub_id: '5.2'
     question_type: short_answer
     question: |
@@ -231,7 +240,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 16,18,20,24,28
+    correct_answers:
+    - 16,18,20,24,28
+    - 18,20,24,28
   - sub_id: '5.3'
     question_type: multiple_choice
     question: What can you conclude about the given AND-OR decomposition?
@@ -248,7 +259,7 @@ questions:
     The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, …, R4 uniquely identify the nodes in the network.
     When required, use the above label ordering to break ties and to enter short answers.
 
-    Note: "attribute <> x" is true when that attribute exists and its value is not equal to x.
+    Note: `attribute <> x` is true when that attribute exists and its value is not equal to x.
 
     ```mermaid
     graph TD
@@ -298,17 +309,17 @@ questions:
 
         B1["B1: = &lt;n&gt;"]
         A8 --- B1
-        A9 --- B1
+        A11 --- B1
         B1 --- R1["R1"]
 
         B2["B2: = &lt;n&gt;"]
         A14 --- B2
-        A15 --- B2
+        A9 --- B2
         B2 --- R3["R3"]
 
         B3["B3: = &lt;n&gt;"]
-        A11 --- B3
         A12 --- B3
+        A15 --- B3
         B3 --- R4["R4"]
 
         A16 --- R2["R2"]

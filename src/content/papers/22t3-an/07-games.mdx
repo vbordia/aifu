@@ -1,0 +1,95 @@
+---
+title: "Q7 — GAMES"
+short: "GAMES"
+order: 7
+paper: "22t3-an"
+question: 7
+label: "GAMES"
+description: "Games question"
+topics: ["GAMES"]
+---
+
+## The Question
+
+The figure shows a 4-ply game tree with evaluation function values at the horizon. The nodes in the horizon are assigned labels A, B, C, ..., P. Use these labels when asked to enter a horizon node or a list of horizon nodes.
+
+**Tie-breaker**: when several nodes qualify then select the left most node, if tie persists then select the deepest node among the left most nodes.
+
+```mermaid
+graph TD
+    Root["MAX"] --> L1_1["MIN (circle)"]
+    Root --> L1_2["MIN (circle)"]
+
+    L1_1 --> L2_1["MAX (square)"]
+    L1_1 --> L2_2["MAX (square)"]
+    L1_2 --> L2_3["MAX (square)"]
+    L1_2 --> L2_4["MAX (square)"]
+
+    L2_1 --> L3_1["MIN (circle)"]
+    L2_1 --> L3_2["MIN (circle)"]
+    L2_2 --> L3_3["MIN (circle)"]
+    L2_2 --> L3_4["MIN (circle)"]
+    L2_3 --> L3_5["MIN (circle)"]
+    L2_3 --> L3_6["MIN (circle)"]
+    L2_4 --> L3_7["MIN (circle)"]
+    L2_4 --> L3_8["MIN (circle)"]
+
+    L3_1 --> A["A: 45"]
+    L3_1 --> B["B: 82"]
+    L3_2 --> C["C: 81"]
+    L3_2 --> D["D: 59"]
+    L3_3 --> E["E: 99"]
+    L3_3 --> F["F: 99"]
+    L3_4 --> G["G: 30"]
+    L3_4 --> H["H: 57"]
+    L3_5 --> I["I: 37"]
+    L3_5 --> J["J: 54"]
+    L3_6 --> K["K: 55"]
+    L3_6 --> L["L: 93"]
+    L3_7 --> M["M: 76"]
+    L3_7 --> N["N: 34"]
+    L3_8 --> O["O: 43"]
+    L3_8 --> P["P: 87"]
+```
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 7.1 | Which of the following are strategies for MAX? | **A**, **B** |
+| 7.2 | List the horizon nodes in the best strategy for MAX. Enter the nodes in the ascending order of node labels. | `C,D,E,F` |
+| 7.3 | List the first five horizon nodes pruned by Alpha-Beta. | `G,H,J,L,M` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**7.1** — Which of the following are strategies for MAX?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | A,B,E,F |
+| **B** | C,D,G,H |
+| **C** | A,C,I,J |
+| **D** | B,D,J,L |
+
+**Answer:** **A**, **B**
+
+**7.2** — List the horizon nodes in the best strategy for MAX. Enter the nodes in the ascending order of node labels.
+
+**Answer:** `C,D,E,F`
+
+**7.3** — List the first five horizon nodes pruned by Alpha-Beta.
+
+**Answer:** `G,H,J,L,M`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

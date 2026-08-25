@@ -1,0 +1,100 @@
+---
+title: "Q9 — CONSTRAINT SATISFACTION"
+short: "CONSTRAINT SATISFACTION"
+order: 9
+paper: "26t1-an"
+question: 9
+label: "CONSTRAINT SATISFACTION"
+description: "Constraint Satisfaction question"
+topics: ["CONSTRAINT SATISFACTION"]
+---
+
+## The Question
+
+Consider a CSP over 3 variables A, B, C where the domains and constraints are:
+
+$$D_A = D_B = D_C = \{1,2,3,4\}$$
+$$R_{AC}: A = \text{mod}(2C, 3)$$
+$$R_{BA}: B = \text{mod}(2A, 7)$$
+$$R_{CB}: C = \text{mod}(2B, 7)$$
+
+where, $\text{mod}(n,d)$ returns the remainder after dividing $n$ by $d$, for example, $\text{mod}(8,3)=2$, $\text{mod}(6,7)=6$, $\text{mod}(8,7)=1$.
+
+Compute the three relations to match the domain constraints, then draw the constraint graph and matching-diagram, and then answer the sub-questions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 9.1 | Which of the following tuples occur in R_AC? | **A**, **B**, **C** |
+| 9.2 | Which of the following tuples occur in R_BA? | **A**, **B**, **D** |
+| 9.3 | Is the given CSP arc-consistent? | **B** |
+| 9.4 | If the given CSP is not already arc-consistent, then make it arc-consistent, and then check if the resulting network is path consistent. | **A** |
+| 9.5 | Does the given CSP have a solution? | `2,4,1` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**9.1** — Which of the following tuples occur in R_AC?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | (1,2) |
+| **B** | (2,1) |
+| **C** | (2,4) |
+| **D** | (4,2) |
+
+**Answer:** **A**, **B**, **C**
+
+**9.2** — Which of the following tuples occur in R_BA?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | (1,4) |
+| **B** | (2,1) |
+| **C** | (3,1) |
+| **D** | (4,2) |
+
+**Answer:** **A**, **B**, **D**
+
+**9.3** — Is the given CSP arc-consistent?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Yes |
+| **B** | No |
+| **C** | Cannot be determined |
+
+**Answer:** **B**
+
+**9.4** — If the given CSP is not already arc-consistent, then make it arc-consistent, and then check if the resulting network is path consistent.
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | It is path consistent. |
+| **B** | It is not path consistent. |
+| **C** | Path consistency does not apply because the constraint graph has a cycle. |
+
+**Answer:** **A**
+
+**9.5** — Does the given CSP have a solution?
+
+**Answer:** `2,4,1`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

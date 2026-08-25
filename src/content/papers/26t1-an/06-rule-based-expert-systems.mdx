@@ -1,0 +1,140 @@
+---
+title: "Q6 — RULE BASED EXPERT SYSTEMS"
+short: "RULE BASED EXPERT SYSTEMS"
+order: 6
+paper: "26t1-an"
+question: 6
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Rule Based Expert Systems question"
+topics: ["RULE BASED EXPERT SYSTEMS"]
+---
+
+## The Question
+
+A part of the Rete Net that classifies mushrooms (as edible or poisonous) is shown in the figure.
+The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, …, R4 uniquely identify the nodes in the network.
+When required, use the above label ordering to break ties and to enter short answers.
+
+Note: `attribute <> x` is true when that attribute exists and its value is not equal to x.
+
+```mermaid
+graph TD
+    WME --- A1["A1: CLASS = Mushroom"]
+    WME --- A2["A2: CLASS = Stalk"]
+    WME --- A3["A3: CLASS = Cap"]
+
+    A1 --- A4["A4: specimen = &lt;n&gt;"]
+    A4 --- A7["A7: odour = NONE"]
+    A4 --- A8["A8: odour = NONE"]
+    A4 --- A9["A9: habitat = LEAVES"]
+
+    A7 --- A14["A14: sp-colour &lt;&gt; GREEN"]
+    A14 --- R1["R1"]
+
+    A2 --- A5["A5: specimen = &lt;n&gt;"]
+    A5 --- A10["A10: br-surface = SCALY"]
+    A5 --- A11["A11: root = BULBOUS"]
+
+    A10 --- A15["A15: ar-colour &lt;&gt; BROWN"]
+
+    A9 --- B1["B1: = &lt;n&gt;"]
+    A12 --- B1
+    B1 --- R2["R2"]
+
+    A8 --- B2["B2: = &lt;n&gt;"]
+    A15 --- B2
+    B2 --- R3["R3"]
+
+    A3 --- A6["A6: specimen = &lt;n&gt;"]
+    A6 --- A12["A12: colour = WHITE"]
+    A6 --- A13["A13: surface = SMOOTH"]
+
+    A13 --- A16["A16: colour = RED"]
+
+    A11 --- B3["B3: = &lt;n&gt;"]
+    A16 --- B3
+    B3 --- R4["R4"]
+```
+
+Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order.
+Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
+
+```text
+101. (Cap ^specimen C36 ^colour RED ^surface SMOOTH)
+102. (Cap ^specimen A25 ^colour WHITE ^surface SMOOTH)
+103. (Mushroom ^specimen X16 ^odour NONE ^habitat LEAVES)
+104. (Mushroom ^specimen A25 ^odour NONE ^habitat LEAVES)
+105. (Stalk ^specimen C36 ^root BULBOUS ^ar-colour WHITE)
+106. (Stalk ^specimen X16 ^br-surface SCALY ^ar-colour WHITE)
+107. (Mushroom ^specimen C36 ^odour NONE ^sp-colour WHITE)
+108. (Mushroom ^specimen B49 ^odour ALMOND ^sp-colour BROWN)
+109. (Stalk ^specimen B49 ^br-surface SMOOTH)
+```
+
+For each WME identify its location (node label) in the Rete Net, and prepare the conflict set for the first cycle, then answer the sub-questions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Which of the following rule-data tuples are in the conflict-set? | **A**, **B**, **C**, **D** |
+| 6.2 | If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify? | **C**, **D** |
+| 6.3 | If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify? | **A** |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**6.1** — Which of the following rule-data tuples are in the conflict-set?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | R1,107 |
+| **B** | R2,102,104 |
+| **C** | R3,103,106 |
+| **D** | R4,101,105 |
+| **E** | R2,102,103 |
+| **F** | R3,104,106 |
+
+**Answer:** **A**, **B**, **C**, **D**
+
+**6.2** — If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | R1,107 |
+| **B** | R2,102,104 |
+| **C** | R3,103,106 |
+| **D** | R4,101,105 |
+| **E** | R2,102,103 |
+| **F** | R3,104,106 |
+
+**Answer:** **C**, **D**
+
+**6.3** — If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | R1,107 |
+| **B** | R2,102,104 |
+| **C** | R3,103,106 |
+| **D** | R4,101,105 |
+| **E** | R2,102,103 |
+| **F** | R3,104,106 |
+
+**Answer:** **A**
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

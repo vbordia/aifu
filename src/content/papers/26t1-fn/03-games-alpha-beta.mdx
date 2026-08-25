@@ -1,0 +1,77 @@
+---
+title: "Q3 — GAMES: ALPHA-BETA"
+short: "GAMES: ALPHA-BETA"
+order: 3
+paper: "26t1-fn"
+question: 3
+label: "GAMES: ALPHA-BETA"
+description: "Games: Alpha-Beta question"
+topics: ["GAMES: ALPHA-BETA"]
+---
+
+## The Question
+
+Consider a game tree with the root node as MAX, where an arbitrary path from the root reaches the subtree shown in the figure.
+
+```mermaid
+graph TD
+    Root["MAX Node<br/>(α=2, β=4)"]
+    N1(("MIN Node 1"))
+    N2(("MIN Node 2"))
+    A["A (?)"]
+    B["B (?)"]
+    C["C (?)"]
+    D["D (?)"]
+
+    Root --- N1
+    Root --- N2
+    N1 --- A
+    N1 --- B
+    N2 --- C
+    N2 --- D
+```
+
+Each leaf node A to D takes a UNIQUE EVAL VALUE from the set {1, 2, 3, 4}.
+Alpha-Beta algorithm is entering the subtree with alpha=2 and beta=4;
+find an optimal eval assignment (for nodes A to D) that maximizes the number of leaves pruned;
+find the minimax value, the type of cuts and the leaves pruned for that assignment.
+
+Based on the above data, answer the given subquestions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 3.1 |  | `1,3,2,4` / `1,4,2,3` / `2,3,1,4` / `2,4,1,3` |
+| 3.2 | The minimax value of the subtree for the optimal eval assignment is __________ . | `2` |
+| 3.3 |  | `2,0` |
+| 3.4 |  | `B,D` / `D,B` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**3.1** — 
+
+**Answer:** `1,3,2,4` / `1,4,2,3` / `2,3,1,4` / `2,4,1,3`
+
+**3.2** — The minimax value of the subtree for the optimal eval assignment is __________ .
+
+**Answer:** `2`
+
+**3.3** — 
+
+**Answer:** `2,0`
+
+**3.4** — 
+
+**Answer:** `B,D` / `D,B`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

@@ -1,0 +1,106 @@
+---
+title: "Q11 — AUTOMATED PLANNING"
+short: "AUTOMATED PLANNING"
+order: 11
+paper: "22t3-fn"
+question: 11
+label: "AUTOMATED PLANNING"
+description: "Automated Planning question"
+topics: ["AUTOMATED PLANNING"]
+---
+
+## The Question
+
+The domain description of a Blocks World with a single one-armed robot is given below.
+
+**PREDICATES**
+```text
+armEmpty    The arm is not holding any block, it is empty.
+holding(X)  The arm is holding X.
+onTable(X)  X is on the table.
+clear(X)    X has nothing above it, it is clear.
+on(X,Y)     X is directly placed on Y.
+```
+
+**OPERATORS**
+```text
+Pickup(X). Pick up X from the table.
+  Preconditions: { armEmpty, clear(X), onTable(X) }
+  Add Effects  : { holding(X) }
+  Del Effects  : { armEmpty, onTable(X) }
+
+Putdown(X). Place X on the table.
+  Preconditions: { holding(X) }
+  Add Effects  : { armEmpty, onTable(X) }
+  Del Effects  : { holding(X) }
+
+Unstack(X,Y). Pick up X that is directly sitting on Y.
+  Preconditions: { armEmpty, clear(X), on(X,Y) }
+  Add Effects  : { clear(Y), holding(X) }
+  Del Effects  : { armempty, on(X,Y) }
+
+Stack(X,Y). Place X directly on top of Y.
+  Preconditions: { holding(X), clear(Y) }
+  Add Effects  : { armEmpty, on(X,Y) }
+  Del Effects  : { holding(X), clear(Y) }
+```
+
+Consider the following planning problem.
+
+**Start State:**
+`Start: { onTable(A), onTable(B), on(C,B), clear(A), clear(C), clear(D), holding(D) }`
+
+**Goal Description:**
+`Goal: { on(A,D), on(B,C) }`
+
+Based on the above data, answer the given subquestions.
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 11.1 | Which of the following are applicable actions for the given problem? | **A**, **B**, **C** |
+| 11.2 | Which of the following are relevant actions for the given problem? | **A**, **B** |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**11.1** — Which of the following are applicable actions for the given problem?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Putdown(D) |
+| **B** | Stack(D,A) |
+| **C** | Stack(D,C) |
+| **D** | Pickup(A) |
+| **E** | Stack(A,D) |
+| **F** | Stack(B,C) |
+
+**Answer:** **A**, **B**, **C**
+
+**11.2** — Which of the following are relevant actions for the given problem?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | Stack(A,D) |
+| **B** | Stack(B,C) |
+| **C** | Putdown(D) |
+| **D** | Pickup(A) |
+| **E** | Stack(C,B) |
+| **F** | Stack(D,C) |
+
+**Answer:** **A**, **B**
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

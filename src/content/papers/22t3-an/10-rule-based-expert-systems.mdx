@@ -1,0 +1,113 @@
+---
+title: "Q10 — RULE BASED EXPERT SYSTEMS"
+short: "RULE BASED EXPERT SYSTEMS"
+order: 10
+paper: "22t3-an"
+question: 10
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Rule Based Expert Systems question"
+topics: ["RULE BASED EXPERT SYSTEMS"]
+---
+
+## The Question
+
+A Rete Net for classification of machines is given. The labels A1, A2, A3, ..., A13, B1, ..., B5, R1, ..., R8 uniquely identify the nodes in the network. When required, use label ordering to break ties.
+
+```mermaid
+graph TD
+    WME --- A1["A1: CLASS = Energy"]
+    WME --- A2["A2: CLASS = BoM"]
+    WME --- A3["A3: CLASS = Fuel"]
+
+    A1 --- A4["A4: item = &lt;x&gt;"]
+    A2 --- A5["A5: item = &lt;x&gt;"]
+    A3 --- A6["A6: item = &lt;x&gt;"]
+
+    A4 --- A7["A7: source = wind"]
+    A4 --- A9["A9: source = stream"]
+    A5 --- A8["A8: part = alternator"]
+    A5 --- A10["A10: part = turbine-blades"]
+    A5 --- A12["A12: part = CD-nozzle"]
+    A6 --- A11["A11: type = liquid"]
+    A6 --- A13["A13: type = solid"]
+
+    A7 --- B1["B1: = &lt;x&gt;"]
+    A8 --- B1
+    B1 --- R1["Windmill (R1)"]
+
+    A8 --- R2["Generator (R2)"]
+
+    A9 --- B2["B2: = &lt;x&gt;"]
+    A8 --- B2
+    B2 --- R3["Watermill (R3)"]
+
+    A10 --- R4["Turbine (R4)"]
+
+    A11 --- B3["B3: = &lt;x&gt;"]
+    A10 --- B3
+    B3 --- R5["Gas Turbine (R5)"]
+
+    A11 --- B4["B4: = &lt;x&gt;"]
+    A12 --- B4
+    B4 --- R6["Liquid Fuel Rocket (R6)"]
+
+    A12 --- R7["Rocket (R7)"]
+
+    A13 --- B5["B5: = &lt;x&gt;"]
+    A12 --- B5
+    B5 --- R8["Solid Fuel Rocket (R8)"]
+```
+
+Run the Rete algorithm for the Working Memory shown below, where the WMEs are in timestamp order:
+- `101.` (Fuel ^item machine5 ^type solid)
+- `102.` (Fuel ^item machine2 ^type liquid)
+- `103.` (Fuel ^item machine3)
+- `104.` (BoM ^item machine4 ^part alternator)
+- `105.` (Energy ^item machine4 ^source wind)
+- `106.` (BoM ^item machine3 ^part alternator)
+- `107.` (BoM ^item machine1 ^part CD-nozzle)
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 10.1 | Which of the following rule-data tuples are in the conflict-set? | **A**, **B**, **C**, **D** |
+| 10.2 | If the Inference Engine uses Specificity as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-... | `R1,104,105` / `R1,105,104` |
+| 10.3 | If the Inference Engine uses Recency as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data... | `R7,107` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**10.1** — Which of the following rule-data tuples are in the conflict-set?
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | R1,104,105 |
+| **B** | R2,104 |
+| **C** | R2,106 |
+| **D** | R7,107 |
+| **E** | R1,104,106 |
+| **F** | R3,104,106 |
+| **G** | R6,102,107 |
+
+**Answer:** **A**, **B**, **C**, **D**
+
+**10.2** — If the Inference Engine uses Specificity as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one.
+
+**Answer:** `R1,104,105` / `R1,105,104`
+
+**10.3** — If the Inference Engine uses Recency as the conflict resolution strategy then identify the rule-data tuples that will be ready to fire. If multiple rule-data tuples qualify then choose one.
+
+**Answer:** `R7,107`
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

@@ -1,0 +1,43 @@
+---
+title: "Q4 — SEARCH FOR OPTIMAL SOLUTION"
+short: "SEARCH FOR OPTIMAL SOLUTION"
+order: 4
+paper: "22t3-fn"
+question: 4
+label: "SEARCH FOR OPTIMAL SOLUTION"
+description: "Search For Optimal Solution question"
+topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+---
+
+## The Question
+
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 4 | In the map, nodes are placed on a grid where each tile is 10x10 in size, is the Manhattan distance heuristic admissible? ```mermaid graph TD S((S)) ---\|6\| ... | **A** |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**4** — In the map, nodes are placed on a grid where each tile is 10x10 in size, is the Manhattan distance heuristic admissible? ```mermaid graph TD S((S)) ---|6| A((A)) S ---|6| B((B)) S ---|14| C((C)) A ---|6| C B ---|6| C B ---|6| D((D)) B ---|14| G((G)) C ---|6| G D ---|6| G ```
+
+Options:
+
+| Option | |
+|---|---|
+| **A** | No |
+| **B** | yes |
+| **C** | Cannot be determined |
+
+**Answer:** **A**
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>
