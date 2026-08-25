@@ -1,0 +1,66 @@
+---
+title: "Q6 — Planning: Applicable/Relevant/Mutex"
+short: "Planning: Applicable/Relevant/Mutex"
+order: 6
+paper: "23t2-fn"
+question: 6
+label: "AUTOMATED PLANNING"
+description: "Blocks World planning graph"
+topics: ["AUTOMATED PLANNING"]
+---
+
+## The Question
+
+The domain description of a Blocks World with a single one-armed robot is given below.
+
+**PREDICATES**
+- `armEmpty`: The arm is not holding any block, it is empty.
+- `holding(X)`: The arm is holding X.
+- `onTable(X)`: X is on the table.
+- `clear(X)`: X has nothing above it, it is clear.
+- `on(X,Y)`: X is directly placed on Y.
+
+**OPERATORS**
+
+`Pickup(X)`: pick up X from the table.
+  Preconditions: `{ armEmpty, clear(X), onTable(X) }`
+  Add Effects: `{ holding(X) }`
+  Del Effects: `{ armEmpty, onTable(X) }`
+
+`Putdown(X)`: place X on the table.
+  Preconditions: `{ holding(X) }`
+  Add Effects: `&#123; 
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Which of the following are applicable actions in the start state? | `A,B,D` |
+| 6.2 | Which of the following are relevant actions in the goal state? | `B,C,E` |
+| 6.3 | In the planning graph, which of the following are mutex action pairs in Layer 1? | `A,B,C` |
+| 6.4 | In the planning graph, which of the following are mutex proposition pairs in Lay | `C,D` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**6.1** — Which of the following are applicable actions in the start state?  
+**Answer:** `A,B,D`
+
+**6.2** — Which of the following are relevant actions in the goal state?  
+**Answer:** `B,C,E`
+
+**6.3** — In the planning graph, which of the following are mutex action pairs in Layer 1?  
+**Answer:** `A,B,C`
+
+**6.4** — In the planning graph, which of the following are mutex proposition pairs in Lay  
+**Answer:** `C,D`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

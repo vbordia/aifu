@@ -1,0 +1,59 @@
+---
+title: "Q6 — Rete Expert System"
+short: "Rete Expert System"
+order: 6
+paper: "23t1-fn"
+question: 6
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Rete net conflict resolution"
+topics: ["RULE BASED EXPERT SYSTEMS"]
+---
+
+## The Question
+
+A Rete Net for classification of machines is shown in the figure. The labels A1, A2, A3, ..., A10, A11, A12, A13, ..., and B1, B2, B3 uniquely identify nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
+
+```mermaid
+graph TD
+    WME["WME"]
+    WME --- A1["A1: CLASS = Wheel"]
+    WME --- A2["A2: CLASS = Passenger"]
+    WME --- A3["A3: CLASS = Power"]
+    WME --- A4["A4: CLASS = Cargo"]
+
+    A1 --- A5["A5: vin = <v>"]
+    A2 --- A6["A6: vin = <v>"]
+    A3 --- A7["A7: vin = <v>"]
+    A4 --- A8["A8: vin = <v>"]
+
+    A5 --- A9["A9: tyre = slic
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 6.1 | Which of the following rule-data tuples are in the conflict-set? | `A,B,C` |
+| 6.2 | If the Inference Engine uses Specificity as the conflict resolution strategy the | `C` |
+| 6.3 | If the Inference Engine uses Recency as the conflict resolution strategy then id | `A` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**6.1** — Which of the following rule-data tuples are in the conflict-set?  
+**Answer:** `A,B,C`
+
+**6.2** — If the Inference Engine uses Specificity as the conflict resolution strategy the  
+**Answer:** `C`
+
+**6.3** — If the Inference Engine uses Recency as the conflict resolution strategy then id  
+**Answer:** `A`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

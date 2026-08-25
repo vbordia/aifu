@@ -224,7 +224,10 @@ questions:
       Enter a comma separated list of node labels in alphabetical order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: A,B,E,I
+    correct_answers:
+    - A,B,E,I
+    - A,E,I,B
+    - I,E,A,B
 - id: 4
   type: comprehension
   label: PROBLEM DECOMPOSITION
@@ -261,7 +264,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,B,A
+    correct_answers:
+    - S,B,A
+    - B,A
   - sub_id: '4.2'
     question_type: short_answer
     question: |
@@ -270,7 +275,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 34,37,56
+    correct_answers:
+    - 34,37,56
+    - 37,56
   - sub_id: '4.3'
     question_type: short_answer
     question: |

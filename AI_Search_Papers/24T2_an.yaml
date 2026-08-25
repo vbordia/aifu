@@ -147,7 +147,9 @@ questions:
       Enter a comma separated list of cities (city labels).
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: A,X,Y
-    correct_answer: A,B,D,E,C
+    correct_answers:
+    - A,B,D,E,C
+    - A,C,E,D,B
 - id: 3
   type: comprehension
   label: GAMES

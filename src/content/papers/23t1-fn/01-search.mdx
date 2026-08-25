@@ -1,0 +1,36 @@
+---
+title: "Q1 — DFS and BFS on a State Space"
+short: "DFS and BFS"
+order: 1
+paper: "23t1-fn"
+question: 1
+label: "SEARCH"
+description: "MoveGen table search — trace DFS and BFS to find a path from S to G."
+topics: ["DFS", "BFS", "MoveGen", "State space search"]
+---
+
+## The Question
+
+A MoveGen table defines the state space. DFS and BFS inspect only new nodes.
+
+**Official answer (DFS):** See the paper for the MoveGen table; the method is identical to the AN version.
+
+## The Topic in 60 Seconds
+
+- **DFS** uses a **stack** (LIFO). **BFS** uses a **queue** (FIFO). "Inspect only new nodes" = skip visited.
+
+> Deep-dive: [Depth First Search](/concepts/week-02-blind-search/02-depth-first-search), [Breadth First Search](/concepts/week-02-blind-search/03-breadth-first-search).
+
+## DFS exam method
+
+1. Use a stack — expand the most recently added node.
+2. Push in reverse MoveGen order so the alphabetically-first node is on top.
+3. Skip seen nodes; track parents; stop at G.
+
+## Tricks & Tips
+
+<Accordion title="Key rules">
+1. Stack (LIFO) for DFS, queue (FIFO) for BFS.
+2. "New nodes only" = don't re-generate visited nodes.
+3. Track parent pointers for path reconstruction.
+</Accordion>

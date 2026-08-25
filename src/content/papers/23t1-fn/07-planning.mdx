@@ -1,0 +1,65 @@
+---
+title: "Q7 — Planning: Applicable/Relevant/Mutex"
+short: "Planning: Applicable/Relevant/Mutex"
+order: 7
+paper: "23t1-fn"
+question: 7
+label: "AUTOMATED PLANNING"
+description: "Blocks World planning graph"
+topics: ["AUTOMATED PLANNING"]
+---
+
+## The Question
+
+The domain description of a Blocks World with a single one-armed robot is given below.
+
+**PREDICATES**
+`armEmpty` - The arm is not holding any block, it is empty.
+`holding(X)` - The arm is holding X.
+`onTable(X)` - X is on the table.
+`clear(X)` - X has nothing above it, it is clear.
+`on(X,Y)` - X is directly placed on Y.
+
+**OPERATORS**
+`Pickup(X)`. Pick up X from the table.
+- Preconditions: `{ armEmpty, clear(X), onTable(X) }`
+- Add Effects: `{ holding(X) }`
+- Del Effects: `{ armEmpty, onTable(X) }`
+
+`Putdown(X)`. Place X on the table.
+- Preconditions: `{ holding(X) }`
+- Add Effects: `&#123; armEmp
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 7.1 | Which of the following are applicable actions in the start state? | `B,C,D` |
+| 7.2 | Which of the following are relevant actions in the goal state? | `F,G` |
+| 7.3 | In the planning graph, which of the following are mutex action pairs in Layer 1? | `A,B` |
+| 7.4 | In the planning graph, which of the following are mutex proposition pairs in Lay | `A,B` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**7.1** — Which of the following are applicable actions in the start state?  
+**Answer:** `B,C,D`
+
+**7.2** — Which of the following are relevant actions in the goal state?  
+**Answer:** `F,G`
+
+**7.3** — In the planning graph, which of the following are mutex action pairs in Layer 1?  
+**Answer:** `A,B`
+
+**7.4** — In the planning graph, which of the following are mutex proposition pairs in Lay  
+**Answer:** `A,B`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

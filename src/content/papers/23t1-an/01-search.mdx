@@ -1,0 +1,101 @@
+---
+title: "Q1 — DFS and BFS on a State Space"
+short: "DFS and BFS"
+order: 1
+paper: "23t1-an"
+question: 1
+label: "SEARCH"
+description: "MoveGen table search — trace DFS and BFS to find a path from S to G, inspecting only new nodes."
+topics: ["DFS", "BFS", "MoveGen", "State space search"]
+---
+
+## The Question
+
+A MoveGen table defines the state space. S is the start, G is the goal. MoveGen returns nodes in table order. DFS and BFS inspect only new nodes.
+
+| X | MoveGen(X) |
+|---|---|
+| S | [A, C] |
+| A | [B, C, D, S] |
+| B | [A, D, E] |
+| C | [A, D, S] |
+| D | [A, B, C, E, G] |
+| E | [B, D, G] |
+| G | [D, E] |
+
+**Official answer:** `S,A,B,E,G`
+
+## The Topic in 60 Seconds
+
+- **DFS** uses a **stack** (LIFO): dive deep, backtrack when stuck.
+- **BFS** uses a **queue** (FIFO): explore level by level.
+- "Inspect only new nodes" = don't re-expand already-visited nodes.
+
+> Deep-dive: [Depth First Search](/concepts/week-02-blind-search/02-depth-first-search), [Breadth First Search](/concepts/week-02-blind-search/03-breadth-first-search), [MoveGen](/concepts/week-02-blind-search/01-move-gen).
+
+## DFS trace → `S,A,B,E,G`
+
+DFS uses a stack (LIFO). Expand the most recently added node first.
+
+| Step | Stack | Expand | MoveGen | Push (new only) | Parent |
+|------|-------|--------|---------|-----------------|--------|
+| 1 | [S] | S | [A, C] | push C, A | A←S, C←S |
+| 2 | [C, A] | **A** (top) | [B, C, D, S] | push D, B (C, S seen) | B←A, D←A |
+| 3 | [C, D, B] | **B** (top) | [A, D, E] | push E (A, D seen) | E←B |
+| 4 | [C, D, E] | **E** (top) | [B, D, G] | push G (B, D seen) | G←E |
+| 5 | [C, D, G] | **G** — goal! | | | |
+
+Path (follow parents): G ← E ← B ← A ← S = **S, A, B, E, G** ✓
+
+<PaperTrace
+  height={380}
+  nodeWidth={90}
+  nodeHeight={50}
+  nodeFontSize={13}
+  legend={[
+    { color: "#b45309", label: "expanding (stack top)" },
+    { color: "#0369a1", label: "on stack" },
+    { color: "#4b5563", label: "visited" },
+    { color: "#16a34a", label: "DFS path" },
+  ]}
+  nodes={[
+    { id: "S", x: 40, y: 200 },
+    { id: "A", x: 220, y: 80 },
+    { id: "C", x: 220, y: 320 },
+    { id: "B", x: 400, y: 140 },
+    { id: "D", x: 400, y: 260 },
+    { id: "E", x: 580, y: 200 },
+    { id: "G", x: 740, y: 200 },
+  ]}
+  edges={[
+    { id: "e1", from: "S", to: "A" },
+    { id: "e2", from: "S", to: "C" },
+    { id: "e3", from: "A", to: "B" },
+    { id: "e4", from: "A", to: "C" },
+    { id: "e5", from: "A", to: "D" },
+    { id: "e6", from: "B", to: "D" },
+    { id: "e7", from: "B", to: "E" },
+    { id: "e8", from: "C", to: "D" },
+    { id: "e9", from: "D", to: "E" },
+    { id: "e10", from: "D", to: "G" },
+    { id: "e11", from: "E", to: "G" },
+  ]}
+  steps={[
+    { label: "Push S", note: "STACK = [S]", nodes: { S: "frontier" } },
+    { label: "Expand S", note: "MoveGen(S) = [A, C]\\nPush C, A (alphabetical reversed for LIFO)\\nSTACK = [C, A] — A is on top", nodes: { S: "explored", A: "frontier", C: "frontier" } },
+    { label: "Expand A", note: "MoveGen(A) = [B, C, D, S]\\nNew: B, D (C, S seen)\\nSTACK = [C, D, B] — B is on top", nodes: { S: "explored", A: "current", B: "frontier", C: "frontier", D: "frontier" } },
+    { label: "Expand B", note: "MoveGen(B) = [A, D, E]\\nNew: E (A, D seen)\\nSTACK = [C, D, E]", nodes: { S: "explored", A: "explored", B: "current", C: "frontier", D: "frontier", E: "frontier" } },
+    { label: "Expand E → Goal!", note: "MoveGen(E) = [B, D, G]\\nNew: G\\nSTACK = [C, D, G]\\nG is the GOAL!", nodes: { S: "path", A: "path", B: "path", E: "path", G: "goal", C: "explored", D: "explored" }, edges: { e1: "path", e3: "path", e7: "path", e11: "path" } },
+  ]}
+/>
+
+## Tricks & Tips
+
+<Accordion title="DFS exam method">
+1. **Stack, not queue** — the most recent node is expanded next.
+2. **"New nodes only"** — skip anything already generated (even if it's just on the stack, not yet expanded).
+3. **Track parents** to reconstruct the path when G is found.
+4. MoveGen order matters: push in REVERSE alphabetical order so the alphabetically-first node is on top of the stack.
+</Accordion>
+
+**Answer:** `S,A,B,E,G`

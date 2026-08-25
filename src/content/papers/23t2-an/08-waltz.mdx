@@ -1,0 +1,48 @@
+---
+title: "Q7 — Waltz Line Labeling"
+short: "Waltz Line Labeling"
+order: 7
+paper: "23t2-an"
+question: 7
+label: "CONSTRAINT SATISFACTION"
+description: "Waltz labeling algorithm"
+topics: ["CONSTRAINT SATISFACTION"]
+---
+
+## The Question
+
+The set of junctions (L, W, Y and T type junctions) that occur in a 2D line drawing of trihedral objects is provided below. The in-plane clockwise/counterclockwise rotations of these junctions are valid as well. These junctions provide constraints on the possible edge assignments (convex, concave, arrow) for the edges/lines in 2D line drawings of trihedral objects.
+
+```mermaid
+graph TD
+    L1["L1"] --- L2["L2"] --- L3["L3"] --- L4["L4"] --- L5["L5"] --- L6["L6"]
+    W1["W1"] --- W2["W2"] --- W3["W3"]
+    Y1["Y1"] --- Y2["Y2"] --- Y3["Y3"]
+    T1["T1"] --- T2["T2"] --- T3["T3"] --- T4["T4"]
+```
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 7.1 | Assign consistent labels to all the edges and junctions in the 2D line drawing s | `Y1,W1,L5,T4` |
+| 7.2 | Assign consistent labels to all the edges and junctions in the 2D line drawing s | `NIL` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**7.1** — Assign consistent labels to all the edges and junctions in the 2D line drawing s  
+**Answer:** `Y1,W1,L5,T4`
+
+**7.2** — Assign consistent labels to all the edges and junctions in the 2D line drawing s  
+**Answer:** `NIL`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

@@ -126,7 +126,9 @@ questions:
       Enter a comma separated list of cities (city labels).
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: A,X,Y
-    correct_answer: A,D,B,C,E
+    correct_answers:
+    - A,D,B,C,E
+    - A,E,C,B,D
 - id: 3
   type: comprehension
   label: GAMES
@@ -207,7 +209,9 @@ questions:
       Enter a comma separated list of leaf-node labels in alphabetical order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: A,B,C,F
+    correct_answers:
+    - A,B,C,F
+    - A,C,F,B
 - id: 4
   type: comprehension
   label: AUTOMATED PLANNING
@@ -314,17 +318,37 @@ questions:
 
     ```mermaid
     graph TD
-        S["S: 10"] --- A["A: 10"]
-        S --- B["B: 8"]
+        S["S: 10"] --- AND_S(( ))
+        AND_S --> A["A: 10"]
+        AND_S --> B["B: 8"]
         S --- C["C: 14"]
-        A --- D["D: 16"]
-        A --- E["E: 10"]
-        B --- E
-        B --- F["F: 20"]
-        C --- G["G: 10"]
-        D --- H[["H (primitive): 20"]]
-        E --- I[["I (primitive): 10"]]
-        F --- J[["J (primitive): 10"]]
+
+        D["D: 16"]
+        E["E: 10"]
+        A --- D
+        A --- E
+
+        F["F: 20"]
+        B --- AND_B(( ))
+        AND_B --> E
+        AND_B --> F
+        B --- I
+
+        G["G: 10"]
+        C --- AND_C(( ))
+        AND_C --> F
+        AND_C --> G
+
+        H[["H (primitive): 20"]]
+        I[["I (primitive): 10"]]
+        J[["J (primitive): 10"]]
+
+        D --- H
+        E --- H
+        E --- I
+        F --- AND_F(( ))
+        AND_F --> I
+        AND_F --> J
         G --- J
     ```
   subquestions:
@@ -336,7 +360,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,C,A
+    correct_answers:
+    - S,C,A
+    - C,A,E
   - sub_id: '5.2'
     question_type: short_answer
     question: |
@@ -346,7 +372,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 16,22,24
+    correct_answers:
+    - 16,22,24
+    - 22,24,26
   - sub_id: '5.3'
     question_type: short_answer
     question: |
@@ -381,18 +409,21 @@ questions:
         A9 --- A15["A15: floor &gt; 10"]
         A10 --- A16["A16: bus-stop = YES"]
         A11 --- A17["A17: school = YES"]
-        A13 --- B1["B1: =&lt;x&gt;"]
-        A14 --- B1
-        A8 --- B1
-        A16 --- B3["B3: =&lt;x&gt;"]
-        A14 --- B3
-        A15 --- B3
-        A12 --- B4["B4: =&lt;x&gt;"]
-        A17 --- B4
-        B1 --- R1["R1"]
-        B2["B2: =&lt;x&gt;"] --- R2["R2"]
-        B3 --- R3["R3"]
-        B4 --- R4["R4"]
+        A13 --> B1["B1: =&lt;x&gt;"]
+        A14 --> B1
+        A8 --> B1
+        A7 --> B2["B2: =&lt;x&gt;"]
+        A14 --> B2
+        A15 --> B2
+        A16 --> B3["B3: =&lt;x&gt;"]
+        A14 --> B3
+        A15 --> B3
+        A12 --> B4["B4: =&lt;x&gt;"]
+        A17 --> B4
+        B1 --> R1["R1"]
+        B2 --> R2["R2"]
+        B3 --> R3["R3"]
+        B4 --> R4["R4"]
     ```
 
     Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order.

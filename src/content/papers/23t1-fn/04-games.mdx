@@ -1,0 +1,65 @@
+---
+title: "Q4 — Games: Strategy + Alpha-Beta"
+short: "Games: Strategy + Alpha-Beta"
+order: 4
+paper: "23t1-fn"
+question: 4
+label: "GAMES"
+description: "Game tree strategies and pruning"
+topics: ["GAMES"]
+---
+
+## The Question
+
+The figure shows a 3-ply game tree with evaluation function values defined at horizon. The nodes in the horizon are labeled from A to L. Use these labels when asked to enter a horizon node or a list of horizon nodes.
+
+**Tie-breaker**: when several nodes qualify then select the left most node, if tie persists then select the deepest node among the left most nodes.
+
+```mermaid
+graph TD
+    Root["MAX"]
+    Root --- L1_1["MIN"]
+    Root --- L1_2["MIN"]
+    Root --- L1_3["MIN"]
+    
+    L1_1 --- L2_1["MAX"]
+    L1_1 --- L2_2["MAX"]
+    
+    L1_2 --- L2_3["MAX"]
+    L1_2 --- L2_4["MAX"]
+    
+    L1_
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 4.1 | Which of the following is a strategy for MAX? | `C` |
+| 4.2 | List the horizon nodes in the best strategy for MAX. Enter the nodes in the asce | `B,D` |
+| 4.3 | List all the horizon nodes pruned by Alpha-Beta. | `G,H,K,L` |
+| 4.4 | Force the MinMax value to 98 by changing the eval of only one horizon node. Sele | `E,98` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**4.1** — Which of the following is a strategy for MAX?  
+**Answer:** `C`
+
+**4.2** — List the horizon nodes in the best strategy for MAX. Enter the nodes in the asce  
+**Answer:** `B,D`
+
+**4.3** — List all the horizon nodes pruned by Alpha-Beta.  
+**Answer:** `G,H,K,L`
+
+**4.4** — Force the MinMax value to 98 by changing the eval of only one horizon node. Sele  
+**Answer:** `E,98`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

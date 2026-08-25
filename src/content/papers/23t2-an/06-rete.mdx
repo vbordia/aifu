@@ -1,0 +1,62 @@
+---
+title: "Q5 — Rete Expert System"
+short: "Rete Expert System"
+order: 5
+paper: "23t2-an"
+question: 5
+label: "RULE BASED EXPERT SYSTEMS"
+description: "Rete net conflict resolution"
+topics: ["RULE BASED EXPERT SYSTEMS"]
+---
+
+## The Question
+
+A small part of the Rete Net for classifying resistors is shown in the figure. The labels A1, A2, ..., A10, A11, ..., B1, ..., B5 uniquely identify the nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
+
+```mermaid
+graph TD
+    WME["WME"]
+    A1["A1: CLASS = Band-1"]
+    A2["A2: CLASS = Band-2"]
+    A3["A3: CLASS = Band-3"]
+    A4["A4: CLASS = Band-4"]
+
+    WME --> A1
+    WME --> A2
+    WME --> A3
+    WME --> A4
+
+    A5["A5: itemNo = &lt;n&gt;"]
+    A6["A6: itemNo = &lt;n&gt;"]
+    A7["A7: itemNo = &lt;n&gt;"]
+    A8["A8: itemNo = &lt;n&
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 5.1 | Which of the following rule-data tuples are in the conflict-set? | `B,D` |
+| 5.2 | If the Inference Engine uses Specificity as the conflict resolution strategy the | `D` |
+| 5.3 | If the Inference Engine uses Recency as the conflict resolution strategy then id | `B` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**5.1** — Which of the following rule-data tuples are in the conflict-set?  
+**Answer:** `B,D`
+
+**5.2** — If the Inference Engine uses Specificity as the conflict resolution strategy the  
+**Answer:** `D`
+
+**5.3** — If the Inference Engine uses Recency as the conflict resolution strategy then id  
+**Answer:** `B`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

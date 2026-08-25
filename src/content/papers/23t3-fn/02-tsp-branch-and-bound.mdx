@@ -1,0 +1,52 @@
+---
+title: "Q2 — TSP Branch-and-Bound"
+short: "TSP Branch-and-Bound"
+order: 2
+paper: "23t3-fn"
+question: 2
+label: "TSP BRANCH-AND-BOUND"
+description: "TSP BnB tree reading"
+topics: ["TSP BRANCH-AND-BOUND"]
+---
+
+## The Question
+
+The TSP Branch-and-Bound algorithm is solving a TSP instance where the cities are A, B, C, .... and so on. The Branch-and-Bound search tree at the time when the algorithm has discovered the optimal tour is shown below.
+
+Each node in the search tree displays an edge (either XY or ~XY), a cost value, and a unique reference number (a1, b1, b2, ..., c1, ..., d1, ..., e1, …, f1, f2). Use the reference numbers to break ties. When required, enter the reference numbers in short answers.
+
+What information can you glean from the search tree? Answer the sub-questions based on the information gleaned from
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 2.1 | Let S0 (ref. no. a1) be the first node to be refined, identify the next 4 nodes  | `b1,c2,b2,c3` |
+| 2.2 | Which node represents the optimal tour and what is the cost of the optimal tour? | `f1,412` |
+| 2.3 | Determine the number of cities in the TSP instance. Enter the number of cities i | `5` |
+| 2.4 | Start from city A, what is the path representation of the optimal tour? Enter th | `A,B,D,C,E` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**2.1** — Let S0 (ref. no. a1) be the first node to be refined, identify the next 4 nodes   
+**Answer:** `b1,c2,b2,c3`
+
+**2.2** — Which node represents the optimal tour and what is the cost of the optimal tour?  
+**Answer:** `f1,412`
+
+**2.3** — Determine the number of cities in the TSP instance. Enter the number of cities i  
+**Answer:** `5`
+
+**2.4** — Start from city A, what is the path representation of the optimal tour? Enter th  
+**Answer:** `A,B,D,C,E`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

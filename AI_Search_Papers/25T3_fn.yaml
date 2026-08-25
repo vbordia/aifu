@@ -37,7 +37,9 @@ questions:
 
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: S,X,Y,Z,G
-    correct_answer: S,B,D,G
+    correct_answers:
+    - S,B,D,G
+    - S,B,E,G
   - sub_id: '1.2'
     question_type: short_answer
     question: |-
@@ -89,7 +91,9 @@ questions:
       Enter an even number.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 16
-    correct_answer: '2'
+    correct_answers:
+    - '2'
+    - '4'
   - sub_id: '2.2'
     question_type: multiple_choice
     question: What type of cut-off is induced by the eval selected for N?
@@ -194,7 +198,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,C,B,G
+    correct_answers:
+    - S,C,B,G
+    - C,B,G
   - sub_id: '4.2'
     question_type: short_answer
     question: |-
@@ -203,7 +209,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 22,24,26,28
+    correct_answers:
+    - 22,24,26,28
+    - 24,26,28
   - sub_id: '4.3'
     question_type: multiple_choice
     question: What can you conclude about the given AND-OR decomposition?

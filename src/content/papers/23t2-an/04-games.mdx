@@ -1,0 +1,68 @@
+---
+title: "Q3 — Games: Strategy + Alpha-Beta"
+short: "Games: Strategy + Alpha-Beta"
+order: 3
+paper: "23t2-an"
+question: 3
+label: "GAMES"
+description: "Game tree strategies and pruning"
+topics: ["GAMES"]
+---
+
+## The Question
+
+The figure shows a game tree with evaluation function values at the horizon nodes. 
+The horizon nodes are labeled from A to G.
+Use these labels to enter a horizon node or a list of horizon nodes in short answers (textbox).
+
+**Tie-breaker**: when several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+```mermaid
+graph TD
+    R["Root (MAX)"]
+    L1_1(("MIN"))
+    L1_2(("MIN"))
+    
+    L2_1["MAX"]
+    L2_2["MAX"]
+    L2_3["MAX"]
+    
+    L3_1(("MIN"))
+    L3_2(("MIN"))
+    
+    A["A: 24"]
+    B["B: 34"]
+
+| # | Question | Official answer |
+|---|----------|-----------------|
+| 3.1 | Which of the following is a strategy for the MAX player? | `A,C` |
+| 3.2 | List the horizon nodes in the best strategy for MAX. Enter the node labels in al | `C,F,G` |
+| 3.3 | List the horizon nodes pruned by Alpha-Beta. | `F,G` |
+| 3.4 | List the horizon nodes SOLVED by SSS*. | `A,C,D,E` |
+
+## The Topic in 60 Seconds
+
+> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+
+## Solutions
+
+**3.1** — Which of the following is a strategy for the MAX player?  
+**Answer:** `A,C`
+
+**3.2** — List the horizon nodes in the best strategy for MAX. Enter the node labels in al  
+**Answer:** `C,F,G`
+
+**3.3** — List the horizon nodes pruned by Alpha-Beta.  
+**Answer:** `F,G`
+
+**3.4** — List the horizon nodes SOLVED by SSS*.  
+**Answer:** `A,C,D,E`
+
+
+## Tricks & Tips
+
+<Accordion title="Exam method">
+1. Read the question carefully — identify the algorithm or technique.
+2. Trace step by step, showing your working.
+3. Verify your answer against the question constraints.
+</Accordion>

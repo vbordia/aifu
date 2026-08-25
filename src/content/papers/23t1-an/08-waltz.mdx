@@ -1,0 +1,67 @@
+---
+title: "Q8 — Waltz Line Labeling"
+short: "Waltz Line Labeling"
+order: 8
+paper: "23t1-an"
+question: 8
+label: "CONSTRAINT SATISFACTION"
+description: "A six-junction drawing with a cross-connector — the propagation wipes out to NIL."
+topics: ["Waltz labeling", "Line drawings", "Constraint propagation"]
+---
+
+## The Question
+
+Same junction dictionary (L1–L6, W1–W3, Y1–Y3, T1–T4, rotations allowed). A six-junction drawing to label.
+
+```text
+     3 --------- 4 --------- 5
+     | \       / |           |
+     |  \     /  |           |
+     |   \   /   |           |
+     |     1     |           |
+     |   /   \   |           |
+     |  /     \  |           |
+     | /       \ |           |
+     2 --------- 6 -----------
+```
+
+**Official answer:** `NIL`
+
+## The Topic in 60 Seconds
+
+Each junction must realize one legal dictionary pattern; shared edges agree at both ends. Empty domain ⇒ NIL.
+
+> Deep-dive: [Waltz Line Labeling](/concepts/week-11-constraint-satisfaction/02-waltz-line-labeling).
+
+## The solution
+
+Junction classification:
+
+| Junction | Edges | Shape | Type |
+|----------|-------|-------|------|
+| 3 | 4 (right), 2 (down), 1 (diagonal) | 3-edge fan | **W** |
+| 4 | 3 (left), 5 (right), 1 (down) | collinear pair + stem | **T** |
+| 5 | 4 (left), 6 (down) | corner | **L** |
+| 1 | 3 (up-left), 2 (down-left), 4 (up-right), 6 (down-right) | 4 edges! | **W** (4-edge variant) |
+| 2 | 3 (up), 1 (up-right), 6 (right) | 3-edge fan | **W** |
+| 6 | 5 (up), 2 (left), 1 (up-left) | 3-edge fan | **W** |
+
+The key forcing:
+
+1. **T(4)**: bar arrows forced outward — edge 3-4 = arrow into 3, edge 4-5 = arrow into 5. Stem 4-1 still free.
+2. **L(5)**: edge 4-5 arrives as arrow into 5. L patterns with arrow-in: other edge ∈ (-, +, arrow-in). Edge 5-6 gets one of those.
+3. **W(3)**: edge 3-4 arrives as arrow into 3. W patterns with arrow-in on a diagonal = **W1** (stem +). So stem 3-2 = +, and the arrow on 3-1 points into 3.
+4. At **junction 1** (the 4-edge W): the constraints from T(4)'s stem, W(3)'s arrow, and W(2)'s propagation all converge. The 4-edge junction has too many constraints — every combination requires an edge label already ruled out. Domain empties.
+
+**Answer: NIL** ✓
+
+## Tricks & Tips
+
+<Accordion title="The 4-step Waltz exam method">
+1. Classify every junction (count edges, look for collinear pairs = T, fans = W, ~120° = Y).
+2. Force the T first (bar arrows outward).
+3. Propagate; watch for 4-edge junctions (extra constraints).
+4. First empty domain ⇒ NIL.
+</Accordion>
+
+**Answer:** 8.1 `NIL`

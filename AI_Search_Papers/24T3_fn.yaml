@@ -22,7 +22,7 @@ questions:
         A ---|2| B((B))
         A ---|6| C((C))
         F ---|6| I((I))
-        F ---|6| C
+        F ---|6| A
         F ---|10| H((H))
         C ---|6| B
         C ---|4| E((E))
@@ -145,7 +145,9 @@ questions:
       Enter a comma separated list of cities (city labels).
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: A,X,Y
-    correct_answer: A,C,E,B,D
+    correct_answers:
+    - A,C,E,B,D
+    - A,D,B,E,C
 - id: 3
   type: comprehension
   label: GAMES
@@ -258,7 +260,9 @@ questions:
       Enter a comma separated list of node labels in alphabetical order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: A,B,C,F
+    correct_answers:
+    - A,B,C,F
+    - A,B,F,C
 - id: 4
   type: comprehension
   label: AUTOMATED PLANNING
@@ -367,13 +371,10 @@ questions:
 
     ```mermaid
     graph TD
-        S["S: 10"]
-        A["A: 8"]
-        B["B: 10"]
-        C["C: 14"]
-        S --- A
-        S --- B
-        S --- C
+        S["S: 10"] --- AND_S(( ))
+        AND_S --> A["A: 8"]
+        AND_S --> B["B: 10"]
+        S --- C["C: 14"]
 
         D["D: 16"]
         E["E: 12"]
@@ -381,21 +382,26 @@ questions:
         A --- E
 
         F["F: 20"]
-        B --- E
-        B --- F
+        B --- AND_B(( ))
+        AND_B --> E
+        AND_B --> F
+        B --- I
 
         G["G: 10"]
-        C --- F
-        C --- G
+        C --- AND_C(( ))
+        AND_C --> F
+        AND_C --> G
 
         H[["H (primitive): 20"]]
         I[["I (primitive): 10"]]
         J[["J (primitive): 10"]]
 
         D --- H
+        E --- H
         E --- I
-        F --- I
-        F --- J
+        F --- AND_F(( ))
+        AND_F --> I
+        AND_F --> J
         G --- J
     ```
   subquestions:
@@ -407,7 +413,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,C,B
+    correct_answers:
+    - S,C,B
+    - C,B,A
   - sub_id: '5.2'
     question_type: short_answer
     question: |
@@ -416,7 +424,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 16,22,24
+    correct_answers:
+    - 16,22,24
+    - 22,24,30
   - sub_id: '5.3'
     question_type: short_answer
     question: |

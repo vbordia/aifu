@@ -137,7 +137,9 @@ questions:
       Enter a comma separated list of cities (city labels).
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: A,X,Y
-    correct_answer: A,C,B,D,E
+    correct_answers:
+    - A,C,B,D,E
+    - A,E,D,B,C
 - id: 3
   type: comprehension
   label: GAMES
@@ -227,15 +229,18 @@ questions:
 
     ```mermaid
     graph TD
-        S((S: 10)) --> A((A: 14))
-        S --> B((B: 10))
+        S((S: 10)) --- AND_S(( ))
+        AND_S --> A((A: 14))
+        AND_S --> B((B: 10))
         S --> C((C: 10))
         A --> D[["D (primitive): 40"]]
         A --> E[["E (primitive): 20"]]
-        B --> E
-        B --> F[["F (primitive): 20"]]
-        C --> F
-        C --> G[["G (primitive): 30"]]
+        B --- AND_B(( ))
+        AND_B --> E
+        AND_B --> F[["F (primitive): 20"]]
+        C --- AND_C(( ))
+        AND_C --> F
+        AND_C --> G[["G (primitive): 30"]]
     ```
   subquestions:
   - sub_id: '4.1'
@@ -246,7 +251,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,C,A
+    correct_answers:
+    - S,C,A
+    - C,A,B
   - sub_id: '4.2'
     question_type: short_answer
     question: |
@@ -255,7 +262,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 12,28,36
+    correct_answers:
+    - 12,28,36
+    - 28,36,56
   - sub_id: '4.3'
     question_type: short_answer
     question: |
@@ -467,7 +476,9 @@ questions:
 
       Enter a comma separated list of junction labels, or enter NIL.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
-    correct_answer: L4,L2,W2,T3
+    correct_answers:
+    - L4,L2,W2,T3
+    - L6,L6,W1,T3
   - sub_id: '7.2'
     question_type: short_answer
     question: |

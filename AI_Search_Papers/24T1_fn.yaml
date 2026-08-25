@@ -133,7 +133,9 @@ questions:
       Enter a comma separated list of cities (city labels).
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: A,B,C
-    correct_answer: A,C,B,E,D,F
+    correct_answers:
+    - A,C,B,E,D,F
+    - A,F,D,E,B,C
 - id: 3
   type: comprehension
   label: GAMES
@@ -205,7 +207,9 @@ questions:
       Enter a comma separated list of node labels in alphabetical order.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: A,D,E,H
+    correct_answers:
+    - A,D,E,H
+    - A,D,H,E
 - id: 4
   type: comprehension
   label: PROBLEM DECOMPOSITION
@@ -228,11 +232,12 @@ questions:
         A --- AND1(( ))
         AND1 --> C[["C (primitive): 20"]]
         AND1 --> D[["D (primitive): 30"]]
+        AND1 --> G[["G (primitive): 10"]]
         B --- AND2(( ))
         AND2 --> E(("E (20)"))
         AND2 --> F(("F (40)"))
         E --- AND3(( ))
-        AND3 --> G[["G (primitive): 10"]]
+        AND3 --> G
         AND3 --> H[["H (primitive): 20"]]
         F --- AND4(( ))
         AND4 --> H
@@ -247,7 +252,9 @@ questions:
       Enter a comma separated list of node labels.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: X,Y,Z
-    correct_answer: S,A,B
+    correct_answers:
+    - S,A,B
+    - A,B,E
   - sub_id: '4.2'
     question_type: short_answer
     question: |
@@ -256,7 +263,9 @@ questions:
       Enter a comma separated list of numbers.
       NO SPACES, TABS, DOTS, BRACKETS OR EXTRANEOUS CHARACTERS.
       Answer format: 12,42,17
-    correct_answer: 22,32,24
+    correct_answers:
+    - 22,32,24
+    - 32,24,38
   - sub_id: '4.3'
     question_type: short_answer
     question: |
