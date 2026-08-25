@@ -20,37 +20,117 @@ Same junction dictionary as the other papers (L1–L6, W1–W3, Y1–Y3, T1–T4
 
 ## The Topic in 60 Seconds
 
-Each junction must realize one legal dictionary pattern; shared edges agree at both ends. Empty domain ⇒ NIL — but a fully consistent assignment means the answer is the label list itself.
+Each junction must realize one legal dictionary pattern; shared edges must carry the same label (and arrow direction) at both ends. Empty domain ⇒ NIL — a fully consistent assignment means the answer is the label list itself.
 
 > Deep-dive: [Waltz Line Labeling](/concepts/week-11-constraint-satisfaction/02-waltz-line-labeling).
 
+## The dictionary entries that matter here
+
+| Label | Geometry |
+|-------|----------|
+| **L2** | one arrow pointing *away* from the corner + one concave ($-$) edge |
+| **L3** | one concave ($-$) edge + one arrow pointing *into* the corner |
+| **Y1** | arrows *into* the junction on two edges, $-$ on the third |
+| **W3** | $+$ on one diagonal, $-$ on the stem, $+$ on the other diagonal |
+
 ## 7.1 — A consistent labeling exists → `L2, Y1, L3, W3`
 
-The official answer assigns junctions 1, 2, 3, 4 as **L2, Y1, L3, W3**:
+The official key assigns junctions 1, 2, 3, 4 = **L2, Y1, L3, W3**. How to verify it fast in the exam:
 
-- **Junction 1 = L2**: one arrow (away) + one concave (−).
-- **Junction 2 = Y1**: arrows into the junction on two edges, − on the third.
-- **Junction 3 = L3**: one concave (−) + one arrow (into).
-- **Junction 4 = W3**: + on one diagonal, − on the stem, + on the other diagonal.
+1. **Classify** the four junctions from the drawing (here: two L's, one Y, one W).
+2. **Start at the Y (junction 2)** — Y1 pins arrows on two of its edges and $-$ on the third. That is the most constrained junction, so everything downstream follows from it.
+3. **Propagate** each pinned edge to its neighbour: an arrow leaving the Y arrives at an L corner, selecting the arrow+$-$ pattern there (L2 if it points away from that corner, L3 if it points into it), and the $-$ edge feeds the W.
+4. **Close at the W (junction 4)**: its diagonals take $+$, its stem takes $-$ — exactly W3. Every junction holds one legal pattern and every shared edge agrees at both ends ⇒ consistent ⇒ the answer is the label list **L2, Y1, L3, W3** ✓
 
-Verification recipe:
+Watch the assignment lock in:
 
-1. **Classify** the four junctions from the drawing (two L's, one Y, one W here).
-2. **Start at the Y (junction 2)** — its Y1 shape pins two arrows and a − on its three edges.
-3. **Propagate** each pinned edge to its neighbour: the arrows flowing out of the Y arrive at the L junctions, selecting L2 and L3 (the arrow + − combination), and the − edge feeds the W.
-4. **W (junction 4)** closes consistently with +, −, + — every junction keeps exactly one legal pattern ⇒ consistent ⇒ answer is the label list **L2, Y1, L3, W3** ✓
+<StepGraph
+  height={300}
+  nodeWidth={120}
+  nodeHeight={64}
+  nodeFontSize={13}
+  legend={[
+    { color: "#4b5563", label: "unassigned" },
+    { color: "#b45309", label: "being labeled" },
+    { color: "#16a34a", label: "labeled (legal pattern)" },
+  ]}
+  steps={[
+    {
+      label: "1 · classify",
+      note: "From the drawing:\nJ1 = L-type · J2 = Y-type · J3 = L-type · J4 = W-type\nDomains: L has 6 patterns, Y has 3, W has 3.",
+      elements: [
+        { data: { id: "J1", label: "J1 : L ?", type: "unassigned" }, position: { x: 80, y: 70 } },
+        { data: { id: "J2", label: "J2 : Y ?", type: "unassigned" }, position: { x: 340, y: 70 } },
+        { data: { id: "J3", label: "J3 : L ?", type: "unassigned" }, position: { x: 80, y: 210 } },
+        { data: { id: "J4", label: "J4 : W ?", type: "unassigned" }, position: { x: 340, y: 210 } },
+        { data: { id: "e12", source: "J1", target: "J2" } },
+        { data: { id: "e13", source: "J1", target: "J3" } },
+        { data: { id: "e24", source: "J2", target: "J4" } },
+        { data: { id: "e34", source: "J3", target: "J4" } },
+      ],
+    },
+    {
+      label: "2 · force J2 = Y1",
+      note: "Most constrained first: Y1 = arrows INTO J2 on two edges, minus on the third.\nTwo edges pinned; propagate them outward.",
+      elements: [
+        { data: { id: "J1", label: "J1 : L ?", type: "unassigned" }, position: { x: 80, y: 70 } },
+        { data: { id: "J2", label: "J2 : Y1", type: "current" }, position: { x: 340, y: 70 } },
+        { data: { id: "J3", label: "J3 : L ?", type: "unassigned" }, position: { x: 80, y: 210 } },
+        { data: { id: "J4", label: "J4 : W ?", type: "unassigned" }, position: { x: 340, y: 210 } },
+        { data: { id: "e12", source: "J1", target: "J2", type: "active" } },
+        { data: { id: "e13", source: "J1", target: "J3" } },
+        { data: { id: "e24", source: "J2", target: "J4", type: "active" } },
+        { data: { id: "e34", source: "J3", target: "J4" } },
+      ],
+    },
+    {
+      label: "3 · L's resolve",
+      note: "Arrows arriving from the Y select the arrow+minus patterns:\nJ1 = L2 (arrow away + concave)\nJ3 = L3 (concave + arrow into)",
+      elements: [
+        { data: { id: "J1", label: "J1 : L2", type: "path" }, position: { x: 80, y: 70 } },
+        { data: { id: "J2", label: "J2 : Y1 ✓", type: "path" }, position: { x: 340, y: 70 } },
+        { data: { id: "J3", label: "J3 : L3", type: "path" }, position: { x: 80, y: 210 } },
+        { data: { id: "J4", label: "J4 : W ?", type: "current" }, position: { x: 340, y: 210 } },
+        { data: { id: "e12", source: "J1", target: "J2", type: "active" } },
+        { data: { id: "e13", source: "J1", target: "J3" } },
+        { data: { id: "e24", source: "J2", target: "J4", type: "active" } },
+        { data: { id: "e34", source: "J3", target: "J4", type: "active" } },
+      ],
+    },
+    {
+      label: "4 · W closes: W3",
+      note: "J4 = W3: plus on both diagonals, minus on the stem.\nEvery junction legal, all shared edges agree → CONSISTENT.\nAnswer: L2, Y1, L3, W3",
+      elements: [
+        { data: { id: "J1", label: "J1 : L2 ✓", type: "path" }, position: { x: 80, y: 70 } },
+        { data: { id: "J2", label: "J2 : Y1 ✓", type: "path" }, position: { x: 340, y: 70 } },
+        { data: { id: "J3", label: "J3 : L3 ✓", type: "path" }, position: { x: 80, y: 210 } },
+        { data: { id: "J4", label: "J4 : W3 ✓", type: "path" }, position: { x: 340, y: 210 } },
+        { data: { id: "e12", source: "J1", target: "J2", type: "path" } },
+        { data: { id: "e13", source: "J1", target: "J3", type: "path" } },
+        { data: { id: "e24", source: "J2", target: "J4", type: "path" } },
+        { data: { id: "e34", source: "J3", target: "J4", type: "path" } },
+      ],
+    },
+  ]}
+/>
 
 ## 7.2 — The second drawing → `NIL`
 
-Same method: classify, force the most constrained junction, propagate. Here the forced labels reach a junction whose remaining patterns all demand an edge label already ruled out — domain empties → **NIL** ✓
+Same method: classify, force the most constrained junction, propagate. Here the forced labels reach a junction whose remaining patterns all demand an edge label already ruled out — the domain empties → **NIL** ✓
+
+The kill typically lands like this:
+
+1. A T-junction's bar arrows pin two edges immediately.
+2. Propagation forces a neighbouring junction into a pattern that over-constrains their shared edge.
+3. The last junction needs, say, two arrows pointing *into* it (any Y pattern) but every remaining edge already carries its arrowhead (or a $+/-)$ at the other end. No dictionary pattern survives → domain size zero → **inconsistent**.
 
 ## Tricks & Tips
 
-<Accordion title="The 4-step Waltz exam method">
-1. Classify every junction (2 edges = L; collinear pair = T; 3-edge fan = W; ~120° trio = Y).
-2. Force the most constrained junction first (T bars; Y arrow patterns; boundary-edge arrows forcing W1).
-3. Propagate; strike patterns.
-4. Empty domain ⇒ NIL; full consistency ⇒ list the junction labels in the requested order.
+<Accordion title="Waltz exam method, tuned to these two drawings">
+1. Classify by geometry, not vibes: 2 edges = L; collinear pair + stem = T; 3-edge fan = W; ~120° trio = Y.
+2. Always start at the most constrained junction — a Y with only three patterns, or any T whose bars are forced. One choice there pins 2–3 edges at once.
+3. Translate each keyed label back into edge facts when verifying: L2 means "arrow leaves me"; L3 means "arrow enters me"; Y1 means "two arrows enter me". If two neighbours disagree about who the arrowhead points at, you have your NIL proof for 7.2-style drawings.
+4. Never enumerate all combinations — strike patterns per junction as edges get pinned. Empty domain ends the question; full consistency means the answer is simply the label list read off in junction order.
 </Accordion>
 
 **Answers:** 7.1 `L2,Y1,L3,W3` · 7.2 `NIL`

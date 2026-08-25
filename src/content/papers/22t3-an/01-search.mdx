@@ -5,8 +5,8 @@ order: 1
 paper: "22t3-an"
 question: 1
 label: "SEARCH"
-description: "Search question"
-topics: ["SEARCH"]
+description: "Blind BFS over the 5-4-1 water jug state space finds 221 in exactly 4 moves via 140 and 131."
+topics: ["SEARCH", "BFS", "Water jug puzzle", "State space search"]
 ---
 
 ## The Question
@@ -31,22 +31,149 @@ For the 5-4-1 water jug puzzle, the `MoveGen` function takes a state $ABC$ and r
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+Every move costs 1, so the state space is an **unweighted graph** and breadth-first search (FIFO queue) returns a shortest path: the first time the goal is dequeued, its depth is minimal.
 
-## Solutions
+Operator semantics used by this puzzle:
 
-**1.1** — Let 500 be the start state and 221 be the goal state, find the shortest path from start to goal. Enter the path starting with 500 as a comma separated list of states.
+| Operator | Valid when | Effect |
+|----------|-----------|--------|
+| `xEy` (empty x into y) | ALL of x fits into y: $A_x \le cap_y - A_y$ | $y$ gains $A_x$, $x$ becomes 0 |
+| `xFy` (fill y up from x) | $A_x > 0$ and $y$ not full | transfer $cap_y - A_y$, $y$ becomes full |
 
-**Answer:** `500,140,131,230,221`
+If both operators yield the same state, the tie-breaker says report `xEy`.
 
-**1.2** — Let 500 be the start state and 221 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.
+> Deep-dive: browse the [Concepts](/concepts) section for uninformed search.
 
-**Answer:** `aFb,bFc,cEa,bFc`
+## Working — BFS level by level
+
+| Depth | New states | Derivation |
+|-------|------------|------------|
+| 0 | 500 | start |
+| 1 | 140, 401 | `aFb`: b 0→4, a keeps 5−4=1 · `aFc`: c 0→1, a keeps 5−1=4 (`aEb` invalid: 5 L cannot fully empty into the 4 L jug) |
+| 2 | 041, 131, 410 | from 140: `aEc` 1≤1 → 041, `bFc` c takes 1, b 4−1=3 → 131 · from 401: `cEb` 1≤4 → b=1, c=0 → 410 |
+| 3 | 230, 311 | from 131: `cEa` 1≤5−1=4 → a=2, c=0 → 230 · from 410: `aFc` c takes 1, a 4−1=3 → 311 |
+| 4 | **221 = GOAL** | from 230: `bFc` c takes 1, b 3−1=2 |
+
+The goal first appears at depth 4, so the 5-state path is provably shortest.
+
+## OPEN-list trace
+
+| Step | Dequeue | Generated | OPEN after (FIFO) |
+|------|---------|-----------|-------------------|
+| 1 | 500 | 140, 401 | 140, 401 |
+| 2 | 140 | 041, 131 (500 already seen) | 401, 041, 131 |
+| 3 | 401 | 410 (041 duplicate, 500 seen) | 041, 131, 410 |
+| 4 | 041 | nothing new (neighbours full or seen) | 131, 410 |
+| 5 | 131 | 230 | 410, 230 |
+| 6 | 410 | 311 | 230, 311 |
+| 7 | 230 | **221 — GOAL, stop** | done |
+
+## 1.1 & 1.2 — Path and move sequence
+
+| # | Move | Transition | Arithmetic / rule |
+|---|------|------------|-------------------|
+| 1 | `aFb` | 500 → 140 | fill b: transfer 4, a keeps 5−4 = 1 (`aEb` invalid — 5 L cannot empty into a 4 L jug) |
+| 2 | `bFc` | 140 → 131 | c takes 1, b keeps 4−1 = 3 (`bEc` invalid — 4 > 1) |
+| 3 | `cEa` | 131 → 230 | 1 ≤ 5−1 = 4 fits entirely → a=2, c=0 (`cFa` yields the same state — tie-breaker picks `cEa`) |
+| 4 | `bFc` | 230 → 221 | c takes 1, b 3−1 = 2 → **GOAL** |
+
+Path: `500,140,131,230,221` · Moves: `aFb,bFc,cEa,bFc`
+
+## Interactive BFS trace
+
+Each step shows the dequeued state, the exact pour arithmetic, and the FIFO queue contents.
+
+<PaperTrace
+  height={540}
+  nodeWidth={96}
+  nodeHeight={52}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "expanding (dequeued)" },
+    { color: "#0369a1", label: "in OPEN (queue)" },
+    { color: "#4b5563", label: "expanded" },
+    { color: "#15803d", label: "goal / shortest path" },
+  ]}
+  nodes={[
+    { id: "500", x: 300, y: 30 },
+    { id: "140", x: 150, y: 135 },
+    { id: "401", x: 450, y: 135 },
+    { id: "041", x: 55, y: 240 },
+    { id: "131", x: 245, y: 240 },
+    { id: "410", x: 520, y: 240 },
+    { id: "230", x: 150, y: 345 },
+    { id: "311", x: 430, y: 345 },
+    { id: "221", x: 295, y: 450 },
+  ]}
+  edges={[
+    { id: "e1", from: "500", to: "140", label: "aFb" },
+    { id: "e2", from: "500", to: "401", label: "aFc" },
+    { id: "e3", from: "140", to: "041", label: "aEc" },
+    { id: "e4", from: "140", to: "131", label: "bFc" },
+    { id: "e5", from: "401", to: "410", label: "cEb" },
+    { id: "e6", from: "131", to: "230", label: "cEa" },
+    { id: "e7", from: "410", to: "311", label: "aFc" },
+    { id: "e8", from: "230", to: "221", label: "bFc" },
+  ]}
+  steps={[
+    {
+      label: "Init",
+      note: "OPEN = [500]    Goal: 221",
+      nodes: { "500": "frontier" },
+      edges: {},
+    },
+    {
+      label: "Dequeue 500",
+      note: "aEb invalid: 5 L of a cannot fully empty into b (cap 4)\naFb: b 0->4, a 5-4=1 -> 140\naFc: c 0->1, a 5-1=4 -> 401\nOPEN = [140, 401]",
+      nodes: { "500": "current", "140": "frontier", "401": "frontier" },
+      edges: { e1: "active", e2: "active" },
+    },
+    {
+      label: "Dequeue 140",
+      note: "aEc: 1 <= cap(c)-c = 1 -> a=0, c=1 -> 041\nbFc: c takes 1, b 4-1=3 -> 131\nbEa / bFa -> 500 (already seen)\nOPEN = [401, 041, 131]",
+      nodes: { "500": "explored", "140": "current", "401": "frontier", "041": "frontier", "131": "frontier" },
+      edges: { e3: "active", e4: "active" },
+    },
+    {
+      label: "Dequeue 401",
+      note: "cEa: 1 <= 5-4=1 -> a=5, c=0 -> 500 (seen)\ncEb: 1 <= 4-0 -> b=1, c=0 -> 410\naEb: 4 <= 4 -> 041 (duplicate)\nOPEN = [041, 131, 410]",
+      nodes: { "500": "explored", "140": "explored", "401": "current", "041": "frontier", "131": "frontier", "410": "frontier" },
+      edges: { e5: "active" },
+    },
+    {
+      label: "Dequeue 041",
+      note: "bEa -> 401 (seen),  cEa -> 140 (seen)\nbEc / cEb: receiving jug already full -> invalid\nNothing new.  OPEN = [131, 410]",
+      nodes: { "500": "explored", "140": "explored", "401": "explored", "041": "current", "131": "frontier", "410": "frontier" },
+      edges: {},
+    },
+    {
+      label: "Dequeue 131",
+      note: "cEa: 1 <= 5-1=4 -> a=2, c=0 -> 230 NEW\ncFa gives the same state - tie-breaker picks cEa\ncEb -> 140 (seen),  bEa -> 401 (seen)\nOPEN = [410, 230]",
+      nodes: { "500": "explored", "140": "explored", "401": "explored", "041": "explored", "131": "current", "410": "frontier", "230": "frontier" },
+      edges: { e6: "active" },
+    },
+    {
+      label: "Dequeue 410",
+      note: "aFc: c takes 1, a 4-1=3 -> 311 NEW\naFb -> 140 (seen),  bEa -> 500,  bEc -> 401 (seen)\nOPEN = [230, 311]",
+      nodes: { "500": "explored", "140": "explored", "401": "explored", "041": "explored", "131": "explored", "410": "current", "230": "frontier", "311": "frontier" },
+      edges: { e7: "active" },
+    },
+    {
+      label: "Goal: 221",
+      note: "Dequeue 230:  bFc: c takes 1, b 3-1=2 -> 221 = GOAL\nPath: 500 -> 140 -> 131 -> 230 -> 221  (4 moves)\nMoves: aFb, bFc, cEa, bFc",
+      nodes: { "500": "path", "140": "path", "401": "explored", "041": "explored", "131": "path", "410": "explored", "230": "path", "311": "explored", "221": "goal" },
+      edges: { e1: "path", e4: "path", e6: "path", e8: "path" },
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Fast method">
+1. Depth = number of moves. The goal first surfaced while processing depth-3 parents, so the 5-state answer is provably shortest — no need to enumerate alternatives.
+2. Apply the strict `xEy` rule (ALL of x must fit into y): 5 L can never empty into the 4 L jug, which kills `aEb` from 500 and forces `aFb` as the first move.
+3. Never re-enqueue a seen state — 500 kept reappearing via `bFa`, `cEa`, `bEa`; skipping it is what keeps the queue clean and the trace short.
+4. Replay the move string as a sanity check: 500 →aFb 140 →bFc 131 →cEa 230 →bFc 221. The third move is the tie-breaker trap: `cEa`, not `cFa`.
 </Accordion>
+
+**Answers:** 1.1 `500,140,131,230,221` · 1.2 `aFb,bFc,cEa,bFc`

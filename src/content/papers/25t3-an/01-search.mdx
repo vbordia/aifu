@@ -84,11 +84,12 @@ Path: **S → B → D → G**, cost $2+1+2 = 5$. (Not optimal — see 1.5.)
 |-----|-------------------|--------|
 | S : 0 | SA : 1, SB : 2 | |
 | SA : 1 | SAE : 2, SAD : 4 | |
-| SAE : 2 | SAEF : 3 | |
+| SAE : 2 (tie with SB — S-A before S-B) | SAEF : 3 | |
 | SB : 2 | SBD : 3, SBC : 4 | |
-| SAEF : 3 (tie with SBD — S-A before S-B) | SAEFG : **4** ← goal on queue | |
-| SBD : 3 | SBDA : 4, SBDF : 5, SBDG : 5, SBDC : 5 | |
-| SAEFG : **4** | all open ≥ 4 → **optimal** | |
+| SAEF : 3 (tie with SBD — S-A before S-B) | SAEFG : **4** ← goal queued | |
+| SBD : 3 | SBDA : $3+3$ = **6**, SBDF : $3+1$ = **4**, SBDG : $3+2$ = 5, SBDC : $3+2$ = 5 | |
+| SAD : 4 (first of the four-way tie at 4 — labels) | SADF : $4+1$ = 5, SADG : $4+2$ = 6 | |
+| SAEFG : **4** — next at the tie, a complete tour | everything left ≥ 4 → **optimal** | |
 
 Path: **S → A → E → F → G**, cost $1+1+1+1 = 4$ ✓ the true shortest path.
 

@@ -5,12 +5,11 @@ order: 5
 paper: "22t3-an"
 question: 5
 label: "SEARCH FOR OPTIMAL SOLUTION"
-description: "Search For Optimal Solution question"
-topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+description: "Euclidean edge costs retire BFS; the best admissible heuristic admits Dijkstra, BnB, A* and SMGS into the optimal club."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "Optimal search", "Admissible heuristics"]
 ---
 
 ## The Question
-
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -18,30 +17,47 @@ topics: ["SEARCH FOR OPTIMAL SOLUTION"]
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+Two inputs changed from Q4: costs are now **non-uniform** (Euclidean distances), and $h$ is now guaranteed **admissible** (and "best" = most informed admissible $h$, so $h = h^*$ is allowed). Non-uniformity disqualifies BFS; admissibility re-qualifies every $f = g + h$ method.
+
+> Deep-dive: browse the [Concepts](/concepts) section for optimal search.
 
 ## Solutions
 
-**5** — Given a state space with Euclidean edge costs, and with the best admissible heuristics, which of the following algorithms will find the optimal path?
+**5** — Euclidean edge costs, best admissible heuristics. Which find the optimal path?
 
 Options:
 
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | Depth First Search |
-| **B** | Breadth First Search |
-| **C** | Dijkstra's algorithm |
-| **D** | Branch and Bound Search |
-| **E** | A* |
-| **F** | WA* for some w |
-| **G** | Sparse Memory Graph Search (SMGS) |
+| **A** — Depth First Search | **No**: still neither complete-on-the-nose nor optimal; cost structure is irrelevant to its flaw (it ignores costs altogether) |
+| **B** — Breadth First Search | **No**: BFS minimises the NUMBER of edges; with Euclidean weights one long edge can beat three short ones, so fewest-edge ≠ cheapest |
+| **C** — Dijkstra's algorithm | **Yes**: cheapest-first expansion needs no heuristic at all; works for any non-negative costs including Euclidean |
+| **D** — Branch and Bound Search | **Yes**: ranks partial paths by true accumulated cost $g$; first complete path popped is optimal, no heuristic involved |
+| **E** — A* | **Yes**: with an admissible $h$, A* returns the optimal path; "best admissible" only makes it faster, never wrong |
+| **F** — WA* for some w | **No**: weighted A* scales $h$ by $w > 1$, intentionally breaking admissibility; solution quality bounded by $w \cdot C^*$, not optimality |
+| **G** — SMGS | **Yes**: Sparse Memory Graph Search preserves optimality under exactly the missing precondition of Q4 — a known-admissible $h$ — while fitting memory bounds |
 
 **Answer:** **C**, **D**, **E**, **G**
 
+### Why the answer set flipped from Q4
+
+| Algorithm | Unit costs, unknown h (Q4) | Euclidean costs, admissible h (Q5) | What changed |
+|---|---|---|---|
+| BFS | in | **out** | non-uniform costs broke "depth = cost" |
+| Dijkstra / BnB | in | in | never depended on either input |
+| A* | out | **in** | admissibility now supplied |
+| SMGS | out | **in** | its pruning is safe only for admissible h |
+| WA* | out | out | $w > 1$ ruins optimality under any h |
+
+The moral: guarantees attach to *assumptions*, not algorithms. Swap the assumptions and the correct option set swaps with them.
+
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. "Best admissible heuristics" is a gift phrase — it unlocks A* AND memory-bounded cousins like SMGS. Circle it before reading options.
+2. BFS fails the moment edge costs vary: construct the two-edge counterexample mentally (1 edge of cost 10 vs 3 edges of cost 1 each) and you will never tick it wrongly again.
+3. WA* never appears in an optimality answer unless w = 1 is forced. "For some w" = includes w > 1 = inadmissible by design.
+4. If both Dijkstra/BnB and A*/SMGS appear with an admissible h, all four are correct together — admissible h can only prune, never mislead.
 </Accordion>
+
+**Answers:** 5 **C, D, E, G**

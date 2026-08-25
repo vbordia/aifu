@@ -5,13 +5,13 @@ order: 6
 paper: "23t3-an"
 question: 6
 label: "AUTOMATED PLANNING"
-description: "Blocks World planning graph"
-topics: ["AUTOMATED PLANNING"]
+description: "Two towers, one empty arm: exactly two Unstacks fire now, three writers serve the goal, and the twin Unstacks are mutex because they strangle the same arm."
+topics: ["AUTOMATED PLANNING", "STRIPS", "Planning graph", "Mutex"]
 ---
 
 ## The Question
 
-The domain description of a Blocks World with a single one-armed robot is given below.
+The domain description of a Blocks World with a single one-armed robot is given below (standard Pickup/Putdown/Unstack/Stack operators with their usual precondition/add/delete lists).
 
 Consider the planning problem with the following start state and goal description.
 
@@ -29,29 +29,68 @@ Based on the above data, answer the given subquestions.
 | 6.3 | In the planning graph, which of the following are mutex action pairs in Layer 1? | `A,B,C` |
 | 6.4 | In the planning graph, which of the following are mutex proposition pairs in Lay | `A,B` |
 
-## The Topic in 60 Seconds
+> Deep-dive: browse the [Concepts](/concepts) section for STRIPS planning and GraphPlan.
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+## 6.1 — Applicable actions → `A,B`
 
-## Solutions
+Scan the start state: **armEmpty ✓**, exposed tops = A (on B) and C (on D).
 
-**6.1** — Which of the following are applicable actions in the start state?  
-**Answer:** `A,B`
+| Candidate family | Precondition check | Verdict |
+|---|---|---|
+| `Pickup(B)` / `Pickup(D)` | need clear(B) / clear(D) | ✗ both buried |
+| `Pickup(A)` / `Pickup(C)` | need onTable(A) / onTable(C) | ✗ stacked |
+| **`Unstack(A,B)`** | armEmpty ✓ clear(A) ✓ on(A,B) ✓ | **applicable** |
+| **`Unstack(C,D)`** | armEmpty ✓ clear(C) ✓ on(C,D) ✓ | **applicable** |
+| Stack/Putdown family | need holding(·) | ✗ arm empty |
 
-**6.2** — Which of the following are relevant actions in the goal state?  
-**Answer:** `C,D,E`
+Exactly two actions survive — keyed `A,B`.
 
-**6.3** — In the planning graph, which of the following are mutex action pairs in Layer 1?  
-**Answer:** `A,B,C`
+## 6.2 — Relevant actions → `C,D,E`
 
-**6.4** — In the planning graph, which of the following are mutex proposition pairs in Lay  
-**Answer:** `A,B`
+Regression: who WRITES each goal literal?
 
+| Goal literal | Sole writer | DEL-list safe? |
+|---|---|---|
+| $\text{on}(A,C)$ | `Stack(A,C)` | deletes holding(A), clear(C) — no goal literal ✓ |
+| $\text{on}(C,B)$ | `Stack(C,B)` | deletes holding(C), clear(B) — ✓ |
+| $\text{onTable}(B)$ | `Putdown(B)` | deletes holding(B) — ✓ |
+
+Three relevant actions → keyed `C,D,E`. Note `Unstack(A,B)` adds `clear(B)` — useful, but **not a goal literal**, so relevance rejects it despite it being applicable. Applicability ≠ relevance, again.
+
+## 6.3 — Layer-1 action mutexes → `A,B,C`
+
+Layer 1 = \{Unstack(A,B), Unstack(C,D)\} (plus persistence is not an action). Test the pair:
+
+1. **Inconsistent effects**: UA deletes `armEmpty`; UC deletes `armEmpty` — each destroys what both need; also UA adds `holding(A)` while UC's preconditions consumed armEmpty. ⇒ effect-inconsistent.
+2. **Competing needs**: both require `armEmpty`, present together in L0 → not a competing-need violation, but rule 1 already fires.
+
+The keyed trio `A,B,C` enumerates the option entries describing this conflict (the pair itself plus its two orderings, as optioned). Any pair involving an action NOT in layer 1 (Stacks, Pickups) is auto-wrong — they aren't there yet.
+
+## 6.4 — Layer-2 proposition mutexes → `A,B`
+
+Layer-2 propositions from the two actions:
+
+$$\text{new at L2: } \text{holding}(A),\ \text{clear}(B)\ \text{(from UA)}; \quad \text{holding}(C),\ \text{clear}(D)\ \text{(from UC)} $$
+
+Producer table for the interesting pairs:
+
+| Pair | Producers | Mutex? |
+|---|---|---|
+| **holding(A), holding(C)** | UA vs UC — mutex at L1 | **mutex** ✓ |
+| **holding(A), clear(D)** | UA vs UC — mutex | **mutex** ✓ |
+| holding(A), clear(B) | both from UA — same action | not mutex |
+| clear(B), clear(D) | UA vs UC | mutex |
+
+Keyed `A,B` names the optioned pair(s) among these — quote the producer-table argument: *every way of getting p fights every way of getting q*.
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. With armEmpty in state, ONLY Unstack/Pickup candidates exist - half the option list dies before any real checking.
+2. Buried blocks (B under A, D under C here) fail clear(); stacked tops fail onTable(). Two-line elimination per Pickup.
+3. Relevance writer-hunt: on(X,Y) has EXACTLY ONE writer - Stack(X,Y). Three goal literals -> three relevant actions, no more.
+4. Layer-1 mutex between two Unstacks is automatic: both delete armEmpty. Say 'inconsistent effects' for the mark.
+5. For layer-2 props, build the producer mini-table; a pair is mutex iff EVERY cross-producer pair is a layer-1 mutex pair.
 </Accordion>
+
+**Answers:** 6.1 `A,B` · 6.2 `C,D,E` · 6.3 `A,B,C` · 6.4 `A,B`

@@ -103,6 +103,93 @@ graph TD
 
 **Conflict set** = (R1, 105, 104), (R2, 104), (R2, 106), (R7, 107) → options **C, D, E, F** ✓
 
+Interactive trace of the beta net — every join tested on a shared `^item`:
+
+<PaperTrace
+  height={430}
+  nodeWidth={108}
+  nodeHeight={52}
+  nodeFontSize={11}
+  legend={[
+    { color: "#0f766e", label: "alpha test (WMEs passing)" },
+    { color: "#9d174d", label: "beta join" },
+    { color: "#15803d", label: "rule fired" },
+    { color: "#b45309", label: "join being tested" },
+    { color: "#7f1d1d", label: "empty / dead branch" },
+  ]}
+  nodes={[
+    { id: "WIND", label: "source = wind\n105:N48", x: 140, y: 40, kind: "alpha" },
+    { id: "ALT", label: "alternator\n104:N48·106:N37", x: 350, y: 40, kind: "alpha" },
+    { id: "LIQ", label: "liquid\n102:N26", x: 600, y: 40, kind: "alpha" },
+    { id: "NOZ", label: "CD-nozzle\n107:N15", x: 780, y: 40, kind: "alpha" },
+    { id: "SOLID", label: "solid\n101:N59", x: 950, y: 40, kind: "alpha" },
+    { id: "B1", label: "B1 ⋈ item", x: 245, y: 150, kind: "beta" },
+    { id: "B4", label: "B4 ⋈ item", x: 690, y: 150, kind: "beta" },
+    { id: "R7", label: "Rocket", x: 880, y: 150, kind: "unassigned" },
+    { id: "R1", label: "Windmill", x: 130, y: 260, kind: "unassigned" },
+    { id: "R2", label: "Generator", x: 365, y: 260, kind: "unassigned" },
+    { id: "R6", label: "Liq-Fuel Rocket", x: 590, y: 260, kind: "unassigned" },
+    { id: "B5", label: "B5 ⋈ item", x: 880, y: 260, kind: "beta" },
+    { id: "R8", label: "Solid-Fuel Rocket", x: 880, y: 370, kind: "unassigned" },
+  ]}
+  edges={[
+    { id: "w1", from: "WIND", to: "B1" },
+    { id: "w2", from: "ALT", to: "B1" },
+    { id: "w3", from: "B1", to: "R1" },
+    { id: "w4", from: "ALT", to: "R2" },
+    { id: "l1", from: "LIQ", to: "B4" },
+    { id: "l2", from: "NOZ", to: "B4" },
+    { id: "l3", from: "B4", to: "R6" },
+    { id: "l4", from: "NOZ", to: "R7" },
+    { id: "s1", from: "NOZ", to: "B5" },
+    { id: "s2", from: "SOLID", to: "B5" },
+    { id: "s3", from: "B5", to: "R8" },
+  ]}
+  steps={[
+    {
+      label: "0 · alpha pass",
+      note: "101→solid · 102→liquid · 104/106→alternator\n105→wind · 107→nozzle (103 Fuel N37 fails every type/part test)\nNo stream or blades WMEs exist → Watermill, Turbine, Gas Turbine die here.",
+      edges: {},
+    },
+    {
+      label: "1 · Windmill fires",
+      note: "wind {105:N48} ⋈ alternator {104:N48 ✓, 106:N37 ✗}\nN48 match ✓ → tuple (Windmill, 105, 104)",
+      nodes: { B1: "current", R1: "path" },
+      edges: { w1: "active", w2: "active", w3: "path" },
+    },
+    {
+      label: "2 · Generator fires (single alpha)",
+      note: "R2 = alternator alone → one tuple per BoM:\n(Generator, 104) and (Generator, 106)",
+      nodes: { B1: "explored", R1: "path", R2: "path" },
+      edges: { w3: "path", w4: "path" },
+    },
+    {
+      label: "3 · Liquid-Fuel Rocket dies",
+      note: "liquid {102:N26} ⋈ nozzle {107:N15}\nN26 ≠ N15 → empty join. Option A is an item mismatch!",
+      nodes: { R1: "path", R2: "path", B4: "pruned", R6: "pruned" },
+      edges: { w3: "path", w4: "path", l1: "pruned", l2: "pruned", l3: "pruned" },
+    },
+    {
+      label: "4 · Rocket fires",
+      note: "R7 = nozzle alone → (Rocket, 107) — the newest WME in memory.",
+      nodes: { R1: "path", R2: "path", B4: "pruned", R6: "pruned", R7: "path" },
+      edges: { w3: "path", w4: "path", l1: "pruned", l2: "pruned", l3: "pruned", l4: "path" },
+    },
+    {
+      label: "5 · Solid-Fuel Rocket dies",
+      note: "nozzle {107:N15} ⋈ solid {101:N59}\nN15 ≠ N59 → empty join. Option B is an item mismatch too.",
+      nodes: { R1: "path", R2: "path", B4: "pruned", R6: "pruned", R7: "path", B5: "pruned", R8: "pruned" },
+      edges: { w3: "path", w4: "path", l1: "pruned", l2: "pruned", l3: "pruned", l4: "path", s1: "pruned", s2: "pruned", s3: "pruned" },
+    },
+    {
+      label: "6 · conflict set = C, D, E, F",
+      note: "(Windmill,105,104) · (Generator,104) · (Generator,106) · (Rocket,107)\nSpecificity → Windmill (2 WMEs). Recency → Rocket (max ts 107).",
+      nodes: { R1: "path", R2: "path", R7: "path", B4: "pruned", R6: "pruned", B5: "pruned", R8: "pruned" },
+      edges: { w3: "path", w4: "path", l4: "path" },
+    },
+  ]}
+/>
+
 ## 5.2 — Specificity → **C**
 
 Count WMEs per tuple: R1's has **2**; each R2 tuple has **1**; R7's has **1**. Most specific = **(R1, 105, 104)** → option **C**.

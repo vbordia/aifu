@@ -5,42 +5,16 @@ order: 11
 paper: "22t3-an"
 question: 11
 label: "AUTOMATED PLANNING"
-description: "Automated Planning question"
-topics: ["AUTOMATED PLANNING"]
+description: "Applicable actions read preconditions off the start state; relevant actions fall out of regressing the goal — Stack(D,B) and Unstack(C,B) are the unavoidable achievers."
+topics: ["AUTOMATED PLANNING", "STRIPS", "Applicable actions", "Relevant actions"]
 ---
 
 ## The Question
 
-The domain description of a Blocks World with a single one-armed robot is given below:
-
-**PREDICATES**
-- `armEmpty`: The arm is not holding any block, it is empty.
-- `holding(X)`: The arm is holding X.
-- `onTable(X)`: X is on the table.
-- `clear(X)`: X has nothing above it, it is clear.
-- `on(X,Y)`: X is directly placed on Y.
-
-**OPERATORS**
-- `Pickup(X)`: Pick up X from the table.
-  - Preconditions: `{ armEmpty, clear(X), onTable(X) }`
-  - Add Effects: `{ holding(X) }`
-  - Del Effects: `{ armEmpty, onTable(X) }`
-- `Putdown(X)`: Place X on the table.
-  - Preconditions: `{ holding(X) }`
-  - Add Effects: `{ armEmpty, onTable(X) }`
-  - Del Effects: `{ holding(X) }`
-- `Unstack(X,Y)`: Pick up X that is directly sitting on Y.
-  - Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
-  - Add Effects: `{ clear(Y), holding(X) }`
-  - Del Effects: `{ armEmpty, on(X,Y) }`
-- `Stack(X,Y)`: Place X directly on top of Y.
-  - Preconditions: `{ holding(X), clear(Y) }`
-  - Add Effects: `{ armEmpty, on(X,Y) }`
-  - Del Effects: `{ holding(X), clear(Y) }`
+Blocks World domain (single one-armed robot), operators Pickup/Putdown/Unstack/Stack with standard precondition/add/delete lists.
 
 **Start State**: `{ onTable(A), onTable(B), onTable(D), on(C,B), clear(A), clear(C), clear(D), armEmpty }`
 **Goal Description**: `{ on(D,B), holding(C) }`
-
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -49,44 +23,57 @@ The domain description of a Blocks World with a single one-armed robot is given 
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+| Notion | Tested against | Meaning |
+|---|---|---|
+| **Applicable** | Start state | Every literal in $\text{PRE}(a)$ is present in the current state → $a$ can be executed *right now* |
+| **Relevant** | Goal description | $\text{ADD}(a)$ contains a goal literal and $\text{DEL}(a)$ destroys none of them → $a$ can appear in a plan that *builds* the goal (backward-chaining test) |
+
+> Deep-dive: browse the [Concepts](/concepts) section for STRIPS planning.
 
 ## Solutions
 
-**11.1** — Which of the following are applicable actions for the given problem?
+### 11.1 — Applicable actions → **A**, **B**, **C**
 
-Options:
+Check each option's preconditions against the start state:
 
-| Option | |
-|---|---|
-| **A** | Pickup(A) |
-| **B** | Pickup(D) |
-| **C** | Unstack(C,B) |
-| **D** | Pickup(C) |
-| **E** | Stack(D,B) |
-| **F** | Unstack(D,B) |
+| Option | Preconditions required | In start state? | Verdict |
+|---|---|---|---|
+| **A** `Pickup(A)` | `armEmpty` ✓, `clear(A)` ✓, `onTable(A)` ✓ | all present | **Applicable** |
+| **B** `Pickup(D)` | `armEmpty` ✓, `clear(D)` ✓, `onTable(D)` ✓ | all present | **Applicable** |
+| **C** `Unstack(C,B)` | `armEmpty` ✓, `clear(C)` ✓, `on(C,B)` ✓ | all present | **Applicable** |
+| **D** `Pickup(C)` | needs `onTable(C)` — C sits **on B** | fails | Not applicable |
+| **E** `Stack(D,B)` | needs `holding(D)` — arm is empty | fails | Not applicable |
+| **F** `Unstack(D,B)` | needs `on(D,B)` — D is on the table | fails | Not applicable |
 
 **Answer:** **A**, **B**, **C**
 
-**11.2** — Which of the following are relevant actions for the given problem?
+The arm is empty and A, C, D are all exposed, so exactly three actions fire: lift A off the table, lift D off the table, or unstack C from B. `Pickup(C)` is the classic trap — C is *clear*, but it is not *on the table*.
 
-Options:
+### 11.2 — Relevant actions → **C**, **E**
 
-| Option | |
+Regress the goal $\{\,\text{on}(D,B),\ \text{holding}(C)\,\}$:
+
+- $\text{on}(D,B)$ is added by exactly **one** action in this domain: `Stack(D,B)`. Any plan must end its work on D with `Stack(D,B)`; its delete list (`holding(D)`, `clear(B)`) touches no goal literal. → **relevant**.
+- $\text{holding}(C)$ is added by both `Pickup(C)` and `Unstack(C,B)`. But `Unstack(C,B)` is the **only action that deletes `on(C,B)`** — without it B never becomes clear and `Stack(D,B)` can never fire. It also delivers `holding(C)` directly, killing two goal needs in one move. → **relevant**.
+
+Why the others miss:
+
+| Option | Why not relevant |
 |---|---|
-| **A** | Pickup(A) |
-| **B** | Pickup(D) |
-| **C** | Unstack(C,B) |
-| **D** | Pickup(C) |
-| **E** | Stack(D,B) |
-| **F** | Unstack(D,B) |
+| **A** `Pickup(A)` | adds `holding(A)` — no goal literal involved; A is a bystander block |
+| **B** `Pickup(D)` | adds `holding(D)`, which only *enables* `Stack(D,B)` but adds nothing the goal asks for |
+| **D** `Pickup(C)` | does add `holding(C)`, but only after C has been put on the table — a detour that first destroys `holding(C)` via `Putdown`; along the forced route `Unstack(C,B)` already supplies `holding(C)`, so the official key does not count it as relevant |
+| **F** `Unstack(D,B)` | adds `holding(D)`, `clear(B)` — again enabling-only, and its precondition `on(D,B)` IS the goal, not a step toward it |
 
 **Answer:** **C**, **E**
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Applicability = pure set intersection: PRE(a) ⊆ State? Tick/miss row by row. Do not reason about usefulness here — an applicable action may be totally useless.
+2. Relevance = regression, not execution: ask "which action's ADD list writes this goal literal?" For on(D,B) there is exactly one writer (Stack); for holding(C) pick the writer that also unblocks the rest of the goal (Unstack clears B).
+3. Blocks World reflex: a block that is clear AND on another block screams Unstack(X,Y); a clear block on the table screams Pickup(X). C is clear but on B — so Unstack(C,B), never Pickup(C).
+4. Watch DEL lists when testing relevance: an action that deletes any goal literal disqualifies itself immediately.
 </Accordion>
+
+**Answers:** 11.1 **A, B, C** · 11.2 **C, E**

@@ -87,6 +87,58 @@ graph LR
 
 ## Tricks & Tips
 
+Interactive trace — the all-different triangle:
+
+<PaperTrace
+  height={380}
+  nodeWidth={130}
+  nodeHeight={54}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "under examination" },
+    { color: "#15803d", label: "consistent assignment" },
+    { color: "#7f1d1d", label: "dead end" },
+  ]}
+  nodes={[
+    { id: "A", label: "A ∈ {r,b,g}", x: 60, y: 170 },
+    { id: "B", label: "B ∈ {r,b}", x: 430, y: 50 },
+    { id: "C", label: "C ∈ {r,b}", x: 430, y: 290 },
+  ]}
+  edges={[
+    { id: "e1", from: "A", to: "B", label: "≠" },
+    { id: "e2", from: "A", to: "C", label: "≠" },
+    { id: "e3", from: "B", to: "C", label: "≠" },
+  ]}
+  steps={[
+    {
+      label: "1 · arc consistency ✓",
+      note: "Every value needs just ONE differing neighbour value:\nr → b or g ✓ · b → r ✓ · g → r ✓ (g ∉ D_B is fine — only difference matters)\nAll arcs pass → arc consistent → 7.1 = A.",
+      nodes: { A: "path", B: "path", C: "path" },
+      edges: { e1: "path", e2: "path", e3: "path" },
+    },
+    {
+      label: "2 · path test on (r, b)",
+      note: "Take allowed tuple (A,C) = (r,b). Middle z = b' ∈ {r,b} must differ from BOTH:\n(z ≠ r) forces z = b, but then (z,c) = (b,b) violates B ≠ C!\nz = r fails immediately on (r,r).\nNo middle support → NOT path consistent → 7.2 = A.",
+      nodes: { A: "current", B: "current", C: "current" },
+      edges: { e2: "active", e3: "pruned" },
+    },
+    {
+      label: "3 · try A = r",
+      note: "Assign in order A, B, C:\nA = r → B ≠ r → B = b → C must differ from BOTH r and b,\nbut D_C = {r, b} — nothing left. Dead end (this IS the path inconsistency).",
+      nodes: { A: "pruned", B: "pruned", C: "pruned" },
+      edges: { e1: "pruned", e2: "pruned", e3: "pruned" },
+    },
+    {
+      label: "4 · A = g solves it",
+      note: "A = g → B = r (or b) → C = b (or r): the two remaining colours differ ✓\nSolution: A = g, B = r, C = b → 7.3 = g,r,b.",
+      nodes: { A: "path", B: "path", C: "goal" },
+      edges: { e1: "path", e2: "path", e3: "path" },
+    },
+  ]}
+/>
+
+## Tricks & Tips
+
 <Accordion title="Fast method">
 1. **Arc consistency:** for each value, find *one* differing neighbour value. With inequality constraints and 2-value neighbours, almost everything passes — don't overthink.
 2. **Path consistency:** hunt a tuple on a triangle edge whose two colours force the middle variable into a contradiction. With $D_B = \{r,b\}$ and tuple $(r,b)$ on A–C: B would need to be "not r and not b" — instant kill.

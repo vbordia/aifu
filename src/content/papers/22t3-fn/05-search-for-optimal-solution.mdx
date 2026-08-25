@@ -5,43 +5,58 @@ order: 5
 paper: "22t3-fn"
 question: 5
 label: "SEARCH FOR OPTIMAL SOLUTION"
-description: "Search For Optimal Solution question"
-topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+description: "Arbitrary edge costs retire BFS, and an unknown-quality heuristic retires everything that trusts h — only Dijkstra and Branch-and-Bound remain."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "Optimal search", "Heuristic quality"]
 ---
 
 ## The Question
 
-
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 5 | Given a finite state space with edge costs that may or may not be Euclidean and a heuristic function whose properties are not known, which of the following a... | **C**, **D** |
+| 5 | Given a finite state space with edge costs that may or may not be Euclidean and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path? | **C**, **D** |
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+A guarantee can only rest on what the question *gives* you. Here you are given: finite space, arbitrary (possibly non-uniform) costs — and explicitly **not** given anything about $h$. So every algorithm whose correctness proof says "…assuming admissible $h$" is disqualified.
+
+> Deep-dive: browse the [Concepts](/concepts) section for optimal search.
 
 ## Solutions
 
-**5** — Given a finite state space with edge costs that may or may not be Euclidean and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
+**5** — Finite space, costs of unknown shape, heuristic of unknown quality. Which find the optimal path?
 
-Options:
-
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | Depth First Search |
-| **B** | Breadth First Search |
-| **C** | Dijkstra's algorithm |
-| **D** | Branch and Bound Search |
-| **E** | A* |
-| **F** | WA* for some w |
-| **G** | Sparse Memory Graph Search (SMGS) |
+| **A** — Depth First Search | **No**: ignores costs completely; returns *a* goal, rarely the cheapest |
+| **B** — Breadth First Search | **No**: minimises the NUMBER of edges; with non-uniform costs one long edge can beat three short ones |
+| **C** — Dijkstra's algorithm | **Yes**: expands in increasing true cost $g$; never consults $h$; correct for any non-negative costs |
+| **D** — Branch and Bound | **Yes**: ranks partial paths by accumulated $g$ and prunes against the best complete tour; no heuristic involved |
+| **E** — A* | **No**: optimal only when $h$ is admissible — "properties not known" removes the guarantee |
+| **F** — WA* for some w | **No**: any $w > 1$ is inadmissible by design; even $w=1$ is just A* needing admissibility |
+| **G** — SMGS | **No**: its pruning rule is safe only under admissible $h$, which we are not given |
 
 **Answer:** **C**, **D**
 
+### The pattern
+
+The two survivors share one property: **they ignore $h$ entirely**. Their correctness needs nothing beyond finite space + non-negative costs — both supplied.
+
+| Algorithm | Depends on h? | Survives unknown h? |
+|---|---|---|
+| DFS / BFS | no — but fails on costs instead | out for a different reason |
+| Dijkstra / BnB | no | **in** |
+| A* / SMGS | yes (admissibility) | out |
+| WA* | yes (w·admissibility) | out |
+
+Compare the sibling questions: add "unit costs" and BFS joins the club; swap to "best admissible h" and A*/SMGS join. Guarantees attach to assumptions, not algorithms.
+
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Sort options into h-users vs h-ignorers before reading anything else. Unknown-h questions keep only ignorers.
+2. Then apply the cost test to the ignorers: BFS dies on non-uniform costs ("may or may not be Euclidean" = non-uniform), leaving Dijkstra + BnB.
+3. WA* trap repeats every term: "for SOME w" secretly includes w > 1 → never optimal.
+4. Memorise the three-question ladder: unit costs? → +BFS. Admissible h? → +A*, SMGS. Memory bound? → only SMGS/IDA*.
 </Accordion>
+
+**Answers:** 5 **C, D**

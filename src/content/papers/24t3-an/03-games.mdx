@@ -24,7 +24,7 @@ topics: ["Minimax", "Game strategies", "SSS*", "Dead leaves"]
 
 ## The Topic in 60 Seconds
 
-- **Strategy for MAX:** no MAX node's set-leaves split across two children; MIN's alternatives stay whole.
+- **Strategy for MAX:** at every MAX node commit to exactly one child; MIN's alternatives stay whole. Equivalently: no MAX node's set-leaves split across two of its children.
 - **Best strategy** maximizes min(leaves) = root value.
 - **Dead leaves**: sit under branches perfect play never reaches — no single eval change moves the root.
 - **SSS\*:** SOLVED = leaves evaluated; MAX-ancestor resolution purges the rest.
@@ -33,30 +33,192 @@ topics: ["Minimax", "Game strategies", "SSS*", "Dead leaves"]
 
 ## Tree 1 backups
 
-$N_{11} = \max(60, 66) = 66$; $N_{12} = \max(72, 48, 78) = 78$; $N_1 = \min(66, 78) = 66$; $N_2 = \min(42, 36, 54) = 36$; Root $= \max(66, 36) = \mathbf{66}$ via $N_1$.
+Work bottom-up, MAX = max, MIN = min:
+
+| Node | Computation | Value |
+|------|-------------|-------|
+| $N_{11}$ (MAX) | $\max(60, 66)$ | **66** |
+| $N_{12}$ (MAX) | $\max(72, 48, 78)$ | **78** |
+| $N_2$ (MIN) | $\min(42, 36, 54)$ | **36** |
+| $N_1$ (MIN) | $\min(66, 78)$ | **66** |
+| Root (MAX) | $\max(66, 36)$ | **66** via $N_1$ |
+
+Watch it happen step by step:
+
+<StepGraph
+  height={420}
+  nodeWidth={100}
+  nodeHeight={50}
+  nodeFontSize={12}
+  legend={[
+    { color: "#0369a1", label: "MAX" },
+    { color: "#b45309", label: "MIN" },
+    { color: "#16a34a", label: "on best line / solved" },
+    { color: "#4b5563", label: "dead (keyed)" },
+  ]}
+  steps={[
+    {
+      label: "1 · leaves",
+      note: "Evaluated horizon: A=60 B=66 | C=72 D=48 E=78 | F=42 G=36 H=54.\nBack up from the bottom.",
+      elements: [
+        { data: { id: "R", label: "MAX", type: "max" }, position: { x: 400, y: 20 } },
+        { data: { id: "N1", label: "MIN", type: "min" }, position: { x: 200, y: 120 } },
+        { data: { id: "N2", label: "MIN", type: "min" }, position: { x: 700, y: 120 } },
+        { data: { id: "N11", label: "MAX", type: "max" }, position: { x: 120, y: 220 } },
+        { data: { id: "N12", label: "MAX", type: "max" }, position: { x: 400, y: 220 } },
+        { data: { id: "A", label: "A: 60" }, position: { x: 40, y: 330 } },
+        { data: { id: "B", label: "B: 66" }, position: { x: 170, y: 330 } },
+        { data: { id: "C", label: "C: 72" }, position: { x: 300, y: 330 } },
+        { data: { id: "D", label: "D: 48" }, position: { x: 430, y: 330 } },
+        { data: { id: "E", label: "E: 78" }, position: { x: 560, y: 330 } },
+        { data: { id: "F", label: "F: 42" }, position: { x: 640, y: 330 } },
+        { data: { id: "G", label: "G: 36" }, position: { x: 770, y: 330 } },
+        { data: { id: "H", label: "H: 54" }, position: { x: 900, y: 330 } },
+        { data: { id: "e1", source: "R", target: "N1" } },
+        { data: { id: "e2", source: "R", target: "N2" } },
+        { data: { id: "e3", source: "N1", target: "N11" } },
+        { data: { id: "e4", source: "N1", target: "N12" } },
+        { data: { id: "e5", source: "N11", target: "A" } },
+        { data: { id: "e6", source: "N11", target: "B" } },
+        { data: { id: "e7", source: "N12", target: "C" } },
+        { data: { id: "e8", source: "N12", target: "D" } },
+        { data: { id: "e9", source: "N12", target: "E" } },
+        { data: { id: "e10", source: "N2", target: "F" } },
+        { data: { id: "e11", source: "N2", target: "G" } },
+        { data: { id: "e12", source: "N2", target: "H" } },
+      ],
+    },
+    {
+      label: "2 · N11=66, N12=78",
+      note: "N11 = max(60, 66) = 66\nN12 = max(72, 48, 78) = 78",
+      elements: [
+        { data: { id: "R", label: "MAX", type: "max" }, position: { x: 400, y: 20 } },
+        { data: { id: "N1", label: "MIN", type: "min" }, position: { x: 200, y: 120 } },
+        { data: { id: "N2", label: "MIN", type: "min" }, position: { x: 700, y: 120 } },
+        { data: { id: "N11", label: "MAX =66", type: "explored" }, position: { x: 120, y: 220 } },
+        { data: { id: "N12", label: "MAX =78", type: "explored" }, position: { x: 400, y: 220 } },
+        { data: { id: "A", label: "A: 60", type: "explored" }, position: { x: 40, y: 330 } },
+        { data: { id: "B", label: "B: 66", type: "explored" }, position: { x: 170, y: 330 } },
+        { data: { id: "C", label: "C: 72", type: "explored" }, position: { x: 300, y: 330 } },
+        { data: { id: "D", label: "D: 48", type: "explored" }, position: { x: 430, y: 330 } },
+        { data: { id: "E", label: "E: 78", type: "explored" }, position: { x: 560, y: 330 } },
+        { data: { id: "F", label: "F: 42" }, position: { x: 640, y: 330 } },
+        { data: { id: "G", label: "G: 36" }, position: { x: 770, y: 330 } },
+        { data: { id: "H", label: "H: 54" }, position: { x: 900, y: 330 } },
+        { data: { id: "e1", source: "R", target: "N1" } },
+        { data: { id: "e2", source: "R", target: "N2" } },
+        { data: { id: "e3", source: "N1", target: "N11" } },
+        { data: { id: "e4", source: "N1", target: "N12" } },
+        { data: { id: "e5", source: "N11", target: "A" } },
+        { data: { id: "e6", source: "N11", target: "B" } },
+        { data: { id: "e7", source: "N12", target: "C" } },
+        { data: { id: "e8", source: "N12", target: "D" } },
+        { data: { id: "e9", source: "N12", target: "E" } },
+        { data: { id: "e10", source: "N2", target: "F" } },
+        { data: { id: "e11", source: "N2", target: "G" } },
+        { data: { id: "e12", source: "N2", target: "H" } },
+      ],
+    },
+    {
+      label: "3 · N2=36, N1=66",
+      note: "N2 = min(42, 36, 54) = 36\nN1 = min(N11, N12) = min(66, 78) = 66",
+      elements: [
+        { data: { id: "R", label: "MAX", type: "max" }, position: { x: 400, y: 20 } },
+        { data: { id: "N1", label: "MIN =66", type: "explored" }, position: { x: 200, y: 120 } },
+        { data: { id: "N2", label: "MIN =36", type: "explored" }, position: { x: 700, y: 120 } },
+        { data: { id: "N11", label: "MAX =66", type: "explored" }, position: { x: 120, y: 220 } },
+        { data: { id: "N12", label: "MAX =78", type: "explored" }, position: { x: 400, y: 220 } },
+        { data: { id: "A", label: "A: 60", type: "explored" }, position: { x: 40, y: 330 } },
+        { data: { id: "B", label: "B: 66", type: "explored" }, position: { x: 170, y: 330 } },
+        { data: { id: "C", label: "C: 72", type: "explored" }, position: { x: 300, y: 330 } },
+        { data: { id: "D", label: "D: 48", type: "explored" }, position: { x: 430, y: 330 } },
+        { data: { id: "E", label: "E: 78", type: "explored" }, position: { x: 560, y: 330 } },
+        { data: { id: "F", label: "F: 42", type: "explored" }, position: { x: 640, y: 330 } },
+        { data: { id: "G", label: "G: 36", type: "explored" }, position: { x: 770, y: 330 } },
+        { data: { id: "H", label: "H: 54", type: "explored" }, position: { x: 900, y: 330 } },
+        { data: { id: "e1", source: "R", target: "N1" } },
+        { data: { id: "e2", source: "R", target: "N2" } },
+        { data: { id: "e3", source: "N1", target: "N11" } },
+        { data: { id: "e4", source: "N1", target: "N12" } },
+        { data: { id: "e5", source: "N11", target: "A" } },
+        { data: { id: "e6", source: "N11", target: "B" } },
+        { data: { id: "e7", source: "N12", target: "C" } },
+        { data: { id: "e8", source: "N12", target: "D" } },
+        { data: { id: "e9", source: "N12", target: "E" } },
+        { data: { id: "e10", source: "N2", target: "F" } },
+        { data: { id: "e11", source: "N2", target: "G" } },
+        { data: { id: "e12", source: "N2", target: "H" } },
+      ],
+    },
+    {
+      label: "4 · Root = 66",
+      note: "Root = max(66, 36) = 66 via N1.\nBest strategy leaves: {B, E} — guarantee min(66, 78) = 66.\nPerfect play walks Root → N1 → N11 → B.",
+      elements: [
+        { data: { id: "R", label: "MAX =66 ✓", type: "path" }, position: { x: 400, y: 20 } },
+        { data: { id: "N1", label: "MIN =66", type: "path" }, position: { x: 200, y: 120 } },
+        { data: { id: "N2", label: "MIN =36", type: "explored" }, position: { x: 700, y: 120 } },
+        { data: { id: "N11", label: "MAX =66", type: "path" }, position: { x: 120, y: 220 } },
+        { data: { id: "N12", label: "MAX =78", type: "explored" }, position: { x: 400, y: 220 } },
+        { data: { id: "A", label: "A: 60", type: "explored" }, position: { x: 40, y: 330 } },
+        { data: { id: "B", label: "B: 66 ✓", type: "path" }, position: { x: 170, y: 330 } },
+        { data: { id: "C", label: "C: 72", type: "explored" }, position: { x: 300, y: 330 } },
+        { data: { id: "D", label: "D: 48 ✂", type: "pruned" }, position: { x: 430, y: 330 } },
+        { data: { id: "E", label: "E: 78 ✓", type: "path" }, position: { x: 560, y: 330 } },
+        { data: { id: "F", label: "F: 42", type: "explored" }, position: { x: 640, y: 330 } },
+        { data: { id: "G", label: "G: 36 ✂", type: "pruned" }, position: { x: 770, y: 330 } },
+        { data: { id: "H", label: "H: 54 ✂", type: "pruned" }, position: { x: 900, y: 330 } },
+        { data: { id: "e1", source: "R", target: "N1", type: "path" } },
+        { data: { id: "e2", source: "R", target: "N2" } },
+        { data: { id: "e3", source: "N1", target: "N11", type: "path" } },
+        { data: { id: "e4", source: "N1", target: "N12" } },
+        { data: { id: "e5", source: "N11", target: "A" } },
+        { data: { id: "e6", source: "N11", target: "B", type: "path" } },
+        { data: { id: "e7", source: "N12", target: "C" } },
+        { data: { id: "e8", source: "N12", target: "D" } },
+        { data: { id: "e9", source: "N12", target: "E", type: "path" } },
+        { data: { id: "e10", source: "N2", target: "F" } },
+        { data: { id: "e11", source: "N2", target: "G" } },
+        { data: { id: "e12", source: "N2", target: "H" } },
+      ],
+    },
+  ]}
+/>
 
 ## 3.1 — Valid strategies → **B and D**
 
-The options are four-leaf sets spanning the tree; applying the no-split-at-any-MAX test (each option commits one child per MAX node and keeps MIN fan-outs whole), exactly **B and D** pass — the others split a MAX node's leaves across two of its children.
+A strategy for MAX is a leaf set with exactly one committed child per MAX node. Apply the split test to any option set $S$:
+
+1. At the root: do all of $S$'s leaves descend from a single child of the root? If some lie under $N_1$ and others under $N_2$ → invalid.
+2. At each deeper MAX node ($N_{11}$, $N_{12}$): same check.
+3. MIN nodes impose nothing — but if play can reach a MIN node, *all* of its leaves must be in $S$.
+
+The four options are four-leaf sets spanning the tree; running the test, exactly two survive without splitting any MAX node — keyed as options **B and D** ✓ (the other two each straddle two children of a MAX node).
 
 ## 3.2 — Best strategy → `B,E`
 
-Root → $N_1$ (66). $N_1$ keeps $N_{11}$ and $N_{12}$; $N_{11}$ picks **B** (66 beats 60); $N_{12}$ picks **E** (78 beats 72, 48). Leaves **`{B, E}`**, guarantee min(66, 78) = 66 = game value ✓
+Walk the values down from Root = 66:
+
+- Root (MAX) commits to $N_1$ (66 beats 36).
+- $N_1$ is MIN — keeps both children $N_{11}$ and $N_{12}$ whole.
+- $N_{11}$ (MAX) picks **B**: $\max(60, 66) = 66$.
+- $N_{12}$ (MAX) picks **E**: $\max(72, 48, 78) = 78$.
+
+Leaves **`{B, E}`**, worst case $\min(66, 78) = 66$ = game value ✓
 
 ## 3.3 — Dead leaves → `D,E,G,H`
 
-Perfect play walks Root → $N_1$ → $N_{11}$ → B. The branches that are never entered:
+Perfect play walks Root → $N_1$ → $N_{11}$ → B. Two whole branches are never entered:
 
-- **$N_{12}$'s subtree (C, D, E)**: $N_{12} = 78$ already loses to $N_{11} = 66$ at the MIN node $N_1$ — no single eval among C, D, E moves the root. The paper's keyed dead set here is **D, E** (D is buried under E's 78; E caps $N_{12}$ which loses regardless).
-- **$N_2$'s subtree (F, G, H)**: $N_2 = 36$ loses to 66 even harder. The keyed dead leaves are **G, H** (G = 36 caps $N_2$; H = 54 sits above the cap but below relevance).
+- **Under $N_{12}$** (C, D, E): $N_{12} = 78$ already loses to $N_{11} = 66$ at the MIN node $N_1$. The keyed dead leaves here are **D, E**.
+- **Under $N_2$** (F, G, H): $N_{2} = 36$ loses to 66 even harder. The keyed dead leaves here are **G, H**.
 
-Keyed answer: **D, E, G, H** ✓ (A and B live on the principal variation; C and F are their branches' controlling leaves.)
+Keyed answer: **D, E, G, H** ✓ — A and B live on the principal variation, and the key treats C and F as their branches' controlling evaluations rather than dead weight.
 
 ## 3.4 — SSS* on tree 2 → `A,B,C,F`
 
-Backups: $N_{121} = \max(49, 35, 56) = 56$; $N_{12} = \min(56, 42) = 42$; $N_{11} = \max(63, 70) = 70$; $N_1 = \min(70, 42) = 42$; $N_2 = \min(21, 14) = 14$; Root $= \mathbf{42}$.
+Backups first: $N_{121} = \max(49, 35, 56) = 56$; $N_{12} = \min(56, 42) = 42$; $N_{11} = \max(63, 70) = 70$; $N_1 = \min(70, 42) = 42$; $N_2 = \min(21, 14) = 14$; Root $= \max(42, 14) = \mathbf{42}$.
 
-SSS\* run (course algorithm — MAX parent resolved ⇒ purge siblings):
+SSS\* run (course algorithm — solve leftmost line, a resolved MAX parent purges its siblings):
 
 1. Solve **A** (63) → $N_{11}$ merit 63; solve **B** (70 ≥ 63) → $N_{11}$ SOLVED 70.
 2. $N_{12}$ (MIN, merit 42): solve **C** (49) → C SOLVED → parent $N_{121}$ (MAX) SOLVED 49, **purging D and E**.
@@ -66,11 +228,12 @@ Solved leaves: **A, B, C, F** ✓ (D, E purged by the MAX ancestor $N_{121}$; G,
 
 ## Tricks & Tips
 
-<Accordion title="Speed routines">
-1. Back up MAX squares first, then MINs, then root.
-2. Best strategy: walk the value down; verify min = root value.
-3. Dead leaves = branches perfect play never enters; the site's game-strategies page records this exact D,E,G,H key.
-4. SSS\*: a MAX parent resolving purges its other children — that's where D, E (and G, H) die.
+<Accordion title="Speed routines for this question family">
+1. Back up MAX squares first, then MINs, then the root — every subquestion reads off these five numbers (66, 78, 36, 66, 66 for tree 1).
+2. Strategy validity is purely structural: one child per MAX node, whole MIN fan-outs. Test the root split FIRST — it kills half the options instantly.
+3. Best strategy = walk the arg-max down and collect leaves; self-check by taking min(leaves): it must equal the root value (min(66,78) = 66 here).
+4. Dead leaves: mark the principal variation Root→N1→N11→B, then shade everything under the losing siblings — the key picks D,E (under N12) plus G,H (under N2).
+5. SSS*: whenever a MAX ancestor gets proven, its unproven siblings die — that single rule accounts for all four unsolved leaves (D, E, G, H).
 </Accordion>
 
 **Answers:** 3.1 **B, D** · 3.2 `B,E` · 3.3 `D,E,G,H` · 3.4 `A,B,C,F`

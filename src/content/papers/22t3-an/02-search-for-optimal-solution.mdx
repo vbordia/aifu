@@ -5,12 +5,11 @@ order: 2
 paper: "22t3-an"
 question: 2
 label: "SEARCH FOR OPTIMAL SOLUTION"
-description: "Search For Optimal Solution question"
-topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+description: "DFID is provably optimal only because every iteration re-inspects nodes it closed in earlier iterations."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "DFID", "Optimality"]
 ---
 
 ## The Question
-
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -18,7 +17,9 @@ topics: ["SEARCH FOR OPTIMAL SOLUTION"]
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+DFID runs a depth-limited DFS with limit $1, 2, 3, \dots$ Each iteration throws away all bookkeeping from the previous one and starts from scratch. With **unit edge costs**, the iteration with limit $d$ visits every node at depth $\le d$ as if it were brand new, so the first iteration that reaches the goal reaches it at minimum depth — exactly what BFS would return, at DFS memory cost.
+
+> Deep-dive: browse the [Concepts](/concepts) section for iterative deepening.
 
 ## Solutions
 
@@ -26,19 +27,32 @@ topics: ["SEARCH FOR OPTIMAL SOLUTION"]
 
 Options:
 
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | When it inspects only new nodes |
-| **B** | When it inspects new as well as open nodes |
-| **C** | When it inspects new as well as closed nodes |
-| **D** | None of these |
+| **A** — When it inspects only new nodes | **Fails**: skipping previously seen nodes means an early iteration could close a node on a shallow path and later iterations would refuse to walk through it |
+| **B** — When it inspects new as well as open nodes | **Not the guarantee**: OPEN-only reuse still lets stale frontier entries block rediscovery; DFID keeps no cross-iteration frontier at all |
+| **C** — When it inspects new as well as closed nodes | **Correct** — see below |
+| **D** — None of these | **Wrong**: C is exactly the case |
 
 **Answer:** **C**
 
+### Why C is right
+
+The optimality argument lives in the *redundant* work. On iteration with limit $d$, DFID re-generates and re-expands **every node closed by iterations $1 \dots d-1$** — nothing is remembered. That is precisely what makes it safe:
+
+1. Suppose a goal $g$ sits at depth $k$ (fewest moves, unit costs).
+2. Iterations $1 \dots k-1$ never reach depth $k$, so they cannot report $g$.
+3. Iteration $k$ explores *all* paths of length $\le k$ from scratch — closed-node history from earlier rounds is discarded, so nothing blocks reaching $g$ via its shortest route.
+4. Hence the first success happens at depth exactly $k$: shortest path guaranteed.
+
+If DFID **did** respect old CLOSED nodes (option A's spirit inverted / a global closed list), a node first closed at depth $j$ in a small iteration would never be re-expanded, and a strictly shorter route found only at limit $d > j$ could be missed — optimality breaks. DFID's apparent wastefulness (re-expanding closed nodes over and over) is not a bug; it *is* the optimality proof.
+
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. DFID = BFS behaviour with DFS memory — but ONLY for uniform (unit) costs. Non-unit costs break it: shallowest ≠ cheapest.
+2. The giveaway phrase: DFID "forgets" CLOSED between iterations and therefore re-inspects closed nodes. Any option describing reuse of old closed/frontier info describes a different algorithm (graph search), not textbook DFID.
+3. Optimality checklist for any blind search: complete? costs uniform? If both yes and the algorithm finds the shallowest goal — optimal. DFID qualifies; DFS does not (can dive past a shallow goal forever).
 </Accordion>
+
+**Answers:** 2 **C**

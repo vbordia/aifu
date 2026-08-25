@@ -70,12 +70,16 @@ graph TD
 
 ## 3.1 — Valid strategies → **A (A,C) and C (G,J,K)**
 
+A strategy must commit to ONE child at every MAX node; MIN nodes contribute all their children.
+
 | Option | Check | Verdict |
 |--------|-------|---------|
-| **A: A,C** | Root→$M_1$ ✓; $M_1$ keeps A, $X_1$; $X_1$ → C only ✓ | **Valid** |
-| B: A,D,G | Root splits across $M_1$/$M_2$/$M_3$ | Invalid |
-| **C: G,J,K** | Root→$M_3$ ✓; $M_3$ keeps G, $X_3$; $X_3$ → $Y_3$ only; $Y_3$ keeps J,K ✓ | **Valid** |
-| D: D,E,F | $X_2$: E direct **and** F via $Y_3$ — split! (wait — F is under $X_2$ directly in this tree? No: F is a direct leaf of $X_2$ alongside E — E and F are both children of $X_2$ → set `{D,E,F}` has E and F from $X_2$ — both children → split!) | Invalid |
+| **A: A,C** | Root→$M_1$ ✓; $M_1$ (MIN) keeps both children: A and $X_1$; $X_1$ (MAX) commits to C only ✓ | **Valid** |
+| B: A,D,G | Root (MAX) would need $M_1$, $M_2$ **and** $M_3$ — split! | Invalid |
+| **C: G,J,K** | Root→$M_3$ ✓; $M_3$ keeps G, $X_3$; $X_3$ commits to $Z_3$ (dropping $Y_3$: no H, I); $Z_3$ keeps J, K ✓ | **Valid** |
+| D: D,E,F | Root→$M_2$ ✓; $M_2$ keeps D, $X_2$; but E and F are the two *children* of MAX node $X_2$ — it can't take both. Split! | Invalid |
+
+Note the trap in option D: unlike the FN-24t1 tree, here E and F hang directly off a MAX node, so \{D,E,F\} is impossible while \{D,E\} would have been fine.
 
 ## 3.2 — Best strategy → `D,E`
 
@@ -110,7 +114,7 @@ Pruned: **C, F, H, I, J, K** ✓ — only A, B, D, E, G inspected.
     { id: "R", label: "MAX", kind: "max", x: 430, y: 20 },
     { id: "M1", label: "MIN", kind: "min", x: 150, y: 120 },
     { id: "M2", label: "MIN", kind: "min", x: 430, y: 120 },
-    { id: "M3", label: "MIN", kind: "min", x: 710, y: 120 },
+    { id: "M3", label: "MIN", kind: "min", x: 730, y: 120 },
     { id: "A", label: "A: 48", x: 40, y: 230 },
     { id: "X1", label: "MAX", kind: "max", x: 210, y: 230 },
     { id: "B", label: "B: 68", x: 140, y: 340 },
@@ -119,14 +123,14 @@ Pruned: **C, F, H, I, J, K** ✓ — only A, B, D, E, G inspected.
     { id: "X2", label: "MAX", kind: "max", x: 480, y: 230 },
     { id: "E", label: "E: 78", x: 420, y: 340 },
     { id: "F", label: "F: 22", x: 550, y: 340 },
-    { id: "G", label: "G: 20", x: 660, y: 230 },
-    { id: "X3", label: "MAX", kind: "max", x: 790, y: 230 },
-    { id: "Y3", label: "MIN", kind: "min", x: 720, y: 340 },
-    { id: "Z3", label: "MIN", kind: "min", x: 860, y: 340 },
-    { id: "H", label: "H: 42", x: 650, y: 450 },
-    { id: "I", label: "I: 76", x: 780, y: 450 },
-    { id: "J", label: "J: 88", x: 800, y: 450 },
-    { id: "K", label: "K: 98", x: 920, y: 450 }
+    { id: "G", label: "G: 20", x: 650, y: 230 },
+    { id: "X3", label: "MAX", kind: "max", x: 812, y: 230 },
+    { id: "Y3", label: "MIN", kind: "min", x: 680, y: 340 },
+    { id: "Z3", label: "MIN", kind: "min", x: 945, y: 340 },
+    { id: "H", label: "H: 42", x: 610, y: 450 },
+    { id: "I", label: "I: 76", x: 750, y: 450 },
+    { id: "J", label: "J: 88", x: 880, y: 450 },
+    { id: "K", label: "K: 98", x: 1010, y: 450 }
   ]}
   edges={[
     { id: "x1", from: "R", to: "M1" },

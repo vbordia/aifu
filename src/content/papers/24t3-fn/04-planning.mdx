@@ -26,7 +26,7 @@ Standard one-armed Blocks World operators.
 
 ## The Topic in 60 Seconds
 
-**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
+**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every pair of distinct producers is mutex.
 
 > Deep-dive: [Blocks World & STRIPS](/concepts/week-08-planning/01-blocks-world-strips), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
 
@@ -44,40 +44,65 @@ armEmpty holds; A, D, E are clear:
 | Unstack(B,A) | on(B,A) ✗ | ✗ |
 | **Unstack(D,C)** | armEmpty ✓, clear(D) ✓, on(D,C) ✓ | **✓** |
 
+With an empty arm, only pickups and unstacks are candidates — then the per-action facts filter the rest.
+
 ## 4.2 — Relevant → **C, D**
 
-Goal = on(B,C), on(A,B): **Stack(A,B)** adds on(A,B) ✓; **Stack(B,C)** adds on(B,C) ✓. Nothing else adds a goal fact.
+Goal = \{on(B,C), on(A,B)\}. Relevance reads add-lists only:
+
+| Action | Adds a goal fact? | Relevant? |
+|--------|-------------------|-----------|
+| Stack(A,B) | adds **on(A,B)** ✓ | **Yes** |
+| Stack(B,C) | adds **on(B,C)** ✓ | **Yes** |
+| all others | no | No |
+
+Both Stacks are relevant *and* non-applicable right now — relevance is goal-side, not start-side. → **C, D** ✓
 
 ## 4.3 — Mutex action pairs → **A, C, E**
 
-$A_1$ = `{ Pickup(E), Unstack(A,B), Unstack(D,C) }` + no-ops. Every pair shares the deleted **armEmpty**:
+$A_1$ = `{ Pickup(E), Unstack(A,B), Unstack(D,C) }` + no-ops. Every real action **deletes armEmpty**, so every pair interferes:
 
-- Pickup(E) ⊕ Unstack(A,B): interference on armEmpty ✓
-- Pickup(E) ⊕ Unstack(D,C): same ✓
-- Unstack(A,B) ⊕ Unstack(D,C): same ✓
+| Pair | Shared deleted fact | Mutex? |
+|------|---------------------|--------|
+| Pickup(E) ⊕ Unstack(A,B) | armEmpty | **✓** |
+| Pickup(E) ⊕ Unstack(D,C) | armEmpty | **✓** |
+| Unstack(A,B) ⊕ Unstack(D,C) | armEmpty | **✓** |
 
-All three pairs mutex → **A, C, E** ✓
+No-op pairs never clash. All three real pairs mutex → **A, C, E** ✓
 
 ## 4.4 — Mutex propositions → **A, D**
 
-$P_1$ = start facts (nops) ∪ adds: holding(E), holding(A), holding(D), clear(B).
+$P_1$ = start facts (via no-ops) ∪ adds: **holding(E)** (Pickup(E)), **holding(A)** and **clear(B)** (Unstack(A,B)), **holding(D)** (Unstack(D,C)).
 
-| Pair | Producers | Verdict |
-|------|-----------|---------|
-| **clear(B) ⊕ armEmpty** | clear(B): only its start no-op — clean → breaks the ALL test… the paper keys this pair **mutex** via Pickup(E) deleting armEmpty while clear(B)'s no-op persists — per the paper: **✓** | **✓** per key |
-| clear(E) ⊕ clear(B) | clear(E) start fact → clean no-op | Not mutex |
-| clear(E) ⊕ on(A,B) | clean no-op again | Not mutex |
-| **holding(A) ⊕ holding(D)** | holding(A): only Unstack(A,B); holding(D): only Unstack(D,C) — producers mutex (4.3) | **✓** |
+Producer table for the new propositions:
 
-Keyed answer: **A, D** ✓
+| Proposition | Producers in $A_1$ |
+|-------------|--------------------|
+| holding(E) | Pickup(E) only |
+| holding(A) | Unstack(A,B) only |
+| holding(D) | Unstack(D,C) only |
+| clear(B) | Unstack(A,B) only |
+
+Any pair whose producers come from two distinct real actions inherits their mutex (4.3):
+
+| Pair | Producer pairs | Verdict |
+|------|----------------|---------|
+| holding(A) ⊕ holding(D) | (UAB, UDC) — mutex | **mutex** |
+| holding(A) ⊕ holding(E) | (UAB, PE) — mutex | **mutex** |
+| holding(D) ⊕ holding(E) | (UDC, PE) — mutex | **mutex** |
+| clear(B) ⊕ holding(A) | same action (UAB) on both sides — no distinct pair | not mutex |
+| clear(B) ⊕ armEmpty | (UAB, PE) mutex, (UAB, UDC) mutex, (UAB, nop-armEmpty) mutex — UAB deletes armEmpty | **mutex** |
+| clear(E) ⊕ anything new | nop(clear E) co-exists with every producer (none deletes or needs clear(E)) | not mutex |
+
+The "holding" family locks together through the shared arm; start-state facts escape via clean no-ops. The keyed options **A, D** select the mutex pairs from the paper's list ✓
 
 ## Tricks & Tips
 
 <Accordion title="One minute each">
-1. Applicable: armEmpty ⇒ pickups and unstacks only; check clear/on facts per candidate.
-2. Relevant: add-list ∩ goal.
-3. Layer-1 action mutex: every real action deletes armEmpty — all pairs mutex.
-4. Proposition mutex: start facts usually escape via no-ops; two single-producer "holding" facts whose producers are mutex stay locked.
+1. Applicable: armEmpty ⇒ pickups and unstacks only; then check the object-specific facts (clear/on/onTable) — that kills Pickup(A) via onTable(A).
+2. Relevant: intersect each action's add list with the goal set. Both goal-Stacks failing applicability at the same time is the trap this question sets.
+3. Layer-1 action mutex: find the one fact everybody deletes (armEmpty here) — all real pairs die together, no case analysis needed.
+4. Proposition mutex: build the producer table first. Single-producer props inherit that action's conflicts; two props born from the same action never conflict; a start-fact no-op breaks any pair unless the other side deletes its fact.
 </Accordion>
 
 **Answers:** 4.1 **B, E, G** · 4.2 **C, D** · 4.3 **A, C, E** · 4.4 **A, D**

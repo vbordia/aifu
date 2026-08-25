@@ -44,6 +44,12 @@ BFS sorts by h, A\* by f = g + h, BnB by g on full paths. A\* is optimal when h 
 
 > Deep-dive: [A* Search](/concepts/week-03-heuristic-search/01-a-star-search), [Best First Search](/concepts/week-03-heuristic-search/09-best-first-search), [Branch and Bound](/concepts/week-03-heuristic-search/05-branch-and-bound).
 
+## Step 0 — Heuristic table (given in the paper)
+
+| Node | S | E | F | D | C | B | A | G |
+|------|---|---|---|---|---|---|---|---|
+| $h$ | 10 | 9 | 10 | 4 | 6 | 7 | 3 | 0 |
+
 ## 1.1 — Best First Search → `S,E,D,G`
 
 | Step | OPEN (node : h) | Pick |
@@ -51,22 +57,26 @@ BFS sorts by h, A\* by f = g + h, BnB by g on full paths. A\* is optimal when h 
 | 1 | S : 10 | **S** → E(9), F(10) |
 | 2 | E : 9, F : 10 | **E** → D(4) |
 | 3 | D : 4, F : 10 | **D** → A(3), G(0) |
-| 4 | G : 0, A : 3, … | **G** — goal! |
+| 4 | G : 0, A : 3, F : 10 | **G** — goal! |
 
-Path: **S → E → D → G**, cost 12 + 8 + 8 = 28.
+Path: **S → E → D → G**, cost 12 + 8 + 8 = **28** — h alone never looks at edge costs.
 
 ## 1.2 — A* → `S,F,C,A,G`
 
-| Step | OPEN (node : f = g+h) | Pick |
+Every line below is f = g + h. Watch steps 3 and 7: E (21) must be expanded before C, and D (24) before G, or your OPEN list is wrong.
+
+| Step | OPEN (node : g+h = f) | Pick |
 |------|------------------------|------|
 | 1 | S : 0+10 = **10** | **S** → E : 12+9 = 21, F : 8+10 = **18** |
 | 2 | F : **18**, E : 21 | **F** → D : 20+4 = 24, C : 16+6 = **22**, B : 16+7 = 23 |
-| 3 | C : **22**, B : 23, D : 24 | **C** → A : 20+3 = **23**, B via C: 24+7 = 31 (keep) |
-| 4 | A : **23**, B : 23, D : 24 | **A** (tie A&lt;B) → G : 24+0 = **24** |
-| 5 | B : 23, G : **24** | **B** first (23 < 24) → G via B: 28+0 = 28 (keep) |
-| 6 | G : **24** | **G** — goal! |
+| 3 | E : **21**, C : 22, B : 23, D : 24 | **E** → D via E : 20+4 = 24 (tie with old 24 — keep either) |
+| 4 | C : **22**, B : 23, D : 24 | **C** → A : 20+3 = **23**, B via C : 24+7 = 31 (keep 23) |
+| 5 | A : **23**, B : 23, D : 24 | **A** (tie 23 vs 23 → labels A &lt; B) → G : 24+0 = **24** |
+| 6 | B : **23**, D : 24, G : 24 | **B** → G via B : 28+0 = 28 (keep 24) |
+| 7 | D : **24**, G : 24 | **D** (tie → labels D &lt; G) → G via D : 28 (keep 24) |
+| 8 | G : **24** | **G** — goal! |
 
-Path: **S → F → C → A → G**, cost 8+8+4+4 = 24.
+Path: **S → F → C → A → G**, cost 8+8+4+4 = **24**.
 
 <PaperTrace
   height={380}
@@ -87,7 +97,7 @@ Path: **S → F → C → A → G**, cost 8+8+4+4 = 24.
     { id: "C", x: 620, y: 60 },
     { id: "B", x: 620, y: 340 },
     { id: "A", x: 820, y: 200 },
-    { id: "G", x: 820, y: 40 }
+    { id: "G", x: 1020, y: 40 }
   ]}
   edges={[
     { id: "e1", from: "S", to: "E", label: "12" },
@@ -104,28 +114,35 @@ Path: **S → F → C → A → G**, cost 8+8+4+4 = 24.
     { id: "e12", from: "B", to: "G", label: "12" }
   ]}
   steps={[
-    { label: "Init", note: "OPEN = {S(g=0, h=10, f=10)}", nodes: { S: "frontier" } },
-    { label: "Expand S", note: "E: g=12, h=9 → f=21 | F: g=8, h=10 → f=18 | OPEN = {F(18), E(21)}", nodes: { S: "explored", F: "frontier", E: "frontier" } },
-    { label: "Expand F", note: "D: g=20, h=4 → f=24 | C: g=16, h=6 → f=22 | B: g=16, h=7 → f=23 | OPEN = {C(22), B(23), D(24)}", nodes: { S: "explored", F: "current", C: "frontier", B: "frontier", D: "frontier", E: "frontier" } },
-    { label: "Expand C", note: "A: g=20, h=3 → f=23 | B via C: g=24 → f=31 (keep 23) | OPEN = {A(23), B(23), D(24)}", nodes: { F: "explored", C: "current", A: "frontier", B: "frontier", D: "frontier", E: "frontier" } },
-    { label: "Expand A", note: "G: g=24, h=0 → f=24 | OPEN = {B(23), G(24), D(24)}", nodes: { C: "explored", A: "current", G: "frontier", B: "frontier", D: "frontier", E: "frontier" } },
-    { label: "Expand B", note: "G via B: g=28 → f=28 (keep 24) | OPEN = {G(24), D(24)}", nodes: { A: "explored", B: "current", G: "frontier", D: "frontier", E: "frontier" } },
-    { label: "GOAL: S→F→C→A", note: "Pick G (f=24) = GOAL. Path S,F,C,A,G cost 24 - optimal (h admissible).", nodes: { S: "path", F: "path", C: "path", A: "path", G: "goal" }, edges: { e2: "path", e5: "path", e9: "path", e11: "path" } }
+    { label: "Init", note: "OPEN = { S(g=0, h=10, f=10) }", nodes: { S: "frontier" } },
+    { label: "Expand S", note: "E: g=12, h=9 -> f=21\nF: g=8, h=10 -> f=18\nOPEN = { F(18), E(21) }", nodes: { S: "explored", F: "frontier", E: "frontier" } },
+    { label: "Expand F", note: "Pick F (f=18).\nD: g=20, h=4 -> f=24 | C: g=16, h=6 -> f=22 | B: g=16, h=7 -> f=23\nOPEN = { E(21), C(22), B(23), D(24) }", nodes: { S: "explored", F: "current", C: "frontier", B: "frontier", D: "frontier", E: "frontier" } },
+    { label: "Expand E", note: "Pick E (f=21).\nD via E: g=12+8=20, f=20+4=24 (tie with existing 24 - keep)\nOPEN = { C(22), B(23), D(24) }", nodes: { S: "explored", F: "explored", E: "current", C: "frontier", B: "frontier", D: "frontier" } },
+    { label: "Expand C", note: "Pick C (f=22).\nA: g=20, h=3 -> f=23 | B via C: g=24 -> f=31 (keep 23)\nOPEN = { A(23), B(23), D(24) }", nodes: { S: "explored", F: "explored", E: "explored", C: "current", A: "frontier", B: "frontier", D: "frontier" } },
+    { label: "Expand A", note: "Pick A (tie 23 vs 23 -> label A < B).\nG: g=24, h=0 -> f=24\nOPEN = { B(23), D(24), G(24) }", nodes: { C: "explored", A: "current", G: "frontier", B: "frontier", D: "frontier" } },
+    { label: "Expand B", note: "Pick B (f=23).\nG via B: g=28 -> f=28 (keep 24)\nOPEN = { D(24), G(24) }", nodes: { A: "explored", B: "current", G: "frontier", D: "frontier" } },
+    { label: "Expand D", note: "Pick D (tie 24 vs 24 -> label D < G).\nG via D: g=28 -> f=28 (keep 24)\nOPEN = { G(24) }", nodes: { B: "explored", D: "current", G: "frontier" } },
+    { label: "GOAL: S-F-C-A-G", note: "Pick G (f=24) = GOAL.\nPath S,F,C,A,G cost 8+8+4+4 = 24 - optimal (h admissible).", nodes: { S: "path", F: "path", C: "path", A: "path", G: "goal" }, edges: { e2: "path", e5: "path", e9: "path", e11: "path" } }
   ]}
 />
 
 ## 1.3 — Branch-and-Bound → `S,F,C,A,G`
 
-| Pop | OPEN (path : g) | Extend |
-|-----|-----------------|--------|
-| S : 0 | SE : 12, SF : 8 | |
-| SF : 8 | SFD : 20, SFC : 16, SFB : 16 | |
-| SFC : 16 (tie SFB, C < B) | SFCA : 24, SFCB : 24 | |
-| SFB : 16 | SFBG : 28 | |
-| SFCA : 24 (tie SFCB, A < B) | SFCAG : **24** ← goal | |
-| SFCAG : **24** | all open ≥ 24 → **optimal** | |
+Pop the cheapest partial path; ties break by path labels (SE &lt; SF, SFCA &lt; SFCB).
 
-Path: **S → F → C → A → G**, cost 24 ✓
+| Pop | Extend | OPEN afterwards (path : g) |
+|-----|--------|----------------------------|
+| S : 0 | SE : 12, SF : 8 | SF : 8, SE : 12 |
+| SF : 8 | SFD : 20, SFC : 16, SFB : 16 | SE : 12, SFC : 16, SFB : 16, SFD : 20 |
+| SE : 12 | SED : 20 | SFC : 16, SFB : 16, SED : 20, SFD : 20 |
+| SFC : 16 (tie SFB) | SFCA : 20, SFCB : 24 | SFB : 16, SFCA : 20, SED : 20, SFD : 20, SFCB : 24 |
+| SFB : 16 | SFBG : 28 | SFCA : 20, SED : 20, SFD : 20, SFCB : 24, SFBG : 28 |
+| SED : 20 | SEDA : 28, SEDG : 28 | SFCA : 20, SFD : 20, SFCB : 24, SEDA/SEDG/SFBG : 28 |
+| SFCA : 20 | **SFCAG : 24** ← goal on queue | SFD : 20, SFCAG : 24, SFCB : 24, … all 28s |
+| SFD : 20 | SFDG : 28 | **SFCAG : 24**, SFCB : 24, … |
+| **SFCAG : 24** | goal popped — cheapest open is SFCB : 24 ≥ 24 | → **optimal** |
+
+Path: **S → F → C → A → G**, cost 8+8+4+4 = **24** ✓
 
 ## 1.4 — Shortest path → **B, C (both)**
 
@@ -133,14 +150,27 @@ A* and BnB both returned 24; BFS returned 28 → **B and C** (multi-select!).
 
 ## 1.5 — Admissibility → **A (admissible)**
 
-Every h ≤ true cost: h(A)=3 ≤ 4, h(D)=4 ≤ 8, h(C)=6 ≤ 8, h(B)=7 ≤ 12, h(F)=10 ≤ 16, h(E)=9 ≤ 20, h(S)=10 ≤ 24 → **admissible** ✓ — which is why A* hit the optimum.
+Every h ≤ true cheapest cost from that node:
+
+| Node | $h$ | $h^*$ (best real cost to G) | OK? |
+|------|-----|------------------------------|-----|
+| A | 3 | 4 (A-G) | ✓ |
+| D | 4 | 8 (D-G) | ✓ |
+| C | 6 | 8 (C-A-G = 4+4) | ✓ |
+| B | 7 | 12 (B-G) | ✓ |
+| F | 10 | 16 (F-C-A-G) | ✓ |
+| E | 9 | 16 (E-D-G) | ✓ |
+| S | 10 | 24 (S-F-C-A-G) | ✓ |
+
+No overestimate anywhere → **admissible** ✓ — which is exactly why A* hit the optimum.
 
 ## Tricks & Tips
 
 <Accordion title="Exam shortcuts">
-1. The h values are printed — build the table before tracing.
-2. Watch 1.4: it is **multi-select** — both optimal algorithms must be ticked.
-3. A\* step 5 is the trap: B (23) pops before G (24); expanding B must not distract you — G's 24 still wins.
+1. The h values are printed — build the table before tracing anything.
+2. The classic slip in this trace: after expanding F, E's f = 21 is still the minimum — expand E before C. And at the end, D (24) pops before G on the label tie-break. Skipping either still lands the same path here, but the OPEN lists you write lose marks.
+3. Watch 1.4: it is multi-select — tick every algorithm whose returned cost equals the BnB optimum (A* and BnB at 24; BFS took 28).
+4. Fast admissibility check: compare each h only against its node's cheapest outgoing route to G (A: 3 ≤ 4, E: 9 ≤ 16, ...) — one row per node, no search needed.
 </Accordion>
 
 **Answers:** 1.1 `S,E,D,G` · 1.2 `S,F,C,A,G` · 1.3 `S,F,C,A,G` · 1.4 **B, C** · 1.5 **A**

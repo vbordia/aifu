@@ -45,58 +45,85 @@ Refine = pop the cheapest open node, insert its two children. Childless snapshot
 
 ## 2.1 — Refine order → `b1,c2,d1,b2`
 
-| Pop | Queue (min first) | Action |
-|-----|-------------------|--------|
-| 1 | a1 : 254 | refine → b1(254), b2(279) |
-| 2 | b1 : 254, b2 : 279 | refine **b1** → c1(302), c2(271) |
-| 3 | c2 : 271, b2 : 279, c1 : 302 | refine **c2** → d1(271), d2(342) |
-| 4 | d1 : 271, b2 : 279, c1 : 302, d2 : 342 | refine **d1** → e1(282), e2(286) |
-| 5 | b2 : 279, e1 : 282, e2 : 286, … | refine **b2** → c3(279), c4(308) |
+Pop the minimum bound each round; refining replaces the popped node by its two children.
+
+| Pop | Queue before (bound) | Refine | Children added |
+|-----|----------------------|--------|----------------|
+| 1 | a1 : 254 | **a1** | b1 : 254, b2 : 279 |
+| 2 | b1 : 254, b2 : 279 | **b1** | c1 : 302, c2 : 271 |
+| 3 | c2 : 271, b2 : 279, c1 : 302 | **c2** | d1 : 271, d2 : 342 |
+| 4 | d1 : 271, b2 : 279, c1 : 302, d2 : 342 | **d1** | e1 : 282, e2 : 286 |
+| 5 | b2 : 279, e1 : 282, e2 : 286, c1 : 302, d2 : 342 | **b2** | c3 : 279, c4 : 308 |
 
 ## 2.2 — Optimal tour → `e1`, cost `282`
 
-Pop c3(279) → d3(300), d4(305). Queue: `{e1 : 282, e2 : 286, d3 : 300, c4 : 308, d4 : 305}`. Minimum **e1 : 282** is a **leaf** — a tour — and everything else ≥ 286 → **e1 = optimal, 282** ✓
+Pop c3(279) → adds d3(300), d4(305). Queue sorted: `{e1 : 282, e2 : 286, d3 : 300, c1 : 302, d4 : 305, c4 : 308, d2 : 342}`.
+
+The minimum **e1 : 282** has no children in the snapshot — it is a **complete tour** — and every other open bound is ≥ 286 > 282. Nothing cheaper can ever appear → **e1 = optimal, 282** ✓
 
 ## 2.3 — Cities → `5`
 
-Path root→e1: **AC in, ~AD, BD in, AB in**. Degrees: A–2 full (C, B), B–2 full (A, D), D–1, C–1, E–0. D's remaining partner: D–E (AD excluded); C then takes E. Tour: **A–B–D–E–C–A** → 5 cities ✓
+Chain root→e1: **AC in → ~AD excluded → BD in → AB in**. Fixed edges: A–C, B–D, A–B.
+
+Degrees: A = 2 (C, B) full · B = 2 (D, A) full · C = 1 (A) · D = 1 (B) · E = 0.
+
+AD is excluded, so D's missing partner cannot be A → forced **D–E**; then C's missing partner is E too → **C–E**. One closed cycle:
+
+$$A - B - D - E - C - A \Rightarrow \textbf{5 cities} ✓$$
 
 ## 2.4 — Tour from A → `A,B,D,E,C`
 
-The forced cycle above ✓ (reverse A,C,E,D,B equivalent).
+The forced cycle above read from A ✓ (the reverse A,C,E,D,B is the same tour).
 
-<Graph
+<PaperTrace
   height={430}
   nodeWidth={110}
   nodeHeight={56}
   nodeFontSize={12}
-  layout={{ name: "preset" }}
-  elements={[
-    { data: { id: "a1", label: "a1: S0 254", type: "current" }, position: { x: 380, y: 20 } },
-    { data: { id: "b1", label: "b1: AC 254", type: "current" }, position: { x: 180, y: 110 } },
-    { data: { id: "b2", label: "b2: ~AC 279", type: "current" }, position: { x: 600, y: 110 } },
-    { data: { id: "c1", label: "c1: AD 302", type: "explored" }, position: { x: 40, y: 200 } },
-    { data: { id: "c2", label: "c2: ~AD 271", type: "current" }, position: { x: 300, y: 200 } },
-    { data: { id: "c3", label: "c3: AD 279", type: "explored" }, position: { x: 540, y: 200 } },
-    { data: { id: "c4", label: "c4: ~AD 308" }, position: { x: 740, y: 200 } },
-    { data: { id: "d1", label: "d1: BD 271", type: "current" }, position: { x: 240, y: 290 } },
-    { data: { id: "d2", label: "d2: ~BD 342" }, position: { x: 380, y: 290 } },
-    { data: { id: "d3", label: "d3: BD 300" }, position: { x: 500, y: 290 } },
-    { data: { id: "d4", label: "d4: ~BD 305" }, position: { x: 630, y: 290 } },
-    { data: { id: "e1", label: "e1: AB 282 ✓", type: "path" }, position: { x: 180, y: 380 } },
-    { data: { id: "e2", label: "e2: ~AB 286" }, position: { x: 310, y: 380 } },
-    { data: { id: "x1", source: "a1", target: "b1" } },
-    { data: { id: "x2", source: "a1", target: "b2" } },
-    { data: { id: "x3", source: "b1", target: "c1" } },
-    { data: { id: "x4", source: "b1", target: "c2" } },
-    { data: { id: "x5", source: "c2", target: "d1" } },
-    { data: { id: "x6", source: "c2", target: "d2" } },
-    { data: { id: "x7", source: "d1", target: "e1" } },
-    { data: { id: "x8", source: "d1", target: "e2" } },
-    { data: { id: "x9", source: "b2", target: "c3" } },
-    { data: { id: "x10", source: "b2", target: "c4" } },
-    { data: { id: "x11", source: "c3", target: "d3" } },
-    { data: { id: "x12", source: "c3", target: "d4" } },
+  legend={[
+    { color: "#b45309", label: "refining now" },
+    { color: "#0369a1", label: "open (waiting)" },
+    { color: "#4b5563", label: "already refined" },
+    { color: "#15803d", label: "optimal tour (leaf)" }
+  ]}
+  nodes={[
+    { id: "a1", label: "a1: S0 254", x: 400, y: 20 },
+    { id: "b1", label: "b1: AC 254", x: 200, y: 110 },
+    { id: "b2", label: "b2: ~AC 279", x: 620, y: 110 },
+    { id: "c1", label: "c1: AD 302", x: 60, y: 200 },
+    { id: "c2", label: "c2: ~AD 271", x: 320, y: 200 },
+    { id: "c3", label: "c3: AD 279", x: 520, y: 200 },
+    { id: "c4", label: "c4: ~AD 308", x: 740, y: 200 },
+    { id: "d1", label: "d1: BD 271", x: 200, y: 290 },
+    { id: "d2", label: "d2: ~BD 342", x: 380, y: 290 },
+    { id: "d3", label: "d3: BD 300", x: 500, y: 290 },
+    { id: "d4", label: "d4: ~BD 305", x: 650, y: 290 },
+    { id: "e1", label: "e1: AB 282", x: 120, y: 380 },
+    { id: "e2", label: "e2: ~AB 286", x: 270, y: 380 }
+  ]}
+  edges={[
+    { id: "x1", from: "a1", to: "b1" },
+    { id: "x2", from: "a1", to: "b2" },
+    { id: "x3", from: "b1", to: "c1" },
+    { id: "x4", from: "b1", to: "c2" },
+    { id: "x5", from: "c2", to: "d1" },
+    { id: "x6", from: "c2", to: "d2" },
+    { id: "x7", from: "d1", to: "e1" },
+    { id: "x8", from: "d1", to: "e2" },
+    { id: "x9", from: "b2", to: "c3" },
+    { id: "x10", from: "b2", to: "c4" },
+    { id: "x11", from: "c3", to: "d3" },
+    { id: "x12", from: "c3", to: "d4" }
+  ]}
+  steps={[
+    { label: "Queue: a1(254)", note: "OPEN = { a1:254 }", nodes: { a1: "frontier" } },
+    { label: "Refine a1", note: "Pop a1:254 -> insert b1:254, b2:279\nOPEN = { b1:254, b2:279 }", nodes: { a1: "explored", b1: "frontier", b2: "frontier" } },
+    { label: "Refine b1", note: "Pop b1:254 -> insert c1:302, c2:271\nOPEN = { c2:271, b2:279, c1:302 }", nodes: { a1: "explored", b1: "current", b2: "frontier", c1: "frontier", c2: "frontier" }, edges: { x1: "path" } },
+    { label: "Refine c2", note: "Pop c2:271 -> insert d1:271, d2:342\nOPEN = { d1:271, b2:279, c1:302, d2:342 }", nodes: { a1: "explored", b1: "explored", b2: "frontier", c1: "frontier", c2: "current", d1: "frontier", d2: "frontier" }, edges: { x1: "path", x4: "active" } },
+    { label: "Refine d1", note: "Pop d1:271 -> insert e1:282, e2:286\nOPEN = { b2:279, e1:282, e2:286, c1:302, d2:342 }", nodes: { a1: "explored", b1: "explored", b2: "frontier", c1: "frontier", c2: "explored", d1: "current", d2: "frontier", e1: "frontier", e2: "frontier" }, edges: { x1: "path", x4: "path", x5: "active" } },
+    { label: "Refine b2", note: "Pop b2:279 -> insert c3:279, c4:308\nOPEN = { c3:279, e1:282, e2:286, c1:302, d2:342, c4:308 }", nodes: { a1: "explored", b1: "explored", b2: "current", c1: "frontier", c2: "explored", d1: "explored", d2: "frontier", e1: "frontier", e2: "frontier", c3: "frontier", c4: "frontier" }, edges: { x2: "active" } },
+    { label: "Pop c3", note: "Pop c3:279 -> insert d3:300, d4:305\nOPEN = { e1:282, e2:286, d3:300, c1:302, d4:305, c4:308, d2:342 }", nodes: { a1: "explored", b1: "explored", b2: "explored", c1: "frontier", c2: "explored", d1: "explored", d2: "frontier", e1: "frontier", e2: "frontier", c3: "current", c4: "frontier", d3: "frontier", d4: "frontier" }, edges: { x2: "path", x9: "active" } },
+    { label: "Tour: e1 = 282", note: "Min e1:282 is a LEAF = complete tour.\nAll other open bounds >= 286 > 282 -> OPTIMAL.\nForced cycle: A-B-D-E-C-A (5 cities).", nodes: { a1: "explored", b1: "explored", b2: "explored", c1: "frontier", c2: "explored", d1: "explored", d2: "frontier", e1: "path", e2: "frontier", c3: "explored", c4: "frontier", d3: "frontier", d4: "frontier" }, edges: { x1: "path", x4: "path", x5: "path", x7: "path" } }
   ]}
 />
 
@@ -105,9 +132,10 @@ The forced cycle above ✓ (reverse A,C,E,D,B equivalent).
 ## Tricks & Tips
 
 <Accordion title="Fast method">
-1. Sorted queue with (cost, ref#); refine only nodes with children in the snapshot.
-2. Optimal = cheapest leaf popped while all open bounds ≥ it.
-3. Cities: complete degrees from the winner's chain; the excluded AD forces D-E and C-E.
+1. Simulate the queue as sorted pairs (bound, ref#): after refining b1, its exclude-child c2 (271) jumps ahead of the untouched b2 (279) — that inversion drives the whole refine order.
+2. Refine exactly five times here: a1, b1, c2, d1, b2. Stop refining the moment a leaf reaches the top of the queue.
+3. Optimality check is one comparison: e1 : 282 vs next-best e2 : 286.
+4. Reconstruct degrees from the winner's chain (AC, BD, AB in; AD out): A and B close instantly, ~AD forces D–E, and C's dangling degree forces C–E. Five junctions, one cycle: A-B-D-E-C-A.
 </Accordion>
 
 **Answers:** 2.1 `b1,c2,d1,b2` · 2.2 `e1,282` · 2.3 `5` · 2.4 `A,B,D,E,C`

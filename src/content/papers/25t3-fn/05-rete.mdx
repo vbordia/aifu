@@ -50,11 +50,11 @@ graph TD
     A3 --> A6["A6: vin = v"]
     A4 --> A7["A7: limit = 2"]
     A4 --> A8["A8: limit = 8"]
-    A5 --> A9["A9: hp >= 700"]
-    A5 --> A10["A10: hp >= 100"]
-    A5 --> A11["A11: hp <= 300"]
-    A5 --> A12["A12: hp >= 300"]
-    A5 --> A13["A13: hp <= 500"]
+    A5 --> A9["A9: hp ≥  700"]
+    A5 --> A10["A10: hp ≥  100"]
+    A5 --> A11["A11: hp ≤  300"]
+    A5 --> A12["A12: hp ≥  300"]
+    A5 --> A13["A13: hp ≤  500"]
     A6 --> A14["A14: bed = x"]
     A7 --> B1(("B1: = v"))
     A9 --> B1
@@ -91,6 +91,78 @@ Rules: **Luxury-Car** = Passenger limit 2 + Power hp ≥ 700 · **Minivan** = li
 - **Truck** (bed ⋈ limit-2 ⋈ hp≤500): bed `101: A1`; limit-2 `102: A1`; hp≤500 `105: A1` → vin A1 ✓ → **(Truck, 101, 102, 105)** ✓
 
 **Conflict set** = options **A, B, C** ✓ (D is invalid — Minivan has no Wheel condition, so 108 can't be in its tuple.)
+
+Interactive trace of the beta net — each step fires one join on a shared `^vin`:
+
+<PaperTrace
+  height={430}
+  nodeWidth={110}
+  nodeHeight={52}
+  nodeFontSize={11}
+  legend={[
+    { color: "#0f766e", label: "alpha test (WMEs passing)" },
+    { color: "#9d174d", label: "beta join (on ^vin)" },
+    { color: "#15803d", label: "rule fired" },
+    { color: "#b45309", label: "join being tested" },
+  ]}
+  nodes={[
+    { id: "A14", label: "bed = x\n101:A1", x: 80, y: 30, kind: "alpha" },
+    { id: "A7", label: "limit = 2\n102:A1·104:C3", x: 250, y: 30, kind: "alpha" },
+    { id: "A13", label: "hp ≤ 500\n105:A1", x: 420, y: 30, kind: "alpha" },
+    { id: "A9", label: "hp ≥ 700\n107:C3", x: 620, y: 30, kind: "alpha" },
+    { id: "A8", label: "limit = 8\n103:B2", x: 800, y: 30, kind: "alpha" },
+    { id: "A11", label: "hp ≤ 300\n106:B2", x: 620, y: 140, kind: "alpha" },
+    { id: "B3", label: "B3 ⋈ vin", x: 160, y: 250, kind: "beta" },
+    { id: "B1", label: "B1 ⋈ vin", x: 520, y: 250, kind: "beta" },
+    { id: "B2", label: "B2 ⋈ vin", x: 760, y: 250, kind: "beta" },
+    { id: "R3", label: "Truck", x: 160, y: 360, kind: "unassigned" },
+    { id: "R1", label: "Luxury-Car", x: 520, y: 360, kind: "unassigned" },
+    { id: "R2", label: "Minivan", x: 760, y: 360, kind: "unassigned" },
+  ]}
+  edges={[
+    { id: "g1", from: "A14", to: "B3" },
+    { id: "g2", from: "A7", to: "B3" },
+    { id: "g3", from: "A13", to: "B3" },
+    { id: "g4", from: "B3", to: "R3" },
+    { id: "g5", from: "A7", to: "B1" },
+    { id: "g6", from: "A9", to: "B1" },
+    { id: "g7", from: "B1", to: "R1" },
+    { id: "g8", from: "A8", to: "B2" },
+    { id: "g9", from: "A11", to: "B2" },
+    { id: "g10", from: "B2", to: "R2" },
+  ]}
+  steps={[
+    {
+      label: "0 · alpha pass",
+      note: "102→A7 · 104→A7 · 103→A8 (Passenger)\n107→A9 · 106→A11 · 105→A13 (Power)\n101→A14 (Cargo). Wheels 108/109: no CLASS = Wheel node → dead.",
+      edges: {},
+    },
+    {
+      label: "1 · Luxury-Car fires",
+      note: "limit-2 {102:A1, 104:C3} ⋈ hp≥700 {107:C3}\nvin match: C3 ✓ → tuple (Luxury-Car, 104, 107)",
+      nodes: { B1: "current", R1: "path" },
+      edges: { g5: "active", g6: "active", g7: "path" },
+    },
+    {
+      label: "2 · Minivan fires",
+      note: "limit-8 {103:B2} ⋈ hp≤300 {106:B2}\nvin match: B2 ✓ → tuple (Minivan, 103, 106)",
+      nodes: { B1: "explored", R1: "path", B2: "current", R2: "path" },
+      edges: { g5: "active", g6: "active", g7: "path", g8: "active", g9: "active", g10: "path" },
+    },
+    {
+      label: "3 · Truck fires",
+      note: "bed {101:A1} ⋈ limit-2 {102:A1} ⋈ hp≤500 {105:A1}\nvin match: A1 across all three ✓ → (Truck, 101, 102, 105)",
+      nodes: { B1: "explored", R1: "path", B2: "explored", R2: "path", B3: "current", R3: "path" },
+      edges: { g7: "path", g10: "path", g1: "active", g2: "active", g3: "active", g4: "path" },
+    },
+    {
+      label: "4 · conflict set = A, B, C",
+      note: "(Luxury-Car,104,107) · (Minivan,103,106) · (Truck,101,102,105)\nOption D dies: 108 is Wheel — Minivan has no Wheel condition.\nSpecificity → Truck (3 conditions). Recency → Luxury-Car (max ts 107).",
+      nodes: { R1: "path", R2: "path", R3: "path", B1: "path", B2: "path", B3: "path" },
+      edges: { g4: "path", g7: "path", g10: "path" },
+    },
+  ]}
+/>
 
 ## 5.2 — Specificity → **C**
 

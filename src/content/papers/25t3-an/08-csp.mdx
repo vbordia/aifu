@@ -84,9 +84,61 @@ Tuple $(2,6)$ has **no middle support** through C → **not path consistent** �
 
 Try the tuples: $(3, 5)$ on A–B, then $C$ must satisfy $(3, c) \in R_{AC}$ → $c = 7$, and $(5, 7) \in R_{BC}$ ✓
 
-$$A = 3,\quad B = 5,\quad C = 7 \Rightarrow \texttt{3,5,7}\ ✓$$
+$$A = 3,\quad B = 5,\quad C = 7 \Rightarrow \texttt{3,5,7}$$ ✓
 
 (Check the other branch: $(2,6)$ forces $c = 8$, but $(6,8) \notin R_{BC}$ — dead end, exactly the path-inconsistency found above.)
+
+## Tricks & Tips
+
+Interactive tuple hunt — arc consistency passes, then path consistency catches the impostor:
+
+<PaperTrace
+  height={380}
+  nodeWidth={120}
+  nodeHeight={54}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "under examination" },
+    { color: "#15803d", label: "supported / part of solution" },
+    { color: "#7f1d1d", label: "failed test" },
+  ]}
+  nodes={[
+    { id: "A", label: "A ∈ {2, 3}", x: 60, y: 170 },
+    { id: "B", label: "B ∈ {5, 6}", x: 430, y: 50 },
+    { id: "C", label: "C ∈ {7, 8}", x: 430, y: 290 },
+  ]}
+  edges={[
+    { id: "r1", from: "A", to: "B", label: "R_AB" },
+    { id: "r2", from: "A", to: "C", label: "R_AC" },
+    { id: "r3", from: "B", to: "C", label: "R_BC" },
+  ]}
+  steps={[
+    {
+      label: "1 · arc consistency ✓",
+      note: "A=2 → B:6 ✓ C:8 ✓ · A=3 → B:5 ✓ C:7 ✓\nB=5 → A:3 ✓ C:7,8 ✓ · B=6 → A:2 ✓ C:7 ✓\nC=7 → A:3 ✓ B:5,6 ✓ · C=8 → A:2 ✓ B:5 ✓\nEvery value has support on every incident relation → arc consistent → 8.1 = A.",
+      nodes: { A: "path", B: "path", C: "path" },
+      edges: { r1: "path", r2: "path", r3: "path" },
+    },
+    {
+      label: "2 · path test on (2,6)",
+      note: "Allowed pair (a,b) = (2,6) on R_AB — need a middle c ∈ {7,8}:\n(2,c) ∈ R_AC = {(2,8),(3,7)} forces c = 8.\nThen (c,b) = (8,6) ∈ R_BC = {(5,7),(5,8),(6,7)}? NO!\n→ (2,6) has no middle support through C.",
+      nodes: { A: "current", B: "current", C: "current" },
+      edges: { r1: "active", r2: "active", r3: "pruned" },
+    },
+    {
+      label: "3 · not path consistent",
+      note: "One failed tuple is enough → NOT path consistent → 8.2 = B.\nArc consistency does not imply path consistency.",
+      nodes: { A: "explored", B: "explored", C: "explored" },
+      edges: { r1: "pruned", r2: "pruned", r3: "pruned" },
+    },
+    {
+      label: "4 · solution 3, 5, 7",
+      note: "The sibling branch survives:\n(3,5) ∈ R_AB ✓ · (3,c) ∈ R_AC → c = 7 ✓ · (5,7) ∈ R_BC ✓\nUnique solution: A=3, B=5, C=7 → 8.3 = 3,5,7.",
+      nodes: { A: "path", B: "path", C: "path" },
+      edges: { r1: "path", r2: "path", r3: "path" },
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 

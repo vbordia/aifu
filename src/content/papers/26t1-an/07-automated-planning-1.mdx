@@ -1,12 +1,12 @@
 ---
-title: "Q7 — AUTOMATED PLANNING 1"
-short: "AUTOMATED PLANNING 1"
+title: "Q7 — Automated Planning Theory"
+short: "Automated Planning Theory"
 order: 7
 paper: "26t1-an"
 question: 7
-label: "AUTOMATED PLANNING 1"
-description: "Automated Planning 1 question"
-topics: ["AUTOMATED PLANNING 1"]
+label: "AUTOMATED PLANNING"
+description: "GraphPlan's fine print: when two orderings are twins, exactly which precondition/effect overlaps make actions mutex, and the monotonicity of NON-mutex."
+topics: ["AUTOMATED PLANNING", "GraphPlan", "Mutex"]
 ---
 
 ## The Question
@@ -22,52 +22,51 @@ Answer the given subquestions.
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+| Concept | Test |
+|---|---|
+| Interchangeable orderings | neither action deletes a precondition or effect of the other, and their preconditions are jointly satisfiable |
+| Action mutex (layer $n$) | **inconsistent effects**: some add of one is deleted by the other; OR **interference**: one deletes a precondition/effect of the other; OR **competing needs**: some $p \in \text{pre}(a)$, $q \in \text{pre}(b)$ are proposition-mutex in layer $n{-}1$ |
+| Non-mutex monotonicity | once two propositions co-exist in one layer, they co-exist in every later layer |
+
+> Deep-dive: browse the [Concepts](/concepts) section for GraphPlan.
 
 ## Solutions
 
-**7.1** — Consider actions a and b and the two orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will make both of the orderings feasible?
+### 7.1 — Both orderings feasible → **A, B**
 
-Options:
+$(a \text{ then } b)$ and $(b \text{ then } a)$ succeed identically exactly when the actions do not step on each other:
 
-| Option | |
-|---|---|
-| **A** | P is in pre(a) and also in pre(b). |
-| **B** | P is in del-effects(a) and also in del-effects(b). |
-| **C** | None of these. |
+1. **No interference**: $a$ deletes nothing that $b$ needs as precondition or brings as effect — and symmetrically for $b$ against $a$.
+2. **Jointly satisfiable preconditions**: running second leaves enough of the state intact for the other's PRE list.
 
-**Answer:** **A**, **B**
+Any condition asserting "a must delete something of b" or demanding exclusive resources kills one of the two orders → wrong by construction.
 
-**7.2** — In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ .
+### 7.2 — Action mutex definition → **A, B**
 
-Options:
+| Option | Reading | Verdict |
+|---|---|---|
+| **A** | $P \in \text{pre}(a)$, $Q \in \text{pre}(b)$ are mutex in layer $n{-}1$ | **Correct** — textbook *competing needs* |
+| **B** | $P$ is in $\text{pre}(a)$, in $\text{del}(a)$, in $\text{pre}(b)$ and in $\text{del}(b)$ | **Correct** — each action needs what both destroy (*inconsistent supports*); they cannot co-exist |
+| C | only if EVERY precondition of $a$ is deleted by $b$ | Far too strong — ONE overlapping deletion suffices ("only if" poisons it) |
+| D | only if every add-effect of $a$ is deleted by $b$ | Same disease |
 
-| Option | |
-|---|---|
-| **A** | if P in pre(a) and Q in pre(b) are mutex |
-| **B** | if P is in pre(a), in del-effects(a), in pre(b) and also in del-effects(b) |
-| **C** | only if every P in pre(a) is also present in del-effects(b) |
-| **D** | only if every P in add-effects(a) is also present in del-effects(b) |
+### 7.3 — Non-mutex monotonicity → **A, B**
 
-**Answer:** **A**, **B**
+GraphPlan's persistence semantics: if $P$ and $Q$ genuinely hold together in some layer (non-mutex), the no-op edges carry both forward forever — co-existence never regresses:
 
-**7.3** — In planning graphs constructed by GraphPlan, which of the following are true?
+- **A ✓**: non-mutex at layer 0 (the initial state) persists through all layers.
+- **B ✓**: non-mutex at any layer $n$ persists to all future layers.
+- **C ✗**: claims future mutex-ification — contradicts monotonicity; mutex sets can SHRINK going up, never the non-mutex relation.
 
-Options:
-
-| Option | |
-|---|---|
-| **A** | If propositions P and Q are non mutex in layer zero then it will remain non mutex in all future layers. |
-| **B** | If propositions P and Q are non mutex in a layer n then it will remain non mutex in all future layers. |
-| **C** | If propositions P and Q are non mutex in a layer n then it can become mutex in a future layer. |
-| **D** | None of these. |
-
-**Answer:** **A**, **B**
+The asymmetry to memorise: *mutex-ness is proved fresh each layer (may disappear); non-mutex-ness, once established, is forever.*
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. 'Only if' options in definitions questions are almost always traps - GraphPlan's mutex tests are existential (ONE bad overlap), not universal.
+2. Three mutex causes, three phrases: inconsistent effects, interference (deleting preconditions/effects), competing needs. Match options verbatim.
+3. For ordering questions ask the single question: 'does either action delete anything the other reads or writes?' No -> interchangeable.
+4. Monotonicity slogan for 7.3: mutex may vanish upward; non-mutex never does. Any option flipping this direction is wrong.
 </Accordion>
+
+**Answers:** 7.1 **A, B** · 7.2 **A, B** · 7.3 **A, B**

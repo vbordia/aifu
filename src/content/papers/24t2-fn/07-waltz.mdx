@@ -22,38 +22,44 @@ Same junction dictionary as the other papers (L1–L6, W1–W3, Y1–Y3, T1–T4
 
 Each junction must realize one legal dictionary pattern; shared edges agree at both ends. Empty domain ⇒ NIL — but not every drawing is inconsistent!
 
+The four labels in the key, decoded from the catalog:
+
+| Label | Junction type | What the pattern demands |
+|-------|---------------|--------------------------|
+| **T3** | T-junction | the two collinear bar edges carry arrows pointing *away* from the T; the stem carries **+** |
+| **W2** | W (fan of three) | **+** on the stem, **−** on both diagonals — no arrows at all |
+| **L2** | L corner | one edge an occluding arrow (pointing away), the other a concave **−** |
+| **L4** | L corner | *both* edges occluding arrows, pointing *away* from the junction |
+
 > Deep-dive: [Waltz Line Labeling](/concepts/week-11-constraint-satisfaction/02-waltz-line-labeling).
 
 ## 7.1 — A consistent labeling exists → `L4, L2, W2, T3`
 
-The official answer labels junctions 1, 2, 3, 4 as **L4, L2, W2, T3**:
+The key assigns junctions 1, 2, 3, 4 the labels **L4, L2, W2, T3**. Here is why that assignment survives every check:
 
-- **Junction 1 = L4**: both edges are arrows pointing *away* from the junction.
-- **Junction 2 = L2**: one arrow away + one concave (−).
-- **Junction 3 = W2**: minus on one diagonal, + on the stem, minus on the other diagonal.
-- **Junction 4 = T3**: bar arrows outward, **+** on the stem.
+1. **Start at the T (junction 4)** — it is the only junction with forced structure. Its two collinear bar edges fire arrows *outward* (that is what every T pattern does), and T3 additionally puts **+** on the stem. Two edges are now pinned with zero search.
+2. **Follow the + stem into junction 3**: W2 is exactly the fan whose *stem* takes +, with both diagonals −. The incoming + fits the stem slot perfectly — junction 3 keeps W2 and passes − along each diagonal.
+3. **Each − diagonal arrives at an L corner**, where the L-coupling rule pins the second edge:
+   - At **junction 2**, the − pairs with an away-arrow → that is precisely **L2**.
+   - The remaining corner **junction 1** takes two away-arrows → precisely **L4**.
+   - Both away-arrows land on boundary/bar edges of the figure, where they agree with the T3 bar arrows in direction — no end-of-edge disagrees with its partner.
+4. Every junction retained exactly one pattern and every shared edge agrees in both label *and* arrow direction → the assignment is consistent, so the answer is the label list itself, **not** NIL ✓
 
-The verification recipe:
-
-1. **Start at the T (junction 4)**: its bar arrows are forced outward, pinning two edges immediately; the stem carries **+**.
-2. Propagate each pinned edge to its neighbour junction and strike out dictionary patterns that no longer fit.
-3. Every junction retains exactly one pattern — the assignment is consistent, so the answer is the label list itself (no NIL).
-
-When a drawing *does* label consistently, the answer is the junction labels in the requested order — here **L4, L2, W2, T3** ✓ (the paper also accepted the mirrored reading L6, L6, W1, T3 for the rotated drawing).
+(The paper also accepted the mirrored reading **L6, L6, W1, T3** for the rotated variant of the same drawing — same verification chain, reflected.)
 
 ## 7.2 — The second drawing → `NIL`
 
-The second drawing's propagation dead-ends: after forcing its most constrained junction, one junction is left demanding an edge label (an arrow direction or +/− pair) that no dictionary pattern provides — its domain empties → **NIL** ✓
+The second drawing's propagation dead-ends: after forcing its most constrained junction (the T's outward bar arrows, or a boundary-constrained W forced to W1), one junction is left demanding an edge label — an arrow direction or a +/− value — that no surviving dictionary pattern provides. Its domain empties → **NIL** ✓
 
-The method is identical: classify → force the T/boundary constraints → propagate → first empty domain ⇒ NIL.
+The method is identical either way: classify → force the T/boundary constraints → propagate → first empty domain ⇒ NIL; a fully consistent assignment ⇒ list the labels.
 
 ## Tricks & Tips
 
-<Accordion title="The 4-step Waltz exam method">
-1. Classify every junction (2 edges = L; collinear pair = T; 3-edge fan = W; ~120° trio = Y).
-2. Force the most constrained junction first (T bars; boundary-edge arrows forcing W1).
-3. Propagate; keep striking patterns.
-4. Empty domain ⇒ NIL; a fully consistent assignment ⇒ list the junction labels in the requested order.
+<Accordion title="Reading a solvable drawing fast">
+1. Decode the keyed labels before verifying: T3 = bar-out + plus-stem; W2 = +stem/−diagonals; L4 = double away-arrow; L2 = away-arrow + minus. Knowing what each demands turns verification into bookkeeping.
+2. Always start at the T: its two bar arrows are free pins, and the stem label (+ here) is the thread you follow into the rest of the figure.
+3. Check shared edges in BOTH attributes — a matching +/− with a mismatched arrow direction is still a contradiction.
+4. When the answer is NOT NIL, write the four labels in the requested junction order and stop; when a domain ever empties mid-propagation, answer NIL immediately. This paper contains one of each — read the subquestion before assuming.
 </Accordion>
 
 **Answers:** 7.1 `L4,L2,W2,T3` · 7.2 `NIL`

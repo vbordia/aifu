@@ -84,23 +84,26 @@ Path: **S → F → B → A → G**, cost $6+6+4+4 = 20$. (The step-6 tie E vs G
 
 ## 1.3 — Branch-and-Bound → `S,F,B,A,G`
 
-| Pop | OPEN (path : $g$) | Extend |
-|-----|-------------------|--------|
-| S : 0 | SF : 6, SD : 8, SE : 16 | |
-| SF : 6 | SFB : 12, SFD : 16 | |
-| SFB : 12 | SFBA : 16, SFBC : 20 | |
-| SD : 8 | SDB : 16, SDF : 16, SDE : 18 | |
-| SDB : 16 | SDBA : 20, SDBC : 24 | |
-| SFD : 16 | SFDE : 26, SDFB : 24 | |
-| SFBA : 16 | SFBAG : **20** ← goal on queue | |
-| SDE : 18 | SDEC : 28 | |
-| SFBC : 20, then SFBAG : **20** | all open ≥ 20 → **optimal** | |
+| Pop | OPEN (path : $g$) after extending |
+|-----|-----------------------------------|
+| S : 0 | SF : $0+6$ = **6** · SD : $0+8$ = **8** · SE : $0+16$ = **16** |
+| SF : 6 | SFB : $6+6$ = **12** · **SFD : $6+8$ = 14** |
+| SD : 8 | SDF : $8+8$ = **16** · SDB : $8+8$ = **16** · SDE : $8+10$ = **18** |
+| SFB : 12 | SFBA : $12+4$ = **16** · SFBC : $12+8$ = **20** · SFBD : $12+8$ = **20** |
+| SFD : 14 | SFDB : $14+8$ = **22** · SFDE : $14+10$ = **24** |
+| SDB : 16 (first of the 16-tie — labels) | SDBA : $16+4$ = **20** · SDBF : $16+6$ = **22** · SDBC : $16+8$ = **24** |
+| SDF : 16 | SDFB : $16+6$ = **22** |
+| SE : 16 | SEC : $16+8$ = **24** · SED : $16+10$ = **26** |
+| SFBA : 16 | SFBAG : $16+4$ = **20** ← goal queued |
+| SDE : 18 | SDEC : $18+8$ = **28** |
+| SDBA : 20 (tie at 20: S-D before S-F) | SDBAG : $20+4$ = **24** |
+| SFBAG : **20** — next at the tie, a complete tour | everything left ≥ 20 → **optimal** |
 
 Path: **S → F → B → A → G**, cost 20 ✓
 
 ## 1.4 — Shortest path → **C (both)**
 
-Routes: S-F-B-A-G = **20** · S-D-B-A-G = 24 · S-F-D-B-A-G = 28 · S-E-C-G = 28. Both algorithms returned 20 → **C**.
+Routes: S-F-B-A-G = **20** · S-D-B-A-G = 24 · S-F-D-B-A-G = $6+8+8+4+4$ = 30 · S-E-C-G = 28. Both algorithms returned 20 → **C**.
 
 ## 1.5 — Admissibility → **A**
 

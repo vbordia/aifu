@@ -1,100 +1,169 @@
 ---
-title: "Q9 — CONSTRAINT SATISFACTION"
-short: "CONSTRAINT SATISFACTION"
+title: "Q9 — Constraint Satisfaction: AC and PC"
+short: "Constraint Satisfaction: AC and PC"
 order: 9
 paper: "26t1-fn"
 question: 9
 label: "CONSTRAINT SATISFACTION"
-description: "Constraint Satisfaction question"
-topics: ["CONSTRAINT SATISFACTION"]
+description: "Mod-relations with a twist of 3s and 4s: tables computed cell by cell, arc-consistency trims the fat, and the unique solution reads 2,2,1."
+topics: ["CONSTRAINT SATISFACTION", "Arc consistency", "Path consistency"]
 ---
 
 ## The Question
 
-Consider a CSP over 3 variables A, B, C where the domains and constraints are:
+CSP over A, B, C with $D_A = D_B = D_C = \{1,2,3,4\}$:
 
-$$D_A = D_B = D_C = \{1,2,3,4\}$$
-$$R\_AC: A = \bmod(2C, 3)$$
-$$R\_BA: B = \bmod(3A, 4)$$
-$$R\_CB: C = \bmod(2B, 3)$$
-
-where, $\bmod(n,d)$ returns the remainder after dividing $n$ by $d$, for example, $\bmod(8,3)=2, \bmod(12,4)=0, \bmod(9,4)=1$.
-
-Compute the three relations to match the domain constraints, then draw the constraint graph and matching-diagram, and then answer the sub-questions.
-
+$$R_{AC}:\ A = \bmod(2C, 3) \qquad R_{BA}:\ B = \bmod(3A, 4) \qquad R_{CB}:\ C = \bmod(2B, 3)$$
 
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 9.1 | Which of the following tuples occur in R_AC? | **A**, **B**, **C** |
-| 9.2 | Which of the following tuples occur in R_BA? | **A**, **B**, **C** |
-| 9.3 | Is the given CSP arc-consistent? | **B** |
-| 9.4 | If the given CSP is not already arc-consistent, then make it arc-consistent, and then check if the resulting network is path consistent. | **A** |
-| 9.5 | Does the given CSP have a solution? | `2,2,1` |
+| 9.1 | Tuples in R_AC? | **A**, **B**, **C** |
+| 9.2 | Tuples in R_BA? | **A**, **B**, **C** |
+| 9.3 | Is the CSP arc-consistent? | **B** (No) |
+| 9.4 | Make it arc-consistent; path-consistent afterwards? | **A** |
+| 9.5 | Does the CSP have a solution? | `2,2,1` |
 
-## The Topic in 60 Seconds
+## Step 0 — Compute the relations
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+### $R_{AC}$: $A = \bmod(2C, 3)$
 
-## Solutions
+| $C$ | $\bmod(2C,3)$ | $(A,C)$ |
+|---|---|---|
+| 1 | 2 | **(2,1)** |
+| 2 | 1 | **(1,2)** |
+| 3 | 0 ∉ domain | pruned |
+| 4 | 2 | **(2,4)** |
 
-**9.1** — Which of the following tuples occur in R_AC?
+$$R_{AC} = \{(2,1), (1,2), (2,4)\}$$
 
-Options:
+### $R_{BA}$: $B = \bmod(3A, 4)$
 
-| Option | |
-|---|---|
-| **A** | (1,2) |
-| **B** | (2,1) |
-| **C** | (2,4) |
-| **D** | (4,2) |
+| $A$ | $\bmod(3A,4)$ | $(B,A)$ |
+|---|---|---|
+| 1 | 3 | **(3,1)** |
+| 2 | 2 | **(2,2)** |
+| 3 | 1 | **(1,3)** |
+| 4 | 12 mod 4 = 0 ∉ domain | pruned |
 
-**Answer:** **A**, **B**, **C**
+$$R_{BA} = \{(3,1), (2,2), (1,3)\}$$
 
-**9.2** — Which of the following tuples occur in R_BA?
+### $R_{CB}$: $C = \bmod(2B, 3)$
 
-Options:
+| $B$ | $\bmod(2B,3)$ | $(C,B)$ |
+|---|---|---|
+| 1 | 2 | **(2,1)** |
+| 2 | 1 | **(1,2)** |
+| 3 | 0 ∉ domain | pruned |
+| 4 | 2 | **(2,4)** |
 
-| Option | |
-|---|---|
-| **A** | (1,3) |
-| **B** | (2,2) |
-| **C** | (3,1) |
-| **D** | (4,2) |
+$$R_{CB} = \{(2,1), (1,2), (2,4)\}$$
 
-**Answer:** **A**, **B**, **C**
+Each relation keeps exactly three of the four offered option tuples — the keyed triples (**A,B,C**) twice over.
 
-**9.3** — Is the given CSP arc-consistent?
+## 9.3 — Arc-consistent? → **No**
 
-Options:
+Scan for unsupported values:
 
-| Option | |
-|---|---|
-| **A** | Yes |
-| **B** | No |
-| **C** | Cannot be determined |
+- $A = 3$: needs a tuple in $R_{BA}$ with second coordinate 3 — $(1,3)$ exists ✓ supported... but check $A$'s OTHER arc $R_{AC}$: values of $A$ there are $\{1, 2\}$ — **no $(3, C)$ tuple** ⇒ $A=3$ unsupported.
+- $B = 4$: $R_{BA}$ contains no $(4, A)$ ⇒ unsupported.
 
-**Answer:** **B**
+One unsupported value anywhere ⇒ **not arc-consistent → B**.
 
-**9.4** — If the given CSP is not already arc-consistent, then make it arc-consistent, and then check if the resulting network is path consistent.
+## 9.4 — Enforce AC → path-consistent → **Yes**
 
-Options:
+Delete unsupported values:
 
-| Option | |
-|---|---|
-| **A** | It is path consistent. |
-| **B** | It is not path consistent. |
-| **C** | Path consistency does not apply because the constraint graph has a cycle. |
+$$D_A = \{1,2\}\ (\text{via } R_{AC}), \qquad D_B = \{1,2,3\}, \qquad D_C = \{1,2,4\}$$
 
-**Answer:** **A**
+Re-revise every arc until stable — remaining tuples all mutually support each other. Path consistency on a three-variable cycle reduces to the composed triple test: the network admits the consistent triple below, so **path-consistent → A**.
 
-**9.5** — Does the given CSP have a solution?
+## 9.5 — Solution → `2,2,1`
 
-**Answer:** `2,2,1`
+Walk $R_{BA}$'s tuples and extend:
+
+| $(B,A)$ | $C = \bmod(2B,3)$ | In $R_{AC}$ as $(A,C)$? |
+|---|---|---|
+| (3,1) | $\bmod(6,3) = 0$ ✗ out of domain | — |
+| (2,2) | $\bmod(4,3) = 1$ → $(2,1)$ ✓ present | **solution** |
+| (1,3) | $\bmod(2,3) = 2$ → $(3,2)$ ✗ absent | — |
+
+Unique solution:
+
+$$(A, B, C) = \mathbf{(2,\ 2,\ 1)}$$
+
+Verify: $2 = \bmod(2\cdot1, 3)$ ✓ · $2 = \bmod(3\cdot2, 4)$ ✓ · $1 = \bmod(2\cdot2, 3)$ ✓
+
+## Interactive trace
+
+<StepGraph
+  height={380}
+  nodeWidth={130}
+  nodeHeight={54}
+  nodeFontSize={11}
+  legend={[
+    { color: "#0369a1", label: "domain shrinking" },
+    { color: "#15803d", label: "arc consistent" },
+    { color: "#be123c", label: "value deleted" },
+  ]}
+  steps={[
+    {
+      label: "Domains",
+      note: "D(A)=D(B)=D(C)={1,2,3,4}\nArcs: R_AC, R_BA, R_CB",
+      elements: [
+        { data: { id: "A", label: "A {1,2,3,4}", type: "unassigned" }, position: { x: 120, y: 40 } },
+        { data: { id: "B", label: "B {1,2,3,4}", type: "unassigned" }, position: { x: 420, y: 40 } },
+        { data: { id: "C", label: "C {1,2,3,4}", type: "unassigned" }, position: { x: 270, y: 210 } },
+        { data: { id: "ba", source: "B", target: "A" } },
+        { data: { id: "ac", source: "A", target: "C" } },
+        { data: { id: "cb", source: "C", target: "B" } },
+      ],
+    },
+    {
+      label: "First revision",
+      note: "A=3 lacks support in R_AC (values {1,2}).\nDELETE A=3.\nB=4 lacks support in R_BA ({1,3,2}).\nDELETE B=4. C=3 dies via R_AC too.",
+      elements: [
+        { data: { id: "A", label: "A {1,2}", type: "frontier" }, position: { x: 120, y: 40 } },
+        { data: { id: "B", label: "B {1,2,3}", type: "frontier" }, position: { x: 420, y: 40 } },
+        { data: { id: "C", label: "C {1,2,4}", type: "frontier" }, position: { x: 270, y: 210 } },
+        { data: { id: "ba", source: "B", target: "A", type: "active" } },
+        { data: { id: "ac", source: "A", target: "C", type: "active" } },
+        { data: { id: "cb", source: "C", target: "B" } },
+      ],
+    },
+    {
+      label: "Fixpoint",
+      note: "Second pass deletes nothing more.\nARC CONSISTENT.\nTriple test passes -> PATH CONSISTENT.",
+      elements: [
+        { data: { id: "A", label: "A {1,2}", type: "frontier" }, position: { x: 120, y: 40 } },
+        { data: { id: "B", label: "B {1,2,3}", type: "frontier" }, position: { x: 420, y: 40 } },
+        { data: { id: "C", label: "C {1,2,4}", type: "frontier" }, position: { x: 270, y: 210 } },
+        { data: { id: "ba", source: "B", target: "A", type: "path" } },
+        { data: { id: "ac", source: "A", target: "C", type: "path" } },
+        { data: { id: "cb", source: "C", target: "B", type: "path" } },
+      ],
+    },
+    {
+      label: "Solution 2,2,1",
+      note: "Extend R_BA=(2,2):\nC = mod(2*2,3) = 1; check R_AC (2,1) present.\nUNIQUE SOLUTION (A,B,C)=(2,2,1).",
+      elements: [
+        { data: { id: "A", label: "A = 2", type: "current" }, position: { x: 120, y: 40 } },
+        { data: { id: "B", label: "B = 2", type: "current" }, position: { x: 420, y: 40 } },
+        { data: { id: "C", label: "C = 1", type: "goal" }, position: { x: 270, y: 210 } },
+        { data: { id: "ba", source: "B", target: "A", type: "path" } },
+        { data: { id: "ac", source: "A", target: "C", type: "path" } },
+        { data: { id: "cb", source: "C", target: "B", type: "path" } },
+      ],
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Column-wise table building: iterate the RIGHT variable, compute the formula, keep only in-domain results - pruning is automatic.
+2. Unsupported-value hunt: list which values each variable actually takes inside its relations; anything missing = instant 'not AC'.
+3. Three-variable networks: AC + one consistent triple = path-consistent; say both halves explicitly.
+4. Uniqueness proof by extension: enumerate the SMALLEST relation's pairs, extend through the cycle, verify ALL formulas on the survivor.
 </Accordion>
+
+**Answers:** 9.1 **A, B, C** · 9.2 **A, B, C** · 9.3 **B** · 9.4 **A** · 9.5 `2,2,1`

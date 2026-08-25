@@ -87,48 +87,113 @@ That tour visits **5 distinct cities** — and a 4-city attempt is impossible (C
 
 The forced completion above *is* the tour: **A, B, D, E, C** (back to A implied). The paper also accepted the reverse rotation A,C,E,D,B — same cycle, opposite direction.
 
-Interactive view of the tree — the refined nodes are amber, the winning leaf d3 is green:
+Interactive view of the tree — step through the seven refinements and the final tour pop:
 
-<Graph
+<PaperTrace
   height={460}
   nodeWidth={110}
   nodeHeight={56}
   nodeFontSize={12}
-  layout={{ name: "preset" }}
-  elements={[
-    { data: { id: "a1", label: "a1: S0 375", type: "current" }, position: { x: 400, y: 30 } },
-    { data: { id: "b1", label: "b1: BD 375", type: "current" }, position: { x: 200, y: 120 } },
-    { data: { id: "b2", label: "b2: ~BD 414", type: "current" }, position: { x: 620, y: 120 } },
-    { data: { id: "c1", label: "c1: CD 418", type: "current" }, position: { x: 60, y: 210 } },
-    { data: { id: "c2", label: "c2: ~CD 410", type: "current" }, position: { x: 300, y: 210 } },
-    { data: { id: "c3", label: "c3: CD 414", type: "current" }, position: { x: 540, y: 210 } },
-    { data: { id: "c4", label: "c4: ~CD 452" }, position: { x: 740, y: 210 } },
-    { data: { id: "d1", label: "d1: AB 456" }, position: { x: 10, y: 300 } },
-    { data: { id: "d2", label: "d2: ~AB 548" }, position: { x: 130, y: 300 } },
-    { data: { id: "d3", label: "d3: AB 434 ✓", type: "path" }, position: { x: 260, y: 300 } },
-    { data: { id: "d4", label: "d4: ~AB 468" }, position: { x: 380, y: 300 } },
-    { data: { id: "d5", label: "d5: AB 414", type: "current" }, position: { x: 500, y: 300 } },
-    { data: { id: "d6", label: "d6: ~AB 572" }, position: { x: 620, y: 300 } },
-    { data: { id: "e1", label: "e1: AD 436" }, position: { x: 450, y: 390 } },
-    { data: { id: "e2", label: "e2: ~AD 472" }, position: { x: 570, y: 390 } },
-    { data: { id: "x1", source: "a1", target: "b1" } },
-    { data: { id: "x2", source: "a1", target: "b2" } },
-    { data: { id: "x3", source: "b1", target: "c1" } },
-    { data: { id: "x4", source: "b1", target: "c2" } },
-    { data: { id: "x5", source: "b2", target: "c3" } },
-    { data: { id: "x6", source: "b2", target: "c4" } },
-    { data: { id: "x7", source: "c1", target: "d1" } },
-    { data: { id: "x8", source: "c1", target: "d2" } },
-    { data: { id: "x9", source: "c2", target: "d3" } },
-    { data: { id: "x10", source: "c2", target: "d4" } },
-    { data: { id: "x11", source: "c3", target: "d5" } },
-    { data: { id: "x12", source: "c3", target: "d6" } },
-    { data: { id: "x13", source: "d5", target: "e1" } },
-    { data: { id: "x14", source: "d5", target: "e2" } },
+  legend={[
+    { color: "#b45309", label: "popping now" },
+    { color: "#4b5563", label: "already refined" },
+    { color: "#0369a1", label: "waiting in OPEN" },
+    { color: "#16a34a", label: "optimal tour (434)" },
+  ]}
+  nodes={[
+    { id: "a1", label: "a1: S0 375", x: 400, y: 30 },
+    { id: "b1", label: "b1: BD 375", x: 200, y: 120 },
+    { id: "b2", label: "b2: ~BD 414", x: 620, y: 120 },
+    { id: "c1", label: "c1: CD 418", x: 60, y: 210 },
+    { id: "c2", label: "c2: ~CD 410", x: 300, y: 210 },
+    { id: "c3", label: "c3: CD 414", x: 540, y: 210 },
+    { id: "c4", label: "c4: ~CD 452", x: 740, y: 210 },
+    { id: "d1", label: "d1: AB 456", x: 10, y: 300 },
+    { id: "d2", label: "d2: ~AB 548", x: 130, y: 300 },
+    { id: "d3", label: "d3: AB 434", x: 260, y: 300 },
+    { id: "d4", label: "d4: ~AB 468", x: 380, y: 300 },
+    { id: "d5", label: "d5: AB 414", x: 500, y: 300 },
+    { id: "d6", label: "d6: ~AB 572", x: 620, y: 300 },
+    { id: "e1", label: "e1: AD 436", x: 450, y: 390 },
+    { id: "e2", label: "e2: ~AD 472", x: 570, y: 390 },
+  ]}
+  edges={[
+    { id: "x1", from: "a1", to: "b1" },
+    { id: "x2", from: "a1", to: "b2" },
+    { id: "x3", from: "b1", to: "c1" },
+    { id: "x4", from: "b1", to: "c2" },
+    { id: "x5", from: "b2", to: "c3" },
+    { id: "x6", from: "b2", to: "c4" },
+    { id: "x7", from: "c1", to: "d1" },
+    { id: "x8", from: "c1", to: "d2" },
+    { id: "x9", from: "c2", to: "d3" },
+    { id: "x10", from: "c2", to: "d4" },
+    { id: "x11", from: "c3", to: "d5" },
+    { id: "x12", from: "c3", to: "d6" },
+    { id: "x13", from: "d5", to: "e1" },
+    { id: "x14", from: "d5", to: "e2" },
+  ]}
+  steps={[
+    {
+      label: "1 · refine a1 : 375",
+      note: "OPEN = [a1:375]\nInsert b1:375 (BD), b2:414 (~BD).\nOPEN = [b1:375, b2:414]",
+      nodes: { a1: "current" },
+    },
+    {
+      label: "2 · refine b1 : 375",
+      note: "Min b1:375.\nInsert c1:418 (CD), c2:410 (~CD).\nOPEN = [c2:410, b2:414, c1:418]",
+      nodes: { a1: "explored", b1: "current" },
+    },
+    {
+      label: "3 · refine c2 : 410",
+      note: "~CD jumps ahead of its parent's sibling!\nInsert d3:434 (AB), d4:468 (~AB).\nOPEN = [b2:414, c1:418, d3:434, d4:468]",
+      nodes: { a1: "explored", b1: "explored", c2: "current" },
+    },
+    {
+      label: "4 · refine b2 : 414",
+      note: "Min b2:414.\nInsert c3:414 (CD), c4:452 (~CD).\nOPEN = [c3:414, c1:418, d3:434, c4:452, d4:468]",
+      nodes: { a1: "explored", b1: "explored", c2: "explored", b2: "current" },
+    },
+    {
+      label: "5 · refine c3 : 414",
+      note: "Tie 414 broken by ref #.\nInsert d5:414 (AB), d6:572 (~AB).\nOPEN = [d5:414, c1:418, d3:434, c4:452, d4:468, d6:572]",
+      nodes: { a1: "explored", b1: "explored", b2: "explored", c2: "explored", c3: "current" },
+    },
+    {
+      label: "6 · refine d5 : 414",
+      note: "Internal node → refined, NOT a tour.\nInsert e1:436 (AD), e2:472 (~AD).\nOPEN = [c1:418, d3:434, e1:436, c4:452, d4:468, e2:472, d6:572]",
+      nodes: { a1: "explored", b1: "explored", b2: "explored", c2: "explored", c3: "explored", d5: "current" },
+    },
+    {
+      label: "7 · refine c1 : 418",
+      note: "Min c1:418.\nInsert d1:456 (AB), d2:548 (~AB).\nOPEN = [d3:434, e1:436, c4:452, d1:456, d4:468, e2:472, d2:548, d6:572]",
+      nodes: { a1: "explored", b1: "explored", b2: "explored", c1: "current", c2: "explored", c3: "explored", d5: "explored" },
+    },
+    {
+      label: "8 · pop d3 : 434 = TOUR",
+      note: "Minimum d3:434 is childless = complete tour.\nEverything open ≥ 436 > 434 → optimal.\nTour: A-B-D-E-C-A, cost 434.",
+      nodes: {
+        a1: "explored",
+        b1: "explored",
+        b2: "explored",
+        c1: "explored",
+        c2: "explored",
+        c3: "explored",
+        d5: "explored",
+        d3: "path",
+        c4: "frontier",
+        d1: "frontier",
+        d2: "frontier",
+        d4: "frontier",
+        d6: "frontier",
+        e1: "frontier",
+        e2: "frontier",
+      },
+    },
   ]}
 />
 
-*Amber = the 7 refined nodes (pop order: a1, b1, c2, b2, c3, d5, c1). Green = d3, the optimal tour at 434.*
+*Amber marks each pop in order (a1, b1, c2, b2, c3, d5, c1); green = d3, the optimal tour at 434.*
 
 ## Tricks & Tips for This Question Family
 

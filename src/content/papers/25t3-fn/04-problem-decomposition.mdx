@@ -105,7 +105,7 @@ Interactive trace:
         { data: { id: "G", label: "G 3", type: "frontier" }, position: { x: 600, y: 240 } },
         { data: { id: "K", label: "K 8", type: "primitive" }, position: { x: 720, y: 240 } },
         { data: { id: "J", label: "J 6", type: "primitive" }, position: { x: 540, y: 350 } },
-        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 800, y: 240 } },
+        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 850, y: 240 } },
         { data: { id: "e1", source: "S", target: "A", label: "OR" } },
         { data: { id: "e2", source: "S", target: "B", label: "AND", type: "path" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND", type: "path" } },
@@ -140,7 +140,7 @@ Interactive trace:
         { data: { id: "G", label: "G 3", type: "frontier" }, position: { x: 600, y: 240 } },
         { data: { id: "K", label: "K 8", type: "primitive" }, position: { x: 720, y: 240 } },
         { data: { id: "J", label: "J 6", type: "primitive" }, position: { x: 540, y: 350 } },
-        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 800, y: 240 } },
+        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 850, y: 240 } },
         { data: { id: "e1", source: "S", target: "A", label: "OR" } },
         { data: { id: "e2", source: "S", target: "B", label: "AND", type: "path" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND", type: "path" } },
@@ -175,7 +175,7 @@ Interactive trace:
         { data: { id: "G", label: "G 3", type: "frontier" }, position: { x: 600, y: 240 } },
         { data: { id: "K", label: "K 8", type: "primitive" }, position: { x: 720, y: 240 } },
         { data: { id: "J", label: "J 6", type: "primitive" }, position: { x: 540, y: 350 } },
-        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 800, y: 240 } },
+        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 850, y: 240 } },
         { data: { id: "e1", source: "S", target: "A", label: "OR" } },
         { data: { id: "e2", source: "S", target: "B", label: "AND", type: "path" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND", type: "path" } },
@@ -210,7 +210,7 @@ Interactive trace:
         { data: { id: "G", label: "G 3", type: "current" }, position: { x: 600, y: 240 } },
         { data: { id: "K", label: "K 8", type: "primitive" }, position: { x: 720, y: 240 } },
         { data: { id: "J", label: "J 6", type: "primitive" }, position: { x: 540, y: 350 } },
-        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 800, y: 240 } },
+        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 850, y: 240 } },
         { data: { id: "e1", source: "S", target: "A", label: "OR" } },
         { data: { id: "e2", source: "S", target: "B", label: "AND", type: "path" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND", type: "path" } },
@@ -245,7 +245,7 @@ Interactive trace:
         { data: { id: "G", label: "G =18", type: "explored" }, position: { x: 600, y: 240 } },
         { data: { id: "K", label: "K 8", type: "primitive" }, position: { x: 720, y: 240 } },
         { data: { id: "J", label: "J 6", type: "primitive" }, position: { x: 540, y: 350 } },
-        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 800, y: 240 } },
+        { data: { id: "L", label: "L 2", type: "primitive" }, position: { x: 850, y: 240 } },
         { data: { id: "e1", source: "S", target: "A", label: "OR" } },
         { data: { id: "e2", source: "S", target: "B", label: "AND", type: "path" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND", type: "path" } },
@@ -271,7 +271,7 @@ Interactive trace:
 
 - **4.1** — expansions: **S, C, B, G** (alternate `C,B,G` drops S).
 - **4.2** — S after each: **22, 24, 26, 28** (alternate `24,26,28` from C onwards).
-- **4.3** — **B (inadmissible)**: $h(A) = 30 > h^*(A) = 12$ ($A = $ AND(E,I) $= (4+2)+(4+2)$) — a massive overestimate.
+- **4.3** — **B (inadmissible)**: $h(A) = 30 > h^*(A) = 18$. A's only solvable option is AND(E, I), and E's *true* cost is $E = \text{AND}(H,I) = (2+2)+(4+2) = 10$, so $A = (10+2)+(4+2) = 18$ — a massive overestimate.
 
 ## Tricks & Tips
 
@@ -279,7 +279,7 @@ Interactive trace:
 1. Arcs first: S's AND spans (B,C); B has THREE children — AND(F,G) plus the OR escape to primitive K.
 2. The +2-per-step rhythm (22 → 24 → 26 → 28) is a good self-check: each expansion refines exactly one branch by its edge cost.
 3. G = AND(J,K) = 18 is the bomb: it blows up AND(F,G) to 23 and flips B onto K = 10.
-4. Inadmissibility: h(A) = 30 vs true 12 — the giveaway.
+4. Inadmissibility: h(A) = 30 vs true 18 (E alone really costs AND(H,I) = 10) — the giveaway.
 </Accordion>
 
 **Answers:** 4.1 `S,C,B,G` · 4.2 `22,24,26,28` · 4.3 **B**

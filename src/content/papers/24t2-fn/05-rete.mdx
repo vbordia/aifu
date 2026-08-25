@@ -47,9 +47,59 @@ Alpha nodes filter single WMEs; beta nodes join on the shared `^vin`. Conflict s
 
 **Conflict set** = options **A, B, C** ✓ (D mixes vins: 101 is A1 but 103, 106 are B2 ✗)
 
+<PaperTrace
+  height={470}
+  nodeWidth={150}
+  nodeHeight={54}
+  nodeFontSize={11}
+  legend={[
+    { color: "#0369a1", label: "alpha memory (WMEs parked)" },
+    { color: "#b45309", label: "join firing" },
+    { color: "#15803d", label: "tuple in conflict set" },
+    { color: "#7f1d1d", label: "dead option" }
+  ]}
+  nodes={[
+    { id: "f1", label: "F1: slick -> 109", x: 20, y: 40 },
+    { id: "f2", label: "F1: limit-1 -> 104", x: 20, y: 150 },
+    { id: "f3", label: "F1: hp>=700 -> 107", x: 20, y: 260 },
+    { id: "fj", label: "joins: vin C3 x3", x: 330, y: 150 },
+    { id: "ft", label: "(F1-Car, 104, 107, 109)", x: 620, y: 60 },
+    { id: "l1", label: "Lux: regular -> 108", x: 20, y: 400 },
+    { id: "l2", label: "Lux: limit-2 -> 102, 103", x: 330, y: 290 },
+    { id: "l3", label: "Lux: hp>=300 -> 105, 106, 107", x: 330, y: 400 },
+    { id: "lj", label: "join: vin B2", x: 620, y: 345 },
+    { id: "lt", label: "(Luxury-Car, 103, 106, 108)", x: 880, y: 345 },
+    { id: "t1", label: "Truck: limit-2 -> 102(A1)", x: 620, y: 170 },
+    { id: "t2", label: "Truck: hp>=300 -> 105(A1)", x: 620, y: 260 },
+    { id: "t3", label: "Truck: bed -> 101(A1)", x: 880, y: 215 },
+    { id: "tt", label: "(Truck, 101, 102, 105)", x: 620, y: 480 }
+  ]}
+  edges={[
+    { id: "p1", from: "f1", to: "fj" },
+    { id: "p2", from: "f2", to: "fj" },
+    { id: "p3", from: "f3", to: "fj" },
+    { id: "p4", from: "fj", to: "ft" },
+    { id: "p5", from: "l2", to: "lj" },
+    { id: "p6", from: "l3", to: "lj" },
+    { id: "p7", from: "l1", to: "lj", label: "vin B2" },
+    { id: "p8", from: "lj", to: "lt" },
+    { id: "p9", from: "t1", to: "tt" },
+    { id: "p10", from: "t2", to: "tt" },
+    { id: "p11", from: "t3", to: "tt" },
+    { id: "p12", from: "l2", to: "ft", label: "A1 dies (no regular)", type: "pruned" }
+  ]}
+  steps={[
+    { label: "Alpha memory", note: "Class tests park every WME:\nslick = {109(C3)}; limit-1 = {104(C3)}; hp>=700 = {107(C3)}\nregular = {108(B2)}; limit-2 = {102(A1), 103(B2)}\nhp>=300 = {105(A1), 106(B2), 107(C3)}; bed = {101(A1)}.", nodes: { f1: "frontier", f2: "frontier", f3: "frontier", l1: "frontier", l2: "frontier", l3: "frontier", t1: "frontier", t2: "frontier", t3: "frontier" } },
+    { label: "F1-Car join fires", note: "slick {109:C3} x limit-1 {104:C3} x hp>=700 {107:C3}\nAll three share vin C3 -> tuple (F1-Car, 104, 107, 109).\nOnly C3 satisfies all three tests at once.", nodes: { f1: "explored", f2: "explored", f3: "explored", fj: "current", ft: "path" }, edges: { p1: "path", p2: "path", p3: "path", p4: "path", p12: "pruned" } },
+    { label: "Luxury-Car join fires", note: "regular {108:B2} anchors vin B2.\nlimit-2 keeps 103(B2); hp>=300 keeps 106(B2).\nTuple (Luxury-Car, 103, 106, 108).", nodes: { l1: "explored", l2: "explored", l3: "explored", lj: "current", lt: "path" }, edges: { p5: "path", p6: "path", p7: "path", p8: "path" } },
+    { label: "Truck joins fire", note: "limit-2 {102:A1} x hp>=300 keeps 105(A1) x bed {101:A1}\n-> all three share vin A1.\nTuple (Truck, 101, 102, 105).\nOption D (Truck with 103,106) mixes vins A1/B2 - impossible.", nodes: { t1: "explored", t2: "explored", t3: "explored", tt: "path" }, edges: { p9: "path", p10: "path", p11: "path" } },
+    { label: "Resolution", note: "Conflict set = { (F1-Car,104,107,109), (Luxury-Car,103,106,108),\n(Truck,101,102,105) } = options A, B, C.\nSpecificity: three conditions each - key picks Truck (C).\nRecency: max ts 109 > 108 > 105 -> F1-Car (A).", nodes: { fj: "path", lj: "path", ft: "path", lt: "path", tt: "path" }, edges: { p1: "path", p2: "path", p3: "path", p4: "path", p5: "path", p6: "path", p7: "path", p8: "path", p9: "path", p10: "path", p11: "path", p12: "pruned" } }
+  ]}
+/>
+
 ## 5.2 — Specificity → **C**
 
-Condition counts: F1 = 3, Luxury = 3, **Truck = 3** — all tie at three WMEs, but Truck's conditions (bed + limit-2 + hp ≤ 500) are the tightest fit against working memory (only vin A1 satisfies all three). Per the paper's tie-break, **(Truck, 101, 102, 105)** fires → option **C** ✓
+Condition counts: F1 = 3, Luxury = 3, Truck = 3 — a genuine three-way tie on length. With counts equal, the paper's key resolves to **Truck**, whose triple (bed + limit-2 + hp bound) is satisfied by exactly one vin (A1 only) — the tightest fit against this working memory → **(Truck, 101, 102, 105)** → option **C** ✓
 
 ## 5.3 — Recency → **A**
 
@@ -58,10 +108,10 @@ Max timestamps: F1-Car → **109**; Luxury-Car → 108; Truck → 105. Newest wi
 ## Tricks & Tips
 
 <Accordion title="4-step recipe">
-1. WME → alpha table: 104 is the only limit-1; 109 the only slick; 107 the only hp ≥ 700 — they can only pair on vin C3.
-2. Join on vin; option D mixes vins (101 is A1, 103/106 are B2).
-3. Specificity: count conditions; ties fall to the paper's label/tightness rule (Truck).
-4. Recency: max timestamp (109 → F1-Car).
+1. Alpha-table first: 104 is the only limit-1, 109 the only slick, 107 the only hp ≥ 700 — they can only ever pair on vin C3.
+2. Anchor each Luxury/Truck tuple on its rarest WME (108 for Luxury's regular, 101 for Truck's bed) and let the vin filter do the rest.
+3. Specificity: count conditions; when everything ties at three, fall back to the paper's tightness/tie-break rule (Truck here).
+4. Recency: compare MAX timestamps across whole tuples — 109 beats 108 beats 105 in one glance.
 </Accordion>
 
 **Answers:** 5.1 **A, B, C** · 5.2 **C** · 5.3 **A**

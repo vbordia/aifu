@@ -193,6 +193,110 @@ export default function CytoscapeGraph({
             "target-arrow-color": dark ? "#22c55e" : "#16a34a",
           },
         },
+        {
+          selector: "edge[type = 'active']",
+          style: {
+            width: 4,
+            "line-color": dark ? "#f59e0b" : "#b45309",
+            "target-arrow-color": dark ? "#f59e0b" : "#b45309",
+          },
+        },
+        {
+          selector: "edge[type = 'pruned']",
+          style: {
+            "line-style": "dashed",
+            width: 2,
+            opacity: 0.45,
+            "line-color": dark ? "#9f1239" : "#be123c",
+            "target-arrow-color": dark ? "#9f1239" : "#be123c",
+          },
+        },
+        {
+          selector: "edge[type = 'convex']",
+          style: {
+            width: 3,
+            "line-color": dark ? "#4ade80" : "#15803d",
+            "target-arrow-color": dark ? "#4ade80" : "#15803d",
+          },
+        },
+        {
+          selector: "edge[type = 'concave']",
+          style: {
+            width: 3,
+            "line-style": "dashed",
+            "line-color": dark ? "#38bdf8" : "#0369a1",
+            "target-arrow-color": dark ? "#38bdf8" : "#0369a1",
+          },
+        },
+        {
+          selector: "edge[type = 'border']",
+          style: {
+            width: 2,
+            "line-style": "dotted",
+            opacity: 0.7,
+            "line-color": dark ? "#9ca3af" : "#6b7280",
+            "target-arrow-shape": "none",
+            "target-arrow-color": dark ? "#9ca3af" : "#6b7280",
+          },
+        },
+        {
+          selector: "node[type = 'solved']",
+          style: {
+            shape: "round-rectangle",
+            "background-color": dark ? "#4c1d95" : "#6d28d9",
+            "border-color": dark ? "#a78bfa" : "#4c1d95",
+            "border-width": 3,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'pruned']",
+          style: {
+            opacity: 0.35,
+            "background-color": dark ? "#450a0a" : "#7f1d1d",
+            "border-color": dark ? "#9f1239" : "#be123c",
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'alpha']",
+          style: {
+            shape: "round-rectangle",
+            "background-color": dark ? "#134e4a" : "#0f766e",
+            "border-color": dark ? "#5eead4" : "#134e4a",
+            "border-width": 2,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'beta']",
+          style: {
+            shape: "round-rectangle",
+            "background-color": dark ? "#701a37" : "#9d174d",
+            "border-color": dark ? "#f9a8d4" : "#701a37",
+            "border-width": 2,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'terminal']",
+          style: {
+            shape: "ellipse",
+            "background-color": dark ? "#1e293b" : "#334155",
+            "border-color": dark ? "#94a3b8" : "#1e293b",
+            "border-width": 2,
+            color: "#ffffff",
+          },
+        },
+        {
+          selector: "node[type = 'unassigned']",
+          style: {
+            "background-color": dark ? "#1f2937" : "#e5e7eb",
+            "border-color": dark ? "#4b5563" : "#9ca3af",
+            "border-width": 2,
+            color: dark ? "#d1d5db" : "#374151",
+          },
+        },
       ],
       layout: layout ?? defaultLayout,
     });

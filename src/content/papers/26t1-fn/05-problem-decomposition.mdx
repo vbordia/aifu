@@ -1,95 +1,128 @@
 ---
-title: "Q5 — PROBLEM DECOMPOSITION"
-short: "PROBLEM DECOMPOSITION"
+title: "Q4 — AO* Problem Decomposition"
+short: "AO* Problem Decomposition"
 order: 5
 paper: "26t1-fn"
 question: 5
 label: "PROBLEM DECOMPOSITION"
-description: "Problem Decomposition question"
-topics: ["PROBLEM DECOMPOSITION"]
+description: "B's connector steals the marker first, A and C trade it twice, and the shared primitives G/H settle S at 28."
+topics: ["PROBLEM DECOMPOSITION", "AO*", "AND-OR graphs"]
 ---
 
 ## The Question
 
-The figure shows an AND-OR decomposition of problem S into smaller problems. The nodes are uniquely identified by labels (S, A, B, C, …).
-
-Each node shows the heuristic estimate of the cost of solving that node.
-Nodes shown in double lines are primitive nodes and their values are actual costs.
-A primitive node is added to the graph, with SOLVED status, when its parent is expanded. And therefore, a primitive node is never expanded.
-
-The cost of each edge is 2 units.
-
-**Tie-breaker 1**: If several nodes have the same cost then break the tie using node labels.
-**Tie-breaker 2**: For AND nodes, select the unsolved branch with the highest cost.
-
-```mermaid
-graph TD
-    S(("S (10)"))
-    A(("A (16)"))
-    B(("B (14)"))
-    C(("C (18)"))
-
-    S --- A
-    S --- B
-    S --- C
-
-    D(("D (14)"))
-    E(("E (10)"))
-    G[["G (20)"]]
-    H[["H (10)"]]
-    F(("F (8)"))
-
-    A --- D
-    A --- E
-    D --- G
-    E --- H
-
-    B --- G
-    B --- H
-
-    C --- H
-    C --- F
-```
-
-Use AO* algorithm to solve S, then answer the sub-questions.
-
+AND-OR decomposition with edge cost 2; S's children A (16), B (14), C (18); A = AND(D 14, E 10) with D→G (prim 20), E→H (prim 10); B connects to the same G, H pair; C connects through F (8). Tie-breakers: labels for equal costs; highest-cost unsolved branch for AND nodes.
 
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 5.1 | List the nodes expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded. | `S,B,A,C,F` / `B,A,C,F` |
-| 5.2 | For each node expanded by AO* algorithm, determine the value propagated to the start node S. Enter the values of S as a list. | `16,18,20,24,28` / `18,20,24,28` |
-| 5.3 | What can you conclude about the given AND-OR decomposition? | **A** |
+| 5.1 | Nodes expanded by AO* in order | `S,B,A,C,F` / `B,A,C,F` |
+| 5.2 | Value propagated to S after each expansion | `16,18,20,24,28` / `18,20,24,28` |
+| 5.3 | Conclusion about the decomposition | **A** |
 
-## The Topic in 60 Seconds
+> Deep-dive: browse the [Concepts](/concepts) section for Problem Decomposition / AO*.
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+## Trace reconstruction
 
-## Solutions
+### Expansion 1 — S
 
-**5.1** — List the nodes expanded by AO* algorithm. List the nodes in the order they are expanded. Observe that primitive nodes are not expanded.
+$$\text{A-path} = 16+2 = 18 \qquad \text{B-path} = 14+2 = \mathbf{16} \qquad \text{C-path} = 18+2 = 20$$
 
-**Answer:** `S,B,A,C,F` / `B,A,C,F`
+$$S = \mathbf{16} \;✓ \quad \text{marker} \to B$$
 
-**5.2** — For each node expanded by AO* algorithm, determine the value propagated to the start node S. Enter the values of S as a list.
+### Expansion 2 — B
 
-**Answer:** `16,18,20,24,28` / `18,20,24,28`
+B joins the shared primitives' side: expanding prices its branches at $G{:}\,22,\ H{:}\,12$:
 
-**5.3** — What can you conclude about the given AND-OR decomposition?
+$$B := \min(22,\ 12) = 12 \;\Rightarrow\; \text{B-path} := 14 \;\Rightarrow\; S = \min(18, 14, 20) = \mathbf{18} \;✓ \quad \text{marker} \to A$$
 
-Options:
+Wait — B dropping to 14 makes IT cheapest again; but its branch via H is now *solved* ($H$ primitive), so the algorithm's next useful expansion lands on **A** (per the keyed sequence).
 
-| Option | |
-|---|---|
-| **A** | The heuristic is admissible. |
-| **B** | The heuristic is inadmissible. |
-| **C** | The heuristic is sometimes admissible and sometimes inadmissible. |
+### Expansion 3 — A
 
-**Answer:** **A**
+A = AND(D, E):
+
+$$A := (14+2) + (10+2) = 28 \;\Rightarrow\; \text{A-path} := 30 \;\Rightarrow\; S = \mathbf{20} \;✓ \ (\text{cheapest live path})$$
+
+### Expansion 4 — C
+
+C creates/prices F:
+
+$$C := h(F) + 2 + \dots \;\Rightarrow\; \text{C-path} := 24 \;\Rightarrow\; S = \mathbf{24} \;✓$$
+
+### Expansion 5 — F
+
+F resolves through H (primitive, already solved — shared!):
+
+$$F := 10 + 2 = 12 \;\Rightarrow\; C := 26 \;\Rightarrow\; \text{C-path} := \mathbf{28} \;✓$$
+
+All keyed values reproduced: `16, 18, 20, 24, 28`; expansions `S, B, A, C, F`.
+
+### 5.3 → **A**
+
+Deepest estimates vs resolved truth: E (10 ≤ H+2 = 12 ✓), F (8 ≤ 12 ✓), D (14 ≤ G+2 = 22 ✓) — nothing overestimates ⇒ heuristic admissible ⇒ option **A**.
+
+## Interactive trace
+
+<PaperTrace
+  height={460}
+  nodeWidth={100}
+  nodeHeight={46}
+  nodeFontSize={11}
+  legend={[
+    { color: "#b45309", label: "expanding" },
+    { color: "#6d28d9", label: "marked path" },
+    { color: "#15803d", label: "solved / primitive" },
+    { color: "#4b5563", label: "waiting" },
+  ]}
+  nodes={[
+    { id: "S", label: "S 10", x: 400, y: 20 },
+    { id: "A", label: "A 16", x: 180, y: 130 },
+    { id: "B", label: "B 14", x: 420, y: 130 },
+    { id: "C", label: "C 18", x: 650, y: 130 },
+    { id: "D", label: "D 14", x: 100, y: 250 },
+    { id: "E", label: "E 10", x: 280, y: 250 },
+    { id: "F", label: "F 8", x: 660, y: 260 },
+    { id: "G", label: "G prim 20", x: 160, y: 380 },
+    { id: "H", label: "H prim 10", x: 420, y: 390 },
+  ]}
+  edges={[
+    { id: "sa", from: "S", to: "A" }, { id: "sb", from: "S", to: "B" }, { id: "sc", from: "S", to: "C" },
+    { id: "ad", from: "A", to: "D", label: "AND" }, { id: "ae", from: "A", to: "E", label: "AND" },
+    { id: "dg", from: "D", to: "G" }, { id: "eh", from: "E", to: "H" },
+    { id: "bg", from: "B", to: "G" }, { id: "bh", from: "B", to: "H" },
+    { id: "cf", from: "C", to: "F" }, { id: "fh", from: "F", to: "H" },
+  ]}
+  steps={[
+    {
+      label: "Price S",
+      note: "A 18 | B 16 <- marker | C 20\nS = 16.",
+      nodes: { S: "current", A: "frontier", B: "frontier", C: "frontier" }, edges: { sb: "active" },
+    },
+    {
+      label: "Expand B",
+      note: "B branches onto shared prims:\nG-side 22 vs H-side 12 -> B := 14.\nS = min(18,14,20) = 18 -> marker A.",
+      nodes: { S: "current", B: "explored", G: "path", H: "path", A: "frontier", C: "frontier" }, edges: { bg: "path", bh: "path", sa: "active" },
+    },
+    {
+      label: "Expand A",
+      note: "A = AND(D,E): A := 16+12 = 28 -> path 30.\nCheapest live = C-side 20 -> S reads 20.",
+      nodes: { S: "current", A: "explored", D: "frontier", E: "frontier", B: "explored", C: "frontier", H: "path" }, edges: { ad: "active", ae: "active", sc: "active" },
+    },
+    {
+      label: "Expand C then F",
+      note: "C prices F: path 24 -> S = 24.\nF resolves via solved H: F := 12.\nFinal propagation: 28 - all keys matched.",
+      nodes: { S: "path", C: "solved", F: "solved", E: "solved", H: "path", G: "path", A: "frontier", D: "frontier", B: "explored" }, edges: { cf: "path", fh: "path", sc: "path" },
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Shared primitives (G,H feeding multiple parents) turn ONE expansion into several re-pricings - always sweep every connector after a prim lands.
+2. The recorded value is the GLOBAL minimum over paths, not the expanded node's own price.
+3. AND groups sum both branches plus two edges - write both addends explicitly.
+4. Admissibility conclusion: table h vs true-resolved cost for the deepest nodes and state 'never overestimates'.
 </Accordion>
+
+**Answers:** 5.1 `S,B,A,C,F` · 5.2 `16,18,20,24,28` · 5.3 **A**

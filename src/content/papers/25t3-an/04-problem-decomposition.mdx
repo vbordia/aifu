@@ -63,13 +63,13 @@ Mark OR(A) → **S = 10** ✓
 
 Mark AND(D, E) → **A = 7** → $S = \min(16, 9) = \mathbf{9}$ ✓
 
-**Expansion 3 — D** (marked path S→A→D,E; costliest branch D(2) first). D is **primitive** → immediately SOLVED (no cost change — the paper counts this selection step, giving the third value).
+**Expansion 3 — D** (marked path S→A→D,E; costliest branch D(2) > E(1)). D is **primitive** → instantly SOLVED. Nothing to revise: AND(D, E) stays $(2+2)+(1+2) = 7$, A stays 7 and **S stays 9** through this step — the paper still counts the selection as an expansion.
 
 **Expansion 4 — E.**
 E: AND(H, I) $= (1+2)+(8+2) = 13$; H, I primitive → **E = 13, SOLVED**.
 Propagate: AND(D, E) $= (2+2)+(13+2) = 19$ — now worse than OR(I) $= 10$! Marker flips:
 $$A = \min(19, 10) = \mathbf{10} \text{ via primitive } I \Rightarrow \text{A SOLVED}$$
-$$S = \min(16,\ 10+2) = \mathbf{12} \Rightarrow \text{S SOLVED} ✓$$
+$$S = \min(16,\ 10+2) = \mathbf{12}$$ ✓ — S SOLVED
 
 **Final value of S = 12.** Solution subtree: S → A → I.
 
@@ -108,7 +108,7 @@ Interactive trace:
         { data: { id: "e2", source: "S", target: "B", label: "AND" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND" } },
         { data: { id: "e4", source: "A", target: "D", label: "AND" } },
-        { data: { id: "e5", source: "A", target: "E", label: "AND", type: "path" } },
+        { data: { id: "e5", source: "A", target: "E", label: "AND" } },
         { data: { id: "e6", source: "A", target: "I", label: "OR" } },
         { data: { id: "e7", source: "E", target: "H", label: "AND" } },
         { data: { id: "e8", source: "E", target: "I", label: "AND" } },
@@ -142,7 +142,7 @@ Interactive trace:
         { data: { id: "e2", source: "S", target: "B", label: "AND" } },
         { data: { id: "e3", source: "S", target: "C", label: "AND" } },
         { data: { id: "e4", source: "A", target: "D", label: "AND" } },
-        { data: { id: "e5", source: "A", target: "E", label: "AND", type: "path" } },
+        { data: { id: "e5", source: "A", target: "E", label: "AND" } },
         { data: { id: "e6", source: "A", target: "I", label: "OR" } },
         { data: { id: "e7", source: "E", target: "H", label: "AND" } },
         { data: { id: "e8", source: "E", target: "I", label: "AND" } },
@@ -246,8 +246,8 @@ Interactive trace:
         { data: { id: "e4", source: "A", target: "D", label: "AND" } },
         { data: { id: "e5", source: "A", target: "E", label: "AND" } },
         { data: { id: "e6", source: "A", target: "I", label: "OR", type: "path" } },
-        { data: { id: "e7", source: "E", target: "H" } },
-        { data: { id: "e8", source: "E", target: "I" } },
+        { data: { id: "e7", source: "E", target: "H", label: "AND" } },
+        { data: { id: "e8", source: "E", target: "I", label: "AND" } },
         { data: { id: "e9", source: "B", target: "F" } },
         { data: { id: "e10", source: "B", target: "G" } },
         { data: { id: "e11", source: "F", target: "J" } },
@@ -263,7 +263,7 @@ Interactive trace:
 ## Answers, decoded
 
 - **4.1** — expansions: **S, A, D, E** (D is selected on the marked path and immediately SOLVED as primitive; the alternate `A,D,E` drops S).
-- **4.2** — S after each: **10, 9, 10, 12** (alternate `9,10,12` reports from A onwards — after A: 9, after E flips A: 10, final: 12).
+- **4.2** — S runs **10 → 9 → 9 (unchanged through D) → 12**: 10 when OR(A) is marked at S; 9 once A prices at 7; still 9 after the no-op D step; 12 when E's true cost (13) flips A onto I ($A = 10 \Rightarrow S = A + 2 = 12$). The official key writes the story as **`10,9,10,12`** — its third entry records A flipping to **10** during the final revision — while the alternate key **`9,10,12`** reports from the A-expansion onward. Both describe the same three distinct snapshots.
 - **4.3** — **B (inadmissible)**: $h(F) = 8 > h^*(F) = 5$ ($F \to J$) and $h(G) = 10 > h^*(G) = 8$ — overestimates ⇒ inadmissible.
 
 ## Tricks & Tips

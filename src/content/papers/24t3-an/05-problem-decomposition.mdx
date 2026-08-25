@@ -30,7 +30,7 @@ graph TD
     G --- J
 ```
 
-AND arcs: **S** = AND(A, B) *or* OR(C) (per the figure's arc placement and the keyed trace); **A** = AND(D, E); **B** = AND(E, F); **C** = OR(G) with G = AND(J) — the C/G/J corner resolves through primitives. Primitives: H, I, J.
+AND arcs: **S** = AND(A, B) *or* OR(C) (per the figure's arc placement and the keyed trace); **A** = AND(D, E); **B** = AND(E, F); **C** = OR(G) with G = AND(J). Primitives: H, I, J.
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -44,36 +44,185 @@ AO* = expand along **marked arcs** + revise (OR: min child+edge; AND: sum childr
 
 > Deep-dive: [AO* and Goal Trees](/concepts/week-09-goal-trees/01-aostar-goal-trees).
 
-## The Trace — keyed values
+## Step 0 — Cost table
 
-h: S=10, A=10, B=8, C=14, D=16, E=10, F=20, G=10; H=20, I=10, J=10 primitive. Edge = 2.
+| Node | $h$ | Node | $h$ |
+|------|-----|------|-----|
+| S | 10 | E | 10 |
+| A | 10 | F | 20 |
+| B | 8 | G | 10 |
+| C | 14 | H, I, J | 10 each ◉ primitive |
 
-**Expansion 1 — S.** OR(C) $= 14+2 = 16$ undercuts the A/B combination → mark OR(C): **S = 16** ✓
+Edge cost = 2 everywhere.
 
-**Expansion 2 — C.** C's corner resolves through G → J (primitives): **C = 16**, SOLVED — and the revised costs flip the marker onto the A/B combination: **S = 22** ✓
+## How the keyed values arise
 
-**Expansion 3 — A.** A's cheapest branch settles via E: $A = 10 + 2 = 12$ → AND(A, B) $= 14 + 10 = 24$ → $S = \min(26,\ 24) = \mathbf{24}$ ✓
+Read the arc placement first — it decides everything:
 
-**Completion.** Expanding the marked remainder (E, then the D-branch) drives A to its AND-cost 32 — wait, the keyed final: with E solved ($12$) and the D-branch resolved, S settles at **32** via the fully-costed A-branch ($A = (16+2)+(12+2) = 32$... the keyed final is **32** ✓).
+- **Expansion 1 (S).** Price both options: AND(A,B) $= (10+2)+(8+2) = 22$; OR(C) $= 14+2 = 16$. Mark OR(C) → **S = 16** ✓ (5.2, first value).
+- **Expansion 2 (C).** Refining the C-corner drives its price past the AND(A,B) standing estimate of 22, so the marker flips onto the A/B combination → **S = 22** ✓ (5.2, second value — the flip is only possible if C's subtree is genuinely expensive; see the callout below).
+- **Expansion 3 (A).** A's branches refine: its cheap escape through E prices A at $10+2 = 12$, so AND(A,B) reads $(10+2)+(12+2)\ldots$ under the paper's mid-resolution accounting → **S = 24** ✓ (5.2, third value).
+- **Completion.** Once E resolves through primitive I ($E = 10+2 = 12$) and the D-branch is priced in, A's fully-costed conjunction is $(16+2)+(12+2) = \mathbf{32}$ — the final keyed value ✓ (5.3).
 
-**Final value of S = 32.**
+<Callout type="warning" title="Strict AO* on the transcribed figure terminates at 16">
+Executed by the textbook (AND = sum of *all* conjuncts, expand along marked arcs only), the graph exactly as drawn above never touches A or B: C's corner resolves through cheap primitives and finishes the search.
 
-<Callout type="important" title="Why the marker flips twice">
-OR(C) = 16 wins only while C is unexpanded. Once C's corner resolves (16) and A's branches get true costs, the A/B combination trades the lead back and forth — the accepted value lists (16,22,24 and 22,24,26) are the two ways of counting those revisions.
+| Step | Action | Revision | S |
+|------|--------|----------|---|
+| 1 | expand S | AND(A,B) $= 22$, OR(C) $= 16$ → mark C | **16** |
+| 2 | expand C | C $= 10+2 = 12$ → OR(C) $= 14$ | $\min(14, 22) = 14$ |
+| 3 | expand G | G $= 10+2 = 12$ SOLVED → C $= 14$ SOLVED → OR(C) $= 16$ | **16**, branch complete → STOP |
+
+So the strict reading gives expansions S, C, G and a final value of **16** — the official key (`S,C,A`, `16,22,24` → `32`) instead treats the C-corner as expensive and prices mid-level ANDs by their cheapest branch until fully resolved. The key's 32 equals the completely-resolved A-conjunction $(16+2)+(12+2)$, which is the number the original paper's figure produces when its C-branch carries real weight (compare the FN sibling paper, where C = AND(F,G) $= (20+2)+(10+2) = 34$ and the first two keyed values 16, 22 reproduce exactly). If you can spare the time in the exam, write the key's sequence — but know that the strict mechanics give 16 on this transcription.
 </Callout>
+
+Interactive walk-through of the strict execution described above:
+
+<StepGraph
+  height={430}
+  nodeWidth={100}
+  nodeHeight={50}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "expanding now" },
+    { color: "#0369a1", label: "live on marked path" },
+    { color: "#52525b", label: "primitive (born SOLVED)" },
+    { color: "#16a34a", label: "marked / solved" },
+  ]}
+  steps={[
+    {
+      label: "0 · setup",
+      note: "S options:\nAND(A,B) = (10+2)+(8+2) = 22\nOR(C) = 14+2 = 16 ← MARK\nS = 16",
+      elements: [
+        { data: { id: "S", label: "S =16", type: "frontier" }, position: { x: 400, y: 30 } },
+        { data: { id: "A", label: "A 10", type: "explored" }, position: { x: 180, y: 140 } },
+        { data: { id: "B", label: "B 8", type: "explored" }, position: { x: 400, y: 140 } },
+        { data: { id: "C", label: "C 14", type: "frontier" }, position: { x: 660, y: 140 } },
+        { data: { id: "D", label: "D 16", type: "explored" }, position: { x: 80, y: 270 } },
+        { data: { id: "E", label: "E 10", type: "explored" }, position: { x: 280, y: 270 } },
+        { data: { id: "F", label: "F 20", type: "explored" }, position: { x: 520, y: 270 } },
+        { data: { id: "G", label: "G 10", type: "frontier" }, position: { x: 780, y: 270 } },
+        { data: { id: "H", label: "H 20", type: "primitive" }, position: { x: 120, y: 390 } },
+        { data: { id: "I", label: "I 10", type: "primitive" }, position: { x: 360, y: 390 } },
+        { data: { id: "J", label: "J 10", type: "primitive" }, position: { x: 660, y: 390 } },
+        { data: { id: "e1", source: "S", target: "A", label: "AND" } },
+        { data: { id: "e2", source: "S", target: "B", label: "AND" } },
+        { data: { id: "e3", source: "S", target: "C", label: "OR", type: "path" } },
+        { data: { id: "e4", source: "A", target: "D", label: "AND" } },
+        { data: { id: "e5", source: "A", target: "E", label: "AND" } },
+        { data: { id: "e6", source: "B", target: "E", label: "AND" } },
+        { data: { id: "e7", source: "B", target: "F", label: "AND" } },
+        { data: { id: "e8", source: "C", target: "G" } },
+        { data: { id: "e9", source: "D", target: "H" } },
+        { data: { id: "e10", source: "E", target: "I" } },
+        { data: { id: "e11", source: "F", target: "J" } },
+        { data: { id: "e12", source: "G", target: "J" } },
+      ],
+    },
+    {
+      label: "1 · expand C",
+      note: "Marked path: S→C.\nGenerate G (h=10).\nC = 10+2 = 12 (live)\nOR(C) = 14 < 22 → marker stays.\nS = min(14, 22) = 14",
+      elements: [
+        { data: { id: "S", label: "S =14", type: "explored" }, position: { x: 400, y: 30 } },
+        { data: { id: "A", label: "A 10", type: "explored" }, position: { x: 180, y: 140 } },
+        { data: { id: "B", label: "B 8", type: "explored" }, position: { x: 400, y: 140 } },
+        { data: { id: "C", label: "C 14→12", type: "current" }, position: { x: 660, y: 140 } },
+        { data: { id: "D", label: "D 16", type: "explored" }, position: { x: 80, y: 270 } },
+        { data: { id: "E", label: "E 10", type: "explored" }, position: { x: 280, y: 270 } },
+        { data: { id: "F", label: "F 20", type: "explored" }, position: { x: 520, y: 270 } },
+        { data: { id: "G", label: "G 10", type: "frontier" }, position: { x: 780, y: 270 } },
+        { data: { id: "H", label: "H 20", type: "primitive" }, position: { x: 120, y: 390 } },
+        { data: { id: "I", label: "I 10", type: "primitive" }, position: { x: 360, y: 390 } },
+        { data: { id: "J", label: "J 10", type: "primitive" }, position: { x: 660, y: 390 } },
+        { data: { id: "e1", source: "S", target: "A", label: "AND" } },
+        { data: { id: "e2", source: "S", target: "B", label: "AND" } },
+        { data: { id: "e3", source: "S", target: "C", label: "OR", type: "path" } },
+        { data: { id: "e4", source: "A", target: "D", label: "AND" } },
+        { data: { id: "e5", source: "A", target: "E", label: "AND" } },
+        { data: { id: "e6", source: "B", target: "E", label: "AND" } },
+        { data: { id: "e7", source: "B", target: "F", label: "AND" } },
+        { data: { id: "e8", source: "C", target: "G", type: "active" } },
+        { data: { id: "e9", source: "D", target: "H" } },
+        { data: { id: "e10", source: "E", target: "I" } },
+        { data: { id: "e11", source: "F", target: "J" } },
+        { data: { id: "e12", source: "G", target: "J" } },
+      ],
+    },
+    {
+      label: "2 · expand G",
+      note: "Marked path: S→C→G.\nG's child J is primitive (10).\nG = 10+2 = 12 SOLVED\nC = 12+2 = 14 SOLVED\nOR(C) = 16",
+      elements: [
+        { data: { id: "S", label: "S =14", type: "explored" }, position: { x: 400, y: 30 } },
+        { data: { id: "A", label: "A 10", type: "explored" }, position: { x: 180, y: 140 } },
+        { data: { id: "B", label: "B 8", type: "explored" }, position: { x: 400, y: 140 } },
+        { data: { id: "C", label: "C =14", type: "explored" }, position: { x: 660, y: 140 } },
+        { data: { id: "D", label: "D 16", type: "explored" }, position: { x: 80, y: 270 } },
+        { data: { id: "E", label: "E 10", type: "explored" }, position: { x: 280, y: 270 } },
+        { data: { id: "F", label: "F 20", type: "explored" }, position: { x: 520, y: 270 } },
+        { data: { id: "G", label: "G =12", type: "current" }, position: { x: 780, y: 270 } },
+        { data: { id: "H", label: "H 20", type: "primitive" }, position: { x: 120, y: 390 } },
+        { data: { id: "I", label: "I 10", type: "primitive" }, position: { x: 360, y: 390 } },
+        { data: { id: "J", label: "J 10", type: "primitive" }, position: { x: 660, y: 390 } },
+        { data: { id: "e1", source: "S", target: "A", label: "AND" } },
+        { data: { id: "e2", source: "S", target: "B", label: "AND" } },
+        { data: { id: "e3", source: "S", target: "C", label: "OR", type: "path" } },
+        { data: { id: "e4", source: "A", target: "D", label: "AND" } },
+        { data: { id: "e5", source: "A", target: "E", label: "AND" } },
+        { data: { id: "e6", source: "B", target: "E", label: "AND" } },
+        { data: { id: "e7", source: "B", target: "F", label: "AND" } },
+        { data: { id: "e8", source: "C", target: "G", type: "path" } },
+        { data: { id: "e9", source: "D", target: "H" } },
+        { data: { id: "e10", source: "E", target: "I" } },
+        { data: { id: "e11", source: "F", target: "J" } },
+        { data: { id: "e12", source: "G", target: "J", type: "active" } },
+      ],
+    },
+    {
+      label: "3 · S solved = 16",
+      note: "Marked branch S→C→G→J fully solved → STOP.\nStrict final value of S = 16.\nA and B are never expanded.\nOfficial key reports S,C,A → 32: it treats the C-corner as expensive (see callout).",
+      elements: [
+        { data: { id: "S", label: "S =16 ✓", type: "path" }, position: { x: 400, y: 30 } },
+        { data: { id: "A", label: "A 10", type: "explored" }, position: { x: 180, y: 140 } },
+        { data: { id: "B", label: "B 8", type: "explored" }, position: { x: 400, y: 140 } },
+        { data: { id: "C", label: "C =14 ✓", type: "path" }, position: { x: 660, y: 140 } },
+        { data: { id: "D", label: "D 16", type: "explored" }, position: { x: 80, y: 270 } },
+        { data: { id: "E", label: "E 10", type: "explored" }, position: { x: 280, y: 270 } },
+        { data: { id: "F", label: "F 20", type: "explored" }, position: { x: 520, y: 270 } },
+        { data: { id: "G", label: "G =12 ✓", type: "path" }, position: { x: 780, y: 270 } },
+        { data: { id: "H", label: "H 20", type: "primitive" }, position: { x: 120, y: 390 } },
+        { data: { id: "I", label: "I 10", type: "primitive" }, position: { x: 360, y: 390 } },
+        { data: { id: "J", label: "J 10", type: "primitive" }, position: { x: 660, y: 390 } },
+        { data: { id: "e1", source: "S", target: "A", label: "AND" } },
+        { data: { id: "e2", source: "S", target: "B", label: "AND" } },
+        { data: { id: "e3", source: "S", target: "C", label: "OR", type: "path" } },
+        { data: { id: "e4", source: "A", target: "D", label: "AND" } },
+        { data: { id: "e5", source: "A", target: "E", label: "AND" } },
+        { data: { id: "e6", source: "B", target: "E", label: "AND" } },
+        { data: { id: "e7", source: "B", target: "F", label: "AND" } },
+        { data: { id: "e8", source: "C", target: "G", type: "path" } },
+        { data: { id: "e9", source: "D", target: "H" } },
+        { data: { id: "e10", source: "E", target: "I" } },
+        { data: { id: "e11", source: "F", target: "J" } },
+        { data: { id: "e12", source: "G", target: "J", type: "path" } },
+      ],
+    },
+  ]}
+/>
 
 ## Answers, decoded
 
-- **5.1** — expansions: **S, C, A** (alternate `C,A,E` drops S and counts E's expansion).
-- **5.2** — S after each: **16, 22, 24** (alternate `22,24,26` from C onwards).
-- **5.3** — final: **32**.
+- **5.1** — keyed expansions: **S, C, A** (alternate `C,A,E` drops S and starts counting at C).
+- **5.2** — keyed S values: **16, 22, 24** (alternate `22,24,26` counts from C onwards).
+- **5.3** — keyed final: **32** (= fully-resolved A-conjunction $(16+2)+(12+2)$). Strict textbook execution on the drawn figure ends at **16** — see the callout before choosing which to write.
 
 ## Tricks & Tips
 
-<Accordion title="Fast method">
-1. Read the arc placement off the figure — it decides which combination S's AND covers.
-2. Track every S option at each revision; the marker follows the minimum.
-3. Primitive grandchildren (I, J) resolve their parents cheaply — watch E and G.
+<Accordion title="Fast method for AO* traces like this">
+1. Draw the AND arcs first — misreading which pairs are conjuncts is the #1 error. Here S's pair spans (A, B) and C hangs off a separate OR edge.
+2. Expansion 1 is always S: price every option explicitly ((child+edge) sums) and mark the minimum — that immediately gives the first keyed value, 16.
+3. Track the marker, not just the numbers: after every revision ask "who is cheapest now?" The keyed 22 exists only because the marker jumps to AND(A,B) once C's corner proves costly.
+4. Primitive grandchildren resolve parents instantly (I under E, J under F/G) — that's where the final 32 comes from: E refined to 12 completes A at (16+2)+(12+2).
+5. If your strict arithmetic disagrees with the key, recheck the arc placement against the original figure before doubting your sums — these keys are produced from the printed figure, not the transcript.
 </Accordion>
 
 **Answers:** 5.1 `S,C,A` · 5.2 `16,22,24` · 5.3 `32`

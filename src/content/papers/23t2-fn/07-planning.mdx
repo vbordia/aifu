@@ -5,8 +5,8 @@ order: 6
 paper: "23t2-fn"
 question: 6
 label: "AUTOMATED PLANNING"
-description: "Blocks World planning graph"
-topics: ["AUTOMATED PLANNING"]
+description: "The Blocks World four-pack: applicable now, relevant to the goal, layer-1 action mutexes, and the proposition mutexes they force next layer."
+topics: ["AUTOMATED PLANNING", "STRIPS", "Planning graph", "Mutex"]
 ---
 
 ## The Question
@@ -29,7 +29,18 @@ The domain description of a Blocks World with a single one-armed robot is given 
 
 `Putdown(X)`: place X on the table.
   Preconditions: `{ holding(X) }`
-  Add Effects: `&#123; 
+  Add Effects: `{ armEmpty, onTable(X) }`
+  Del Effects: `{ holding(X) }`
+
+`Unstack(X,Y)`: pick up X sitting on Y.
+  Preconditions: `{ armEmpty, clear(X), on(X,Y) }`
+  Add Effects: `{ clear(Y), holding(X) }`
+  Del Effects: `{ armEmpty, on(X,Y) }`
+
+`Stack(X,Y)`: place X onto Y.
+  Preconditions: `{ holding(X), clear(Y) }`
+  Add Effects: `{ armEmpty, on(X,Y) }`
+  Del Effects: `{ holding(X), clear(Y) }`
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -38,29 +49,69 @@ The domain description of a Blocks World with a single one-armed robot is given 
 | 6.3 | In the planning graph, which of the following are mutex action pairs in Layer 1? | `A,B,C` |
 | 6.4 | In the planning graph, which of the following are mutex proposition pairs in Lay | `C,D` |
 
+<Callout type="warning" title="Source-data notice">
+Start state, goal and option texts were lost in transcription (operators completed from the standard domain shared across this paper family). Official answers preserved verbatim; the machinery below regenerates all four from the printed instance.
+</Callout>
+
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+| Test | Against | Pass condition |
+|---|---|---|
+| Applicable | start state | $\text{PRE}(a) \subseteq \text{state}$ |
+| Relevant | goal | ADD writes ≥1 goal literal AND DEL destroys none |
+| Action mutex L1 | pair in layer 1 | inconsistent effects OR competing needs (preconditions prop-mutex in L0) |
+| Prop mutex L2 | pair in layer 2 | ALL producer pairs action-mutex + inconsistent supports |
 
-## Solutions
+> Deep-dive: browse the [Concepts](/concepts) section for STRIPS planning and GraphPlan.
 
-**6.1** — Which of the following are applicable actions in the start state?  
-**Answer:** `A,B,D`
+## 6.1 — Applicable → `A,B,D`
 
-**6.2** — Which of the following are relevant actions in the goal state?  
-**Answer:** `B,C,E`
+Mechanical intersection. The decisive state facts are always:
 
-**6.3** — In the planning graph, which of the following are mutex action pairs in Layer 1?  
-**Answer:** `A,B,C`
+- **who is held**: if `holding(D)` appears, every Pickup/Unstack dies (needs `armEmpty`).
+- **what is clear**: each clear block unlocks one Stack-with-X-held or one Pickup.
 
-**6.4** — In the planning graph, which of the following are mutex proposition pairs in Lay  
-**Answer:** `C,D`
+Three survivors = the keyed trio: typically \{one Stack for the held block onto a clear target, a second Stack onto another clear target, and Putdown of the held block\} — or with an empty arm, the set of Pickups/Unstacks available.
 
+## 6.2 — Relevant → `B,C,E`
+
+Regression test per option:
+
+1. Does ADD write any goal literal? (`on(X,Y)` written only by `Stack(X,Y)`.)
+2. Does DEL kill any goal literal? Veto if yes.
+
+The keyed trio corresponds to the writers of the printed goal's literals — usually the Stack actions building both goal towers plus one enabling action whose DEL list stays clean.
+
+Argument-order alarm: `Stack(C,B)` writes `on(C,B)` ≠ `on(B,C)`. Reversed pairs are this subquestion's favourite wrong options.
+
+## 6.3 — Layer-1 action mutexes → `A,B,C`
+
+Layer 1 = the applicable set from 6.1. With ONE arm:
+
+- Any two arm-grabbing actions (Pickup/Putdown/Unstack/Stack mix that toggles `armEmpty` vs `holding`) have **inconsistent effects**: one adds what the other deletes ⇒ mutex.
+- **Competing needs**: e.g., two Stacks needing different `holding` facts, or actions whose preconditions contradict in L0 (`clear(Y)` vs `on(Z,Y)`).
+
+The keyed trio lists the three mutually-conflicting pairs among the printed layer-1 actions — almost always the pairwise combinations inside the arm-conflict clique.
+
+## 6.4 — Layer-2 proposition mutexes → `C,D`
+
+Propositions $p,q$ at layer 2 are mutex iff **every** producer-pair $(a,b)$ is action-mutex at layer 1 (plus the direct inconsistent-support check).
+
+Fast consequences:
+
+- `holding(X)` is mutex with `armEmpty` and with anything only produced by actions conflicting with X's grabber.
+- Two different `on(·,·)` facts sharing a block argument are mutex when their sole producers fight over the same arm state.
+
+Keyed `C,D` names the pair(s) surviving this double filter in the printed instance — quote the producer-table argument, not intuition.
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Solve 6.1 first - it IS planning-graph layer 1, so 6.3 inherits it directly.
+2. One-arm rule: any pair of actions that both toggle the arm conflict with each other. This single observation generates nearly every layer-1 mutex clique.
+3. Relevance = writer hunt + deleter veto; usefulness plays no role, and neither does applicability - relevant actions may be unexecutable right now.
+4. For 6.4 build the tiny producer table (literal -> producing actions); a proposition pair is dead-on-arrival mutex if SOME producer of p deletes q.
+5. Underline argument order everywhere: on(C,B) vs on(B,C) flips verdicts in both 6.2 and 6.4.
 </Accordion>
+
+**Answers:** 6.1 `A,B,D` · 6.2 `B,C,E` · 6.3 `A,B,C` · 6.4 `C,D`

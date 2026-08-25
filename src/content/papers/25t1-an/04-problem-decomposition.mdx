@@ -54,7 +54,7 @@ Primitive nodes enter the graph already SOLVED; a node becomes SOLVED when all c
 
 ## The Trace — five expansions to a solved root
 
-Initial costs: S=40, A=50, B=8, C=18, E=8, F=12; D=G=H(I)=10 primitive.
+Initial costs: S=40, A=50, B=8, C=18, E=8, F=12; primitives D, G, H, I born SOLVED at 10 each.
 
 **Expansion 1 — S.** Options:
 - `AND(B, C)`: $(8+2) + (18+2) = 30$
@@ -64,7 +64,7 @@ Mark `AND(B, C)` → **S = 30** ✓ (value after 1st expansion).
 
 **Expansion 2 — C** (marked path hits B and C; tie-breaker 2: C is the costlier branch, 18 > 8).
 C's only option: $F + 2 = 12 + 2 = 14$ → **C = 14**. Propagate:
-$$S = (8+2) + (14+2) = \mathbf{26} ✓$$
+$$S = (8+2) + (14+2) = \mathbf{26}$$ ✓
 
 **Expansion 3 — F** (marked path: B(8), F(14→ via C); F costlier than B).
 F's `AND(H, I)`: $(10+2)+(10+2) = 24$, both primitive → **F = 24, SOLVED**. Propagate:

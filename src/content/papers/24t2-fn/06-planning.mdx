@@ -26,13 +26,13 @@ Standard one-armed Blocks World operators.
 
 ## The Topic in 60 Seconds
 
-**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
+**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅ (applicability irrelevant). $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
 
 > Deep-dive: [Blocks World & STRIPS](/concepts/week-08-planning/01-blocks-world-strips), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
 
 ## 6.1 — Applicable → **B, C, D**
 
-armEmpty holds:
+armEmpty holds, so only unstacks and pickups are candidates:
 
 | Action | Preconditions | Verdict |
 |--------|---------------|---------|
@@ -40,38 +40,106 @@ armEmpty holds:
 | **Unstack(D,A)** | armEmpty ✓, clear(D) ✓, on(D,A) ✓ | **✓** |
 | **Unstack(E,B)** | armEmpty ✓, clear(E) ✓, on(E,B) ✓ | **✓** |
 | **Pickup(C)** | armEmpty ✓, clear(C) ✓, onTable(C) ✓ | **✓** |
-| Pickup(A) | clear(A) ✗ (D on A) | ✗ |
+| Pickup(A) | clear(A) ✗ (D sits on A) | ✗ |
 | Stack(A,B) / Stack(B,C) | holding(·) ✗ | ✗ |
 
 ## 6.2 — Relevant → **F, G**
 
-Goal = on(B,C), on(A,B): **Stack(B,C)** adds on(B,C) ✓; **Stack(A,B)** adds on(A,B) ✓. Nothing else adds a goal fact.
+Goal = on(B,C), on(A,B):
+
+| Action | Adds | Hits goal? |
+|--------|------|-----------|
+| **Stack(A,B)** | on(A,B), armEmpty | ✓ on(A,B) |
+| **Stack(B,C)** | on(B,C), armEmpty | ✓ on(B,C) |
+| everything else | no goal fact | ✗ |
 
 ## 6.3 — Mutex action pairs → **A, B**
 
-$A_1$ = `{ Unstack(D,A), Unstack(E,B), Pickup(C) }` + no-ops (options C, D name inapplicable Stacks → auto-wrong).
+$A_1$ = \{ Unstack(D,A), Unstack(E,B), Pickup(C) \} + no-ops of the start facts.
 
-- Unstack(D,A) ⊕ Pickup(C): both **delete armEmpty** → interference → mutex ✓
-- Unstack(D,A) ⊕ Unstack(E,B): same → mutex ✓
+| Pair | Test | Mutex? |
+|------|------|--------|
+| **Unstack(D,A) ⊕ Pickup(C)** | both delete armEmpty → interference | **✓** |
+| **Unstack(D,A) ⊕ Unstack(E,B)** | both delete armEmpty → interference | **✓** |
+| Pickup(C) ⊕ Stack(A,B) / Stack(B,C) | the Stacks are not in $A_1$ at all | options C, D auto-wrong |
+
+All three real actions share the deleted fact armEmpty — one mutual mutex clique → **A, B** ✓
 
 ## 6.4 — Mutex propositions → **A, B**
 
-$P_1$ = start facts (nops) ∪ adds: clear(A), clear(B), holding(D), holding(E), holding(C).
+$P_1$ = start facts (clean no-ops) ∪ adds: clear(A) [Unstack(D,A)], clear(B) [Unstack(E,B)], holding(D) [Unstack(D,A)], holding(E) [Unstack(E,B)], holding(C) [Pickup(C)].
 
 | Pair | Producers | Verdict |
 |------|-----------|---------|
-| **clear(A) ⊕ holding(E)** | clear(A): only Unstack(D,A) (D sits on A — not a start fact); holding(E): only Unstack(E,B) — producers mutex (6.3) | **✓** |
+| **clear(A) ⊕ holding(E)** | clear(A): only Unstack(D,A) (D sits on A — not a start fact); holding(E): only Unstack(E,B); producers mutex (6.3) | **✓** |
 | **clear(A) ⊕ clear(B)** | clear(B): only Unstack(E,B) — same mutex pair | **✓** |
-| clear(C) ⊕ on(D,A) | clear(C) is a **start fact** → nop producer clean | Not mutex |
-| clear(C) ⊕ holding(E) | same clean no-op | Not mutex |
+| clear(C) ⊕ on(D,A) | both are start facts → their no-ops coexist cleanly | Not mutex |
+| clear(C) ⊕ holding(E) | clear(C)'s nop is clean against anything in $A_1$ | Not mutex |
+
+<PaperTrace
+  height={520}
+  nodeWidth={110}
+  nodeHeight={44}
+  nodeFontSize={11}
+  legend={[
+    { color: "#4b5563", label: "start facts (P0)" },
+    { color: "#b45309", label: "applicable actions (A1)" },
+    { color: "#0369a1", label: "new facts (P1)" },
+    { color: "#15803d", label: "keyed answers" }
+  ]}
+  nodes={[
+    { id: "arm", label: "armEmpty", x: 40, y: 40 },
+    { id: "cD", label: "clear(D)", x: 40, y: 100 },
+    { id: "oDA", label: "on(D,A)", x: 40, y: 160 },
+    { id: "cE", label: "clear(E)", x: 40, y: 220 },
+    { id: "oEB", label: "on(E,B)", x: 40, y: 280 },
+    { id: "cC", label: "clear(C)", x: 40, y: 340 },
+    { id: "otC", label: "onTable(C)", x: 40, y: 400 },
+    { id: "uda", label: "Unstack(D,A)", x: 300, y: 100 },
+    { id: "ueb", label: "Unstack(E,B)", x: 300, y: 250 },
+    { id: "pcc", label: "Pickup(C)", x: 300, y: 400 },
+    { id: "cA", label: "clear(A)+", x: 560, y: 60 },
+    { id: "hD", label: "holding(D)", x: 560, y: 150 },
+    { id: "cB", label: "clear(B)+", x: 560, y: 240 },
+    { id: "hE", label: "holding(E)", x: 560, y: 330 },
+    { id: "hC", label: "holding(C)", x: 560, y: 420 }
+  ]}
+  edges={[
+    { id: "f1", from: "arm", to: "uda" },
+    { id: "f2", from: "cD", to: "uda", label: "pre" },
+    { id: "f3", from: "oDA", to: "uda", label: "pre" },
+    { id: "f4", from: "arm", to: "ueb" },
+    { id: "f5", from: "cE", to: "ueb", label: "pre" },
+    { id: "f6", from: "oEB", to: "ueb", label: "pre" },
+    { id: "f7", from: "arm", to: "pcc" },
+    { id: "f8", from: "cC", to: "pcc", label: "pre" },
+    { id: "f9", from: "otC", to: "pcc", label: "pre" },
+    { id: "g1", from: "uda", to: "cA" },
+    { id: "g2", from: "uda", to: "hD" },
+    { id: "g3", from: "ueb", to: "cB" },
+    { id: "g4", from: "ueb", to: "hE" },
+    { id: "g5", from: "pcc", to: "hC" }
+  ]}
+  steps={[
+    { label: "Layer P0", note: "Start state:\nonTable(A), onTable(B), onTable(C),\nclear(D), clear(E), clear(C), on(D,A), on(E,B), armEmpty\nGoal: on(B,C), on(A,B)", nodes: { arm: "explored", cD: "explored", oDA: "explored", cE: "explored", oEB: "explored", cC: "explored", otC: "explored" } },
+    { label: "A1: applicable", note: "armEmpty -> unstack/pickup only.\nUnstack(D,A): clear(D)+on(D,A) YES\nUnstack(E,B): clear(E)+on(E,B) YES\nPickup(C): clear(C)+onTable(C) YES\nPickup(A)? clear(A) NO (D sits on A). All Stacks/Putdowns need holding.", nodes: { uda: "current", ueb: "current", pcc: "current", arm: "frontier", cD: "frontier", oDA: "frontier", cE: "frontier", oEB: "frontier", cC: "frontier", otC: "frontier" }, edges: { f1: "active", f2: "active", f3: "active", f4: "active", f5: "active", f6: "active", f7: "active", f8: "active", f9: "active" } },
+    { label: "Action mutexes", note: "All three real actions DELETE armEmpty:\nany two interfere -> every pair mutex.\nOption A (UDA + PC) keyed; option B (UDA + UEB) keyed.\nOptions C/D name Stacks - not in A1.", nodes: { uda: "path", ueb: "path", pcc: "path" } },
+    { label: "Layer P1", note: "P1 = P0 (clean nops) UNION adds:\nUnstack(D,A) -> clear(A), holding(D)\nUnstack(E,B) -> clear(B), holding(E)\nPickup(C) -> holding(C)\nNew facts inherit their single producer's mutex status.", nodes: { cA: "frontier", hD: "frontier", cB: "frontier", hE: "frontier", hC: "frontier" }, edges: { g1: "path", g2: "path", g3: "path", g4: "path", g5: "path" } },
+    { label: "Proposition mutexes", note: "clear(A)+holding(E): UDA vs UEB - mutex -> A keyed.\nclear(A)+clear(B): UDA vs UEB again -> B keyed.\nclear(C)+on(D,A), clear(C)+holding(E):\nclear(C) is a start fact - its nop is clean -> NOT mutex.", nodes: { cA: "path", hE: "path", cB: "path", hD: "explored", cC: "explored", oDA: "explored", hC: "explored" } }
+  ]}
+/>
+
+<Callout type="tip" title="The armEmpty hinge">
+With armEmpty in the state, every applicable action deletes it — layer 1's real actions form one mutual mutex clique, each new proposition is chained to its producer's fate, and only start-state facts escape through their clean no-ops.
+</Callout>
 
 ## Tricks & Tips
 
 <Accordion title="One minute each">
-1. Applicable: armEmpty ⇒ unstacks/pickups only.
-2. Relevant: add-list ∩ goal.
-3. Layer-1 mutex: armEmpty interference; inapplicable options are free eliminations.
-4. Proposition mutex: start facts escape via no-ops; single-producer facts inherit their producer's mutex status.
+1. Applicable: see armEmpty ⇒ think unstacks/pickups only; verify the extra preconditions (clear of top block + on-pair or onTable).
+2. Relevant: which schema adds an on(·,·)? Only Stack — so F and G fall out without touching the other five.
+3. Layer-1 action mutex: shared deleted fact (armEmpty) = interference = mutex for every pair; options naming inapplicable Stacks eliminate themselves.
+4. Proposition mutex: write producer sets first. New facts have singleton sets married to mutex producers (mutex); any start fact in the pair brings its clean no-op and kills the mutex.
 </Accordion>
 
 **Answers:** 6.1 **B, C, D** · 6.2 **F, G** · 6.3 **A, B** · 6.4 **A, B**

@@ -91,7 +91,7 @@ graph TD
 
 - **R1 Diesel Engine** (diesel ⋈ crankshaft): 101 (M59) vs 107 (M15) → no match
 - **R2 Engine** (crankshaft alone): 107 → **(Engine, 107)** ✓
-- **R3 Petrol Engine** (crankshaft ⋈ petrol): no petrol → empty
+- **R3 Petrol Engine** (crankshaft ⋈ petrol): petrol is `102:M26`, crankshaft is `107:M15` — `^item` mismatch → empty
 - **R4 Gas Turbine** (petrol ⋈ blades): empty
 - **R5 Turbine** (blades): none → empty
 - **R6 Single Phase Motor** (lines-1 ⋈ armature): 105 (M48) ⋈ 104 (M48) → **(SPM, 105, 104)** ✓
@@ -99,6 +99,104 @@ graph TD
 - **R8 Three Phase Motor** (armature ⋈ lines-3): no lines-3 → empty
 
 **Conflict set** = (Engine, 107), (SPM, 105, 104), (Motor, 104), (Motor, 106) → options **C, D, E, F** ✓
+
+Interactive trace of the beta net — every join tested on a shared `^item`:
+
+<PaperTrace
+  height={430}
+  nodeWidth={108}
+  nodeHeight={52}
+  nodeFontSize={11}
+  legend={[
+    { color: "#0f766e", label: "alpha test (WMEs passing)" },
+    { color: "#9d174d", label: "beta join" },
+    { color: "#15803d", label: "rule fired" },
+    { color: "#7f1d1d", label: "empty / dead branch" },
+  ]}
+  nodes={[
+    { id: "DIESEL", label: "type = diesel\n101:M59", x: 110, y: 30, kind: "alpha" },
+    { id: "PETROL", label: "type = petrol\n102:M26", x: 310, y: 30, kind: "alpha" },
+    { id: "CRANK", label: "crankshaft\n107:M15", x: 510, y: 30, kind: "alpha" },
+    { id: "LINES1", label: "lines = 1\n105:M48", x: 720, y: 30, kind: "alpha" },
+    { id: "R2", label: "Engine", x: 400, y: 145, kind: "unassigned" },
+    { id: "ARM", label: "armature\n104:M48·106:M37", x: 620, y: 145, kind: "alpha" },
+    { id: "LINES3", label: "lines = 3\nnone in memory", x: 950, y: 145, kind: "alpha" },
+    { id: "B1", label: "B1 ⋈ item", x: 230, y: 260, kind: "beta" },
+    { id: "B2", label: "B2 ⋈ item", x: 450, y: 260, kind: "beta" },
+    { id: "R7", label: "Motor", x: 620, y: 260, kind: "unassigned" },
+    { id: "B4", label: "B4 ⋈ item", x: 790, y: 260, kind: "beta" },
+    { id: "B5", label: "B5 ⋈ item", x: 950, y: 260, kind: "beta" },
+    { id: "R1", label: "Diesel Engine", x: 230, y: 370, kind: "unassigned" },
+    { id: "R3", label: "Petrol Engine", x: 450, y: 370, kind: "unassigned" },
+    { id: "R6", label: "Single-Phase Motor", x: 790, y: 370, kind: "unassigned" },
+    { id: "R8", label: "Three-Phase Motor", x: 950, y: 370, kind: "unassigned" },
+  ]}
+  edges={[
+    { id: "d1", from: "DIESEL", to: "B1" },
+    { id: "d2", from: "CRANK", to: "B1" },
+    { id: "d3", from: "B1", to: "R1" },
+    { id: "p1", from: "PETROL", to: "B2" },
+    { id: "p2", from: "CRANK", to: "B2" },
+    { id: "p3", from: "B2", to: "R3" },
+    { id: "c1", from: "CRANK", to: "R2" },
+    { id: "m1", from: "LINES1", to: "B4" },
+    { id: "m2", from: "ARM", to: "B4" },
+    { id: "m3", from: "B4", to: "R6" },
+    { id: "a1", from: "ARM", to: "R7" },
+    { id: "t1", from: "ARM", to: "B5" },
+    { id: "t2", from: "LINES3", to: "B5" },
+    { id: "t3", from: "B5", to: "R8" },
+  ]}
+  steps={[
+    {
+      label: "0 · alpha pass",
+      note: "101→diesel · 102→petrol · 104/106→armature · 105→lines-1 · 107→crankshaft\n103 Fuel M37 fails every type/part test.\nNo blades WMEs → Gas Turbine and Turbine die immediately.",
+      edges: {},
+    },
+    {
+      label: "1 · Diesel join dies",
+      note: "diesel {101:M59} ⋈ crankshaft {107:M15}\nM59 ≠ M15 → empty. Option A is an item mismatch!",
+      nodes: { B1: "pruned", R1: "pruned" },
+      edges: { d1: "pruned", d2: "pruned", d3: "pruned" },
+    },
+    {
+      label: "2 · Petrol join dies",
+      note: "crankshaft {107:M15} ⋈ petrol {102:M26}\nM15 ≠ M26 → empty. Option B is an item mismatch too!",
+      nodes: { B1: "pruned", R1: "pruned", B2: "pruned", R3: "pruned" },
+      edges: { d1: "pruned", d2: "pruned", d3: "pruned", p1: "pruned", p2: "pruned", p3: "pruned" },
+    },
+    {
+      label: "3 · Engine fires",
+      note: "R2 = crankshaft alone → one tuple per BoM:\n(Engine, 107) — option C.",
+      nodes: { R2: "path", B1: "pruned", R1: "pruned", B2: "pruned", R3: "pruned" },
+      edges: { c1: "path", d1: "pruned", d2: "pruned", d3: "pruned", p1: "pruned", p2: "pruned", p3: "pruned" },
+    },
+    {
+      label: "4 · Single-Phase Motor fires",
+      note: "lines-1 {105:M48} ⋈ armature {104:M48 ✓, 106:M37 ✗}\nM48 match ✓ → (SPM, 105, 104) — option D.",
+      nodes: { R2: "path", B4: "current", R6: "path", B1: "pruned", R1: "pruned", B2: "pruned", R3: "pruned" },
+      edges: { c1: "path", m1: "active", m2: "active", m3: "path", d3: "pruned", p3: "pruned" },
+    },
+    {
+      label: "5 · Motor fires twice",
+      note: "R7 = armature alone → one tuple per BoM:\n(Motor, 104) and (Motor, 106) — options E and F.",
+      nodes: { R2: "path", R6: "path", R7: "path", B1: "pruned", R1: "pruned", B2: "pruned", R3: "pruned" },
+      edges: { c1: "path", m3: "path", a1: "path", d3: "pruned", p3: "pruned" },
+    },
+    {
+      label: "6 · Three-Phase dies",
+      note: "armature ⋈ lines-3: no lines-3 WME exists → empty join.",
+      nodes: { R2: "path", R6: "path", R7: "path", B5: "pruned", R8: "pruned", B1: "pruned", R1: "pruned", B2: "pruned", R3: "pruned" },
+      edges: { c1: "path", m3: "path", a1: "path", t1: "pruned", t2: "pruned", t3: "pruned", d3: "pruned", p3: "pruned" },
+    },
+    {
+      label: "7 · conflict set = C, D, E, F",
+      note: "(Engine,107) · (SPM,105,104) · (Motor,104) · (Motor,106)\nSpecificity → SPM (2 WMEs). Recency → Engine (max ts 107).",
+      nodes: { R2: "path", R6: "path", R7: "path", B5: "pruned", R8: "pruned", B1: "pruned", R1: "pruned", B2: "pruned", R3: "pruned" },
+      edges: { c1: "path", m3: "path", a1: "path" },
+    },
+  ]}
+/>
 
 ## 5.2 — Specificity → **D**
 

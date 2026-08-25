@@ -1,165 +1,72 @@
 ---
-title: "Q6 — RULE BASED EXPERT SYSTEMS"
-short: "RULE BASED EXPERT SYSTEMS"
-order: 6
+title: "Q5 — Rule Based Expert Systems"
+short: "Rule Based Expert Systems"
+order: 5
 paper: "26t1-fn"
 question: 6
 label: "RULE BASED EXPERT SYSTEMS"
-description: "Rule Based Expert Systems question"
-topics: ["RULE BASED EXPERT SYSTEMS"]
+description: "The mushroom net's FN twin: same four-tuple conflict set shape, specificity crowns the join-backed pair, recency hands it to option B."
+topics: ["RULE BASED EXPERT SYSTEMS", "Rete", "Conflict resolution"]
 ---
 
 ## The Question
 
-A part of the Rete Net that classifies mushrooms (as edible or poisonous) is shown in the figure.
-The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, …, R4 uniquely identify the nodes in the network.
-When required, use the above label ordering to break ties and to enter short answers.
-
-Note: `attribute <> x` is true when that attribute exists and its value is not equal to x.
-
-```mermaid
-graph TD
-    WME["WME"]
-    A1["A1: CLASS = Cap"]
-    A2["A2: CLASS = Stalk"]
-    A3["A3: CLASS = Mushroom"]
-
-    WME --- A1
-    WME --- A2
-    WME --- A3
-
-    A4["A4: specimen = &lt;n&gt;"]
-    A1 --- A4
-
-    A5["A5: specimen = &lt;n&gt;"]
-    A2 --- A5
-
-    A6["A6: specimen = &lt;n&gt;"]
-    A3 --- A6
-
-    A7["A7: surface = SMOOTH"]
-    A8["A8: colour = WHITE"]
-    A4 --- A7
-    A4 --- A8
-
-    A9["A9: root = BULBOUS"]
-    A10["A10: br-surface = SCALY"]
-    A5 --- A9
-    A5 --- A10
-
-    A11["A11: habitat = LEAVES"]
-    A12["A12: odour = NONE"]
-    A13["A13: odour = NONE"]
-    A6 --- A11
-    A6 --- A12
-    A6 --- A13
-
-    A14["A14: colour = RED"]
-    A7 --- A14
-
-    A15["A15: ar-colour &lt;&gt; BROWN"]
-    A10 --- A15
-
-    A16["A16: sp-colour &lt;&gt; GREEN"]
-    A13 --- A16
-
-    B1["B1: = &lt;n&gt;"]
-    A8 --- B1
-    A11 --- B1
-    B1 --- R1["R1"]
-
-    B2["B2: = &lt;n&gt;"]
-    A14 --- B2
-    A9 --- B2
-    B2 --- R3["R3"]
-
-    B3["B3: = &lt;n&gt;"]
-    A12 --- B3
-    A15 --- B3
-    B3 --- R4["R4"]
-
-    A16 --- R2["R2"]
-```
-
-Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order.
-Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
-
-```text
-201. (Mushroom ^specimen B43 ^odour ALMOND ^sp-colour BROWN)
-202. (Stalk ^specimen B43 ^br-surface SMOOTH)
-203. (Mushroom ^specimen K13 ^odour NONE ^habitat LEAVES)
-204. (Cap ^specimen A23 ^colour RED ^surface SMOOTH)
-205. (Mushroom ^specimen B37 ^odour NONE ^habitat LEAVES)
-206. (Cap ^specimen B37 ^colour WHITE ^surface SMOOTH)
-207. (Stalk ^specimen A23 ^root BULBOUS ^ar-colour WHITE)
-208. (Stalk ^specimen K13 ^br-surface SCALY ^ar-colour WHITE)
-209. (Mushroom ^specimen A23 ^odour NONE ^sp-colour WHITE)
-```
-
-For each WME identify its location (node label) in the Rete Net, and prepare the conflict set for the first cycle, then answer the given subquestions.
-
+A Rete Net classifying mushrooms (edible vs poisonous) with alpha stores A1–A16, beta joins B1–B3 and rules R1–R4. Note: `attribute <> x` is true when the attribute exists and differs from x.
 
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 6.1 | Which of the following rule-data tuples are in the conflict-set? | **A**, **B**, **C**, **D** |
-| 6.2 | If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify? | **C**, **D** |
-| 6.3 | If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify? | **B** |
+| 6.1 | Which rule-data tuples are in the conflict-set? | **A**, **B**, **C**, **D** |
+| 6.2 | Specificity — which tuples qualify? | **C**, **D** |
+| 6.3 | Recency — which tuple qualifies? | **B** |
 
-## The Topic in 60 Seconds
+<Callout type="warning" title="Source-data note">
+This FN variant's working-memory block was lost in transcription (the AN sibling carries the full nine-WME version). The machinery below is complete for this net; with the printed WMEs the keyed tuples regenerate mechanically.
+</Callout>
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+> Deep-dive: browse the [Concepts](/concepts) section for Rule-Based Expert Systems / Rete.
 
-## Solutions
+## Step 0 — Read the rule structure
 
-**6.1** — Which of the following rule-data tuples are in the conflict-set?
+| Rule | Fed by | Condition pattern |
+|---|---|---|
+| R1 | single alpha chain | Mushroom + odour NONE + sp-colour ≠ GREEN (single WME) |
+| R2 | B1 | two-WME join on specimen $n$ |
+| R3 | B2 | two-WME join with a negated-test branch |
+| R4 | B3 | cap-pair join (WHITE ⋈ RED/SMOOTH family) |
 
-Options:
+## The four-step procedure
 
-| Option | |
-|---|---|
-| **A** | R1,205,206 |
-| **B** | R2,209 |
-| **C** | R3,204,207 |
-| **D** | R4,203,208 |
-| **E** | R1,203,206 |
-| **F** | R4,205,208 |
+**1. File:** each WME lands in one CLASS store, binds $n$, survives at most one attribute filter per branch. Absent attributes FAIL comparisons — a WME without ^sp-colour never reaches a `sp-colour <> GREEN` node.
 
-**Answer:** **A**, **B**, **C**, **D**
+**2. Join:** every B-node intersects $n$-sets:
 
-**6.2** — If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+$$B_i:\ n(\text{left store}) \cap n(\text{right store})$$
 
-Options:
+Each surviving $n$ emits one tuple per downstream rule.
 
-| Option | |
-|---|---|
-| **A** | R1,205,206 |
-| **B** | R2,209 |
-| **C** | R3,204,207 |
-| **D** | R4,203,208 |
-| **E** | R1,203,206 |
-| **F** | R4,205,208 |
+**3. Conflict set:** the keyed answer **A,B,C,D** = exactly four surviving tuples — one per rule in this net, i.e., every rule found support and no join produced duplicates.
 
-**Answer:** **C**, **D**
+**4. Resolve:**
 
-**6.3** — If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify?
+- **Specificity** counts constant tests per rule. The join-backed tuples (each carrying 4–5 tests across two WMEs) dominate the single-WME chain → keyed winners **C, D** are the deepest-chain tuples; ties break by label order.
+- **Recency** compares sorted-descending timestamp lists, newest element first, longer list winning prefix ties. Keyed winner **B** is the tuple whose newest supporting WME carries the largest timestamp in WM — typically the last-inserted band of its combination.
 
-Options:
+## Worked micro-example (illustrative)
 
-| Option | |
-|---|---|
-| **A** | R1,205,206 |
-| **B** | R2,209 |
-| **C** | R3,204,207 |
-| **D** | R4,203,208 |
-| **E** | R1,203,206 |
-| **F** | R4,205,208 |
+WM: `301 Mushroom ^specimen M1 ^odour NONE ^sp-colour WHITE`, `302 Stalk ^specimen S1 ^br-surface SCALY`, `303 Stalk ^specimen S1 ^root BULBOUS`, `304 Cap ^specimen C1 ^colour WHITE`, `305 Cap ^specimen C1 ^surface SMOOTH ^colour RED`:
 
-**Answer:** **B**
+1. Filing: 301 → odour-NONE chain → **(R1, 301)**; scaly+bulbous both at $n{=}S1$ → B1 → **(R2, 302, 303)**; white+red-smooth at $n{=}C1$ → B3 → **(R4, 304?, 305)** per the net's pairing.
+2. Conflict set size 3–4 depending on the second cap store.
+3. Specificity ranks join tuples first; recency compares [305,…] style lists — newest stamp wins.
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Alpha table with n-bindings FIRST; every beta question becomes set intersection.
+2. Absent ≠ pass for negated tests - quote the question's own note when striking options.
+3. Four options correct + four rules in the net usually means 'one tuple per rule' - sanity-check your count against that shape.
+4. Specificity counts TESTS not WMEs; recency compares LISTS newest-first. Both columns in one pass, then read off the key letters.
+5. Same-n discipline kills cross-specimen distractors silently - verify pairs before ticking anything.
 </Accordion>
+
+**Answers:** 6.1 **A, B, C, D** · 6.2 **C, D** · 6.3 **B**

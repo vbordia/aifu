@@ -59,7 +59,7 @@ Propagate: $S = \min(50,\ 70+10) = \mathbf{50}$ ✓ — still via AND(A, B) (50 
 **Expansion 3 — B** (marked path A(10), B(20); B costlier → tie-breaker 2).
 B: AND(E, F) $= (10+10)+(30+10) = 60$; E, F primitive → **B = 60, SOLVED**.
 Propagate: AND(A, B) $= (10+10) + (60+10) = 90$; OR(C) $= 70+10 = 80$:
-$$S = \min(90,\ 80) = \mathbf{80} ✓$$
+$$S = \min(90,\ 80) = \mathbf{80}$$ ✓
 C is solved → **S SOLVED = 80**. (A was never expanded!)
 
 **Final value of S = 80.** Solution subtree: S → C → F,G.
@@ -153,7 +153,7 @@ Interactive trace:
       elements: [
         { data: { id: "S", label: "S =80 ✓", type: "path" }, position: { x: 400, y: 30 } },
         { data: { id: "A", label: "A 10", type: "explored" }, position: { x: 150, y: 150 } },
-        { data: { id: "B", label: "B =60 ✓", type: "path" }, position: { x: 400, y: 150 } },
+        { data: { id: "B", label: "B =60 ✓", type: "explored" }, position: { x: 400, y: 150 } },
         { data: { id: "C", label: "C =70 ✓", type: "path" }, position: { x: 660, y: 150 } },
         { data: { id: "D", label: "D 20", type: "primitive" }, position: { x: 60, y: 280 } },
         { data: { id: "E", label: "E 10", type: "primitive" }, position: { x: 260, y: 280 } },
@@ -164,8 +164,8 @@ Interactive trace:
         { data: { id: "e3", source: "S", target: "C", label: "OR", type: "path" } },
         { data: { id: "e4", source: "A", target: "D" } },
         { data: { id: "e5", source: "A", target: "E" } },
-        { data: { id: "e6", source: "B", target: "E", type: "path" } },
-        { data: { id: "e7", source: "B", target: "F", type: "path" } },
+        { data: { id: "e6", source: "B", target: "E" } },
+        { data: { id: "e7", source: "B", target: "F" } },
         { data: { id: "e8", source: "C", target: "F", type: "path" } },
         { data: { id: "e9", source: "C", target: "G", type: "path" } },
       ],

@@ -101,6 +101,84 @@ graph LR
 
 ## Tricks & Tips
 
+Interactive AC-3 cascade — watch the domains collapse:
+
+<StepGraph
+  height={380}
+  nodeWidth={110}
+  nodeHeight={54}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "value being tested / pruned" },
+    { color: "#0369a1", label: "still in play" },
+    { color: "#15803d", label: "final unique solution" },
+  ]}
+  steps={[
+    {
+      label: "1 · arc check",
+      note: "Supports: A=2 → B:6 ✓ C:7,8 ✓ · A=3 → B:5 ✓ but C: ? — no c with (3,c) ∈ R_AC!\nB=5 → A:3 ✓ C:7 ✓ · B=6 → A:2 ✓ C:8 ✓\nC=7 → A:2 ✓ B:5 ✓ · C=8 → A:2 ✓ B:6 ✓\nA = 3 has no support on R_AC → NOT arc consistent → 8.1 = B.",
+      elements: [
+        { data: { id: "A", label: "A: 2, 3", type: "current" }, position: { x: 60, y: 170 } },
+        { data: { id: "B", label: "B: 5, 6", type: "frontier" }, position: { x: 430, y: 50 } },
+        { data: { id: "C", label: "C: 7, 8", type: "frontier" }, position: { x: 430, y: 290 } },
+        { data: { id: "r1", source: "A", target: "B", label: "R_AB" } },
+        { data: { id: "r2", source: "A", target: "C", label: "R_AC" } },
+        { data: { id: "r3", source: "B", target: "C", label: "R_BC" } },
+      ],
+    },
+    {
+      label: "2 · prune A = 3",
+      note: "Revise(A, C): no c ∈ {7,8} satisfies (3,c) ∈ R_AC = {(2,7),(2,8)}.\nD_A = {2}.",
+      elements: [
+        { data: { id: "A", label: "A: 2", type: "path" }, position: { x: 60, y: 170 } },
+        { data: { id: "B", label: "B: 5, 6", type: "frontier" }, position: { x: 430, y: 50 } },
+        { data: { id: "C", label: "C: 7, 8", type: "frontier" }, position: { x: 430, y: 290 } },
+        { data: { id: "r1", source: "A", target: "B", label: "R_AB" } },
+        { data: { id: "r2", source: "A", target: "C", label: "R_AC" } },
+        { data: { id: "r3", source: "B", target: "C", label: "R_BC" } },
+      ],
+    },
+    {
+      label: "3 · cascade B = 5 out",
+      note: "Revise(B, A): B = 5 was supported only by (3,5) — A = 3 is gone.\nD_B = {6}.",
+      elements: [
+        { data: { id: "A", label: "A: 2", type: "path" }, position: { x: 60, y: 170 } },
+        { data: { id: "B", label: "B: 6", type: "path" }, position: { x: 430, y: 50 } },
+        { data: { id: "C", label: "C: 7, 8", type: "frontier" }, position: { x: 430, y: 290 } },
+        { data: { id: "r1", source: "A", target: "B", label: "R_AB" } },
+        { data: { id: "r2", source: "A", target: "C", label: "R_AC" } },
+        { data: { id: "r3", source: "B", target: "C", label: "R_BC" } },
+      ],
+    },
+    {
+      label: "4 · cascade C = 7 out",
+      note: "Revise(C, B): C = 7 had exactly one R_BC support, (5,7) — B = 5 is gone.\n(Its other arc is fine: (2,7) ∈ R_AC.)\nD_C = {8}.",
+      elements: [
+        { data: { id: "A", label: "A: 2", type: "path" }, position: { x: 60, y: 170 } },
+        { data: { id: "B", label: "B: 6", type: "path" }, position: { x: 430, y: 50 } },
+        { data: { id: "C", label: "C: 8", type: "path" }, position: { x: 430, y: 290 } },
+        { data: { id: "r1", source: "A", target: "B", label: "R_AB" } },
+        { data: { id: "r2", source: "A", target: "C", label: "R_AC" } },
+        { data: { id: "r3", source: "B", target: "C", label: "R_BC" } },
+      ],
+    },
+    {
+      label: "5 · solution 2, 6, 8",
+      note: "Singletons everywhere → unique assignment:\nA = 2, B = 6, C = 8\nVerify: (2,6) ∈ R_AB ✓ (2,8) ∈ R_AC ✓ (6,8) ∈ R_BC ✓\nPath consistency: pair (2,8) via middle B = 6: (2,6) ∈ R_AB ✓ (6,8) ∈ R_BC ✓ → 8.2 = A.",
+      elements: [
+        { data: { id: "A", label: "A = 2", type: "path" }, position: { x: 60, y: 170 } },
+        { data: { id: "B", label: "B = 6", type: "path" }, position: { x: 430, y: 50 } },
+        { data: { id: "C", label: "C = 8", type: "goal" }, position: { x: 430, y: 290 } },
+        { data: { id: "r1", source: "A", target: "B", label: "(2,6)", type: "path" } },
+        { data: { id: "r2", source: "A", target: "C", label: "(2,8)", type: "path" } },
+        { data: { id: "r3", source: "B", target: "C", label: "(6,8)", type: "path" } },
+      ],
+    },
+  ]}
+/>
+
+## Tricks & Tips
+
 <Accordion title="Fast method">
 1. Matching diagram first; scan each value for a support on **every** incident relation — A = 3 dies on R_AC.
 2. **Cascade** prunings until stable (AC-3): A=3 out ⇒ B=5 out ⇒ C=7 out.

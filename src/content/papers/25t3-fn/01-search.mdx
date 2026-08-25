@@ -85,10 +85,9 @@ Path: **S → A → D → G**, cost $1+2+2 = 5$.
 | S : 0 | SA : 1, SB : 4 | |
 | SA : 1 | SAC : 2, SAD : 3 | |
 | SAC : 2 | SACF : 3 | |
-| SAD : 3 | SADF : 5, SADG : 5, SADB : 7 | |
-| SACF : 3 | SACFG : **4** ← goal on queue | |
-| SB : 4 | SBD : 5, SBE : 6, SBA : 8 | |
-| SBD : 5, then SACFG : **4** | all open ≥ 4 → **optimal** | |
+| SACF : 3 (tie with SAD — labels: S-A-C before S-A-D) | SACFG : **4** ← goal queued | |
+| SAD : 3 | SADF : $3+2$ = 5, SADG : $3+2$ = 5, SADB : $3+1$ = **4** | |
+| SACFG : **4** — cheapest in OPEN (ties SADB/SB at 4 lose on labels) | a complete tour, everything left ≥ 4 → **optimal** | |
 
 Path: **S → A → C → F → G**, cost $1+1+1+1 = 4$ ✓ the true shortest.
 

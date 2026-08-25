@@ -99,11 +99,11 @@ Path: **S → D → H → F → G**, cost $2+2+2+4 = 10$.
     { id: "S", x: 40, y: 200 },
     { id: "A", x: 230, y: 60 },
     { id: "B", x: 470, y: 60 },
-    { id: "D", x: 120, y: 200 },
-    { id: "E", x: 340, y: 200 },
-    { id: "C", x: 450, y: 300 },
-    { id: "G", x: 660, y: 300 },
-    { id: "F", x: 560, y: 390 },
+    { id: "D", x: 170, y: 200 },
+    { id: "E", x: 370, y: 200 },
+    { id: "C", x: 470, y: 300 },
+    { id: "G", x: 680, y: 300 },
+    { id: "F", x: 580, y: 390 },
     { id: "H", x: 230, y: 390 }
   ]}
   edges={[
@@ -138,15 +138,18 @@ E's low $h$ (5) is a lie — its real cost to G is 8. But at expansion time $f(E
 
 ## 1.3 — Branch-and-Bound → `S,A,B,G`
 
-| Pop | OPEN (path : $g$) | Extend |
-|-----|-------------------|--------|
-| S : 0 | SA : 4, SD : 2 | |
-| SD : 2 | SDE : 6, SDH : 4 | |
-| SDH : 4 | SDHF : 6 | |
-| SA : 4 | SAB : 6, SAE : 12 | |
-| SDHF : 6 | SDHFG : 10 | |
-| SAB : 6 | SABG : **8** ← goal on queue, SB C : 10 | |
-| SBG : **8** | all open ≥ 8 → **optimal** | |
+Pop the cheapest partial path; ties break by path labels (SDE &lt; SDHF &lt; SAB).
+
+| Pop | Extend to | OPEN afterwards (path : g) |
+|-----|-----------|---------------------------|
+| S : 0 | SA : 4, SD : 2 | SD : 2, SA : 4 |
+| SD : 2 | SDE : 6, SDH : 4 | SA : 4, SDH : 4, SDE : 6 |
+| SDH : 4 | SDHF : 6 | SA : 4, SDE : 6, SDHF : 6 |
+| SA : 4 | SAB : 6, SAE : 12 | SDE : 6, SDHF : 6, SAB : 6, SAE : 12 |
+| SDE : 6 | SDEC : 10, SDEH : 14 | SDHF : 6, SAB : 6, SDEC : 10, SAE : 12, SDEH : 14 |
+| SDHF : 6 | SDHFG : 10 (goal on queue) | SAB : 6, SDHFG : 10, SDEC : 10, SAE : 12, SDEH : 14 |
+| SAB : 6 | SABC : 10, SABG : **8** (goal on queue) | **SABG : 8**, SDHFG : 10, SABC : 10, SDEC : 10, SAE : 12, SDEH : 14 |
+| **SABG : 8** | goal popped — cheapest open is 10 ≥ 8 | → **optimal** |
 
 Path: **S → A → B → G**, cost $4+2+2 = 8$ ✓ the true shortest.
 
@@ -161,11 +164,11 @@ $h(A) = 7$ but $h^*(A) = A \to B \to G = 4$ — **overestimate** → inadmissibl
 ## Tricks & Tips
 
 <Accordion title="Exam shortcuts">
-1. h-table first. Here it explains everything: B looks cheap (h=3) to BFS... no wait, A(7) vs D(5) sends BFS right; A* never expands E because f(E) = 11 exceeds the goal cost 10.
-2. BFS = sort by h (ties → labels: E before H).
-3. A* = sort by g+h; a node with f above the final goal cost is never expanded.
-4. BnB = sort by g on full paths — the S,A,B,G = 8 line pops first.
-5. 1.4/1.5 agree: A* suboptimal ⇒ h inadmissible (A: 7 > 4).
+1. h-table first. A(7) vs D(5) sends Best First down the D branch; E and H tie at h = 5, so the label rule fires (E first).
+2. BFS = sort by h (ties → labels); it never looks at edge costs — hence the 14 detour.
+3. A* = sort by g+h; any node with f above the final goal cost is never expanded (E sits at f = 11 when G pops at 10).
+4. BnB = sort by g on full paths; S,A,B,G = 8 pops before anything else can close.
+5. 1.4/1.5 agree: A* suboptimal ⇒ h inadmissible (A: 7 &gt; 4).
 </Accordion>
 
 **Answers:** 1.1 `S,D,E,C,G` · 1.2 `S,D,H,F,G` · 1.3 `S,A,B,G` · 1.4 **C** · 1.5 **B**

@@ -1,77 +1,63 @@
 ---
-title: "Q2 — SEARCH ALGORITHMS"
-short: "SEARCH ALGORITHMS"
+title: "Q2 — Search Algorithms Theory"
+short: "Search Algorithms Theory"
 order: 2
 paper: "26t1-fn"
 question: 2
-label: "SEARCH ALGORITHMS"
-description: "Search Algorithms question"
-topics: ["SEARCH ALGORITHMS"]
+label: "SEARCH FOR OPTIMAL SOLUTION"
+description: "DFID's closed-list secret, the two survivors of an unknown heuristic under arbitrary costs, and why w = 0 turns wA* into Dijkstra."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "DFID", "Optimality", "WA*"]
 ---
 
 ## The Question
 
-Answer the given subquestions.
-
-
 | # | Question | Official answer |
 |---|----------|-----------------|
 | 2.1 | Which of the following variants of Depth First Iterative Deepening (DFID) is guaranteed to find the shortest path if one exists? | **C** |
-| 2.2 | Given a finite state space with edge costs that may or may not be Euclidean and a heuristic function whose properties are not known, which of the following a... | **C**, **D** |
+| 2.2 | Given a finite state space with edge costs that may or may not be Euclidean and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path? | **C**, **D** |
 | 2.3 | If w is set to zero then wA* algorithm will __________ . | **B**, **C** |
 
-## The Topic in 60 Seconds
-
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+> Deep-dive: browse the [Concepts](/concepts) section for optimal search.
 
 ## Solutions
 
-**2.1** — Which of the following variants of Depth First Iterative Deepening (DFID) is guaranteed to find the shortest path if one exists?
+### 2.1 — DFID optimality → **C**
 
-Options:
+DFID re-runs depth-limited DFS with limits $1, 2, 3, \dots$, discarding bookkeeping between rounds. The optimality proof lives in that amnesia: iteration $k$ re-inspects every **closed** node from earlier rounds, so nothing blocks the shallowest goal when its depth arrives.
 
-| Option | |
-|---|---|
-| **A** | DFID that inspects only new nodes. |
-| **B** | DFID that inspects new as well as open nodes. |
-| **C** | DFID that inspects new as well as closed nodes. |
-| **D** | None of these. |
+- A (new nodes only): an early round could close a node on the shallow path — later rounds refuse to reuse it ✗
+- B (new + open): stale frontier entries still block rediscovery ✗
+- **C (new + closed): correct ✓**
+- D: contradicted by C ✗
 
-**Answer:** **C**
+### 2.2 — Arbitrary costs + unknown $h$ → **C, D**
 
-**2.2** — Given a finite state space with edge costs that may or may not be Euclidean and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
+Two filters, applied in order:
 
-Options:
+1. **Unknown $h$** removes every heuristic-trusting method: A*, WA*, SMGS.
+2. **Non-uniform costs** ("may or may not be Euclidean") removes BFS (fewest edges ≠ cheapest) and already removed DFS.
 
-| Option | |
-|---|---|
-| **A** | Depth First Search |
-| **B** | Breadth First Search |
-| **C** | Dijkstra's algorithm |
-| **D** | Branch and Bound Search |
-| **E** | A* |
-| **F** | WA* for some w |
-| **G** | Sparse Memory Graph Search (SMGS) |
+Survivors: **Dijkstra (C)** and **Branch-and-Bound (D)** — both order by true accumulated cost and consult no heuristic.
 
-**Answer:** **C**, **D**
+### 2.3 — $w = 0$ → **B, C**
 
-**2.3** — If w is set to zero then wA* algorithm will __________ .
+$$f(n) = g(n) + 0 \cdot h(n) = g(n)$$
 
-Options:
+Ordering collapses to pure accumulated cost:
 
-| Option | |
-|---|---|
-| **A** | behave like Best-First Search |
-| **B** | behave like Dijkstra's algorithm |
-| **C** | always find the optimal path |
-| **D** | sometimes find a suboptimal path |
+- **B ✓**: this is exactly Dijkstra's algorithm — expansion by cheapest $g$.
+- **C ✓**: optimality is guaranteed (it *is* Dijkstra); the conditional "if $h$ is admissible" is satisfied vacuously — the guarantee holds regardless of $h$.
+- Best-first behaviour needs $w \to \infty$, not $w \to 0$ ✗; "no guarantee" claims contradict Dijkstra's theorem ✗.
 
-**Answer:** **B**, **C**
+Memorise the dial: $w = 0$ → Dijkstra · $w = 1$ → A* · $w > 1$ → bounded-suboptimal · $w \to \infty$ → greedy Best-First.
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. DFID keyword: 're-inspects closed nodes each iteration' - cross-iteration memory of any kind disqualifies the option.
+2. Unknown-h ladder: filter h-users first, then apply the cost test to the survivors - two passes, done.
+3. The w-dial answers every WA* limit question: name the algorithm at w = 0, 1, >1, infinity and match options verbatim.
+4. Watch for vacuous conditionals: 'guarantees optimal IF h admissible' is TRUE even when the guarantee never needed h.
 </Accordion>
+
+**Answers:** 2.1 **C** · 2.2 **C, D** · 2.3 **B, C**

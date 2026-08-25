@@ -5,43 +5,55 @@ order: 3
 paper: "22t3-fn"
 question: 3
 label: "SEARCH FOR OPTIMAL SOLUTION"
-description: "Search For Optimal Solution question"
-topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+description: "When the whole search space cannot sit in memory, SMGS is the only listed algorithm whose optimality proof survives the memory cut."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "SMGS", "Memory-bounded search"]
 ---
 
 ## The Question
 
-
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 3 | Given a state space (and a search space) that is too large to fit into main memory, and with Euclidean edge costs, and with the best admissible heuristics, w... | **G** |
+| 3 | Given a state space (and a search space) that is too large to fit into main memory, and with Euclidean edge costs, and with the best admissible heuristics, which of the following algorithms will you choose to find an optimal path? | **G** |
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+Three constraints stack up here: (1) memory is smaller than the space, (2) costs are non-uniform (Euclidean), (3) $h$ is admissible. The algorithm must stay optimal **while respecting the memory bound** — that pair of demands eliminates six of the seven options.
+
+> Deep-dive: browse the [Concepts](/concepts) section for memory-bounded search.
 
 ## Solutions
 
-**3** — Given a state space (and a search space) that is too large to fit into main memory, and with Euclidean edge costs, and with the best admissible heuristics, which of the following algorithms will you choose to find an optimal path?
+**3** — Too-large-for-memory space, Euclidean costs, best admissible heuristics. Which algorithm?
 
-Options:
-
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | Depth First Search |
-| **B** | Breadth First Search |
-| **C** | Dijkstra's algorithm |
-| **D** | Branch and Bound Search |
-| **E** | A* |
-| **F** | WA* for some w |
-| **G** | Sparse Memory Graph Search (SMGS) |
+| **A** — Depth First Search | **No**: fits memory but ignores costs entirely — never optimal with non-uniform edges |
+| **B** — Breadth First Search | **No**: needs the whole level in memory AND minimises edge-count, not Euclidean cost |
+| **C** — Dijkstra | **No (here)**: optimal, but its OPEN/CLOSED grow to the size of the space — dies on the memory constraint |
+| **D** — Branch and Bound | **No (here)**: same disease as Dijkstra; the bound list itself outgrows memory |
+| **E** — A* | **No (here)**: optimal given admissible $h$, but stores every generated node — blows the memory budget |
+| **F** — WA* for some w | **No**: bounded-suboptimal at best ($w \cdot C^*$), and still memory-hungry |
+| **G** — SMGS | **Correct**: Sparse Memory Graph Search provably returns optimal paths while keeping only a sparse subset of the graph in memory |
 
 **Answer:** **G**
 
+### Why only G survives all three constraints
+
+| Constraint | Kills | Survived by |
+|---|---|---|
+| Space > memory | B, C, D, E (all keep ~full OPEN/CLOSED) | A (tiny memory, but…), G |
+| Non-uniform costs | A (ignores costs), B (counts edges) | C, D, E, F, G |
+| Optimality required | F (only w·C*-bounded) | C, D, E, G |
+
+Intersecting the surviving columns leaves exactly one name: **SMGS**. Its trick is deliberate node pruning + regeneration: it forgets nodes it can provably re-derive later, so the memory bound holds *without* giving up the admissible-$h$ optimality argument.
+
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Spot the compound question: each added condition ("too large for memory", "Euclidean", "admissible h") is designed to eliminate one family of algorithms. Filter options condition by condition.
+2. Dijkstra/BnB/A* are always optimal-but-fat: any mention of tight memory removes all three at once.
+3. WA* answers quality-guarantee questions, never optimality questions — "for some w" includes w > 1 by design.
+4. SMGS = the course's designated answer whenever "optimal" and "memory-bounded" appear in the same sentence. IDA* plays the same role if it is offered.
 </Accordion>
+
+**Answers:** 3 **G**

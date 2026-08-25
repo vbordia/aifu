@@ -1,12 +1,12 @@
 ---
-title: "Q2 — SEARCH ALGORITHMS"
-short: "SEARCH ALGORITHMS"
+title: "Q2 — Search Algorithms Theory"
+short: "Search Algorithms Theory"
 order: 2
 paper: "26t1-an"
 question: 2
-label: "SEARCH ALGORITHMS"
-description: "Search Algorithms question"
-topics: ["SEARCH ALGORITHMS"]
+label: "SEARCH FOR OPTIMAL SOLUTION"
+description: "Three guarantee questions: DFID's closed-list secret, which algorithms survive an unknown heuristic, and why wA* at infinity forgets g entirely."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "DFID", "Optimality", "WA*"]
 ---
 
 ## The Question
@@ -22,56 +22,52 @@ Answer the given subquestions.
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+Guarantees attach to assumptions: DFID needs unit costs + amnesia about CLOSED; heuristic methods need admissibility — unknown $h$ kills them; $f = g + w\cdot h$ degenerates to pure $h$-greed as $w \to \infty$.
+
+> Deep-dive: browse the [Concepts](/concepts) section for optimal search.
 
 ## Solutions
 
-**2.1** — Under what cases does Depth First Iterative Deepening (DFID) guarantee to find the shortest path if one exists?
+### 2.1 — DFID optimality → **C**
 
-Options:
+DFID re-runs depth-limited DFS with limit $1, 2, 3, \dots$, discarding all bookkeeping between rounds. Optimality lives in the *amnesia*: iteration $k$ re-expands every node closed by iterations $1..k{-}1$ from scratch, so nothing blocks the shallowest goal when its turn comes.
 
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | When it inspects only new nodes. |
-| **B** | When it inspects new as well as open nodes. |
-| **C** | When it inspects new as well as closed nodes. |
-| **D** | None of these |
+| A — inspects only new nodes | Fails: an early round could close a node ON the shallow path; later rounds refuse to reuse it |
+| B — new + open | Not the guarantee: stale frontier entries still block rediscovery |
+| **C — new + closed** | **Correct**: re-inspecting closed nodes every iteration is precisely the optimality proof |
+| D — none | Wrong: C is textbook DFID |
 
-**Answer:** **C**
+### 2.2 — Unknown-quality $h$, unit costs → **B, C, D**
 
-**2.2** — Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
+Split options into $h$-users and $h$-ignorers:
 
-Options:
+| Option | Uses $h$? | Verdict |
+|---|---|---|
+| A — DFS | no, but ignores costs too | No: returns *a* goal, not the shallowest |
+| **B — BFS** | no | **Yes**: unit costs make fewest-edges = cheapest |
+| **C — Dijkstra** | no | **Yes**: cheapest-first expansion, no assumptions beyond non-negative costs |
+| **D — Branch & Bound** | no | **Yes**: ranks by true accumulated $g$ |
+| E — A* | yes (admissibility) | No: unknown quality removes the guarantee |
+| F — WA* | yes ($w \cdot$ admissibility) | No |
+| G — SMGS | yes | No: pruning rule safe only under admissible $h$ |
 
-| Option | |
-|---|---|
-| **A** | Depth First Search |
-| **B** | Breadth First Search |
-| **C** | Dijkstra's algorithm |
-| **D** | Branch and Bound Search |
-| **E** | A* |
-| **F** | WA* for some w |
-| **G** | Sparse Memory Graph Search (SMGS) |
+### 2.3 — $w \to \infty$ → **A, D**
 
-**Answer:** **B**, **C**, **D**
+$$f(n) = g(n) + w \cdot h(n) \xrightarrow{w \to \infty} h(n)\ \text{dominates completely}$$
 
-**2.3** — If w is set to a large value (tending to infinity) then wA* algorithm will __________ .
-
-Options:
-
-| Option | |
-|---|---|
-| **A** | behave like Best-First Search |
-| **B** | behave like Dijkstra's algorithm |
-| **C** | guarantee an optimal path if h is admissible |
-| **D** | not guarantee an optimal path even if h is admissible |
-
-**Answer:** **A**, **D**
+- **A ✓**: ordering collapses to $h$ alone = Best-First Search behaviour (greedy best-first).
+- **B ✗**: Dijkstra orders by $g$ — the exact opposite limit ($w = 0$).
+- **C ✗ / D ✓**: even with admissible $h$, ignoring $g$ means the first goal popped may sit down a cheap-$h$ but expensive-$g$ corridor — no optimality guarantee at any $w > 1$, a fortiori at infinity.
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. DFID keyword: 'forgets CLOSED between iterations' - any option describing cross-iteration memory describes graph search, not DFID.
+2. Unknown-h questions: keep only the h-ignorers, then apply the cost test (unit -> BFS stays; non-uniform -> BFS goes).
+3. WA* limits to memorise: w=1 recovers A*; w>1 breaks admissibility BY DESIGN; w->infinity recovers greedy Best First. One line, three subquestions.
+4. 'Suitable for finding the optimal path' always means PROVABLY optimal - bounded-suboptimal (w*C*) does not count.
 </Accordion>
+
+**Answers:** 2.1 **C** · 2.2 **B, C, D** · 2.3 **A, D**

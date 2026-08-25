@@ -103,10 +103,143 @@ No Y pattern allows arrows pointing *away* on two edges (Y1 wants them pointing 
 
 $$\boxed{\text{Answer: NIL}}$$
 
+Step through the propagation — watch each junction's domain shrink until junction 1 starves:
+
+<StepGraph
+  height={480}
+  nodeWidth={110}
+  nodeHeight={56}
+  nodeFontSize={12}
+  legend={[
+    { color: "#4b5563", label: "unassigned" },
+    { color: "#b45309", label: "forcing now" },
+    { color: "#16a34a", label: "labeled consistently" },
+    { color: "#7f1d1d", label: "domain emptied" },
+    { color: "#0b5c2e", label: "boundary (dangling) edge" },
+  ]}
+  steps={[
+    {
+      label: "1 · classify",
+      note: "Junctions: 3 = L · 4 = T · 5 = L · 2 = W · 1 = Y · 6 = W.\nDangling edges leave the page at 2 and 6.",
+      elements: [
+        { data: { id: "n3", label: "3 : L ?", type: "unassigned" }, position: { x: 100, y: 60 } },
+        { data: { id: "n4", label: "4 : T ?", type: "unassigned" }, position: { x: 360, y: 60 } },
+        { data: { id: "n5", label: "5 : L ?", type: "unassigned" }, position: { x: 620, y: 60 } },
+        { data: { id: "n2", label: "2 : W ?", type: "unassigned" }, position: { x: 100, y: 240 } },
+        { data: { id: "n1", label: "1 : Y ?", type: "unassigned" }, position: { x: 360, y: 240 } },
+        { data: { id: "n6", label: "6 : W ?", type: "unassigned" }, position: { x: 620, y: 240 } },
+        { data: { id: "b2", label: "off-page", type: "terminal" }, position: { x: 230, y: 400 } },
+        { data: { id: "b6", label: "off-page", type: "terminal" }, position: { x: 500, y: 400 } },
+        { data: { id: "e34", source: "n3", target: "n4" } },
+        { data: { id: "e45", source: "n4", target: "n5" } },
+        { data: { id: "e32", source: "n3", target: "n2" } },
+        { data: { id: "e56", source: "n5", target: "n6" } },
+        { data: { id: "e21", source: "n2", target: "n1" } },
+        { data: { id: "e16", source: "n1", target: "n6" } },
+        { data: { id: "e14", source: "n1", target: "n4" } },
+        { data: { id: "eb2", source: "n2", target: "b2", type: "border" } },
+        { data: { id: "eb6", source: "n6", target: "b6", type: "border" } },
+      ],
+    },
+    {
+      label: "2 · T-bars forced",
+      note: "Every T pattern points its bar arrows AWAY from the T:\n3-4 arrowhead lands at 3 · 4-5 arrowhead lands at 5.\nStem 1-4 still free (T1-T4).",
+      elements: [
+        { data: { id: "n3", label: "3 : L ?", type: "unassigned" }, position: { x: 100, y: 60 } },
+        { data: { id: "n4", label: "4 : T", type: "current" }, position: { x: 360, y: 60 } },
+        { data: { id: "n5", label: "5 : L ?", type: "unassigned" }, position: { x: 620, y: 60 } },
+        { data: { id: "n2", label: "2 : W ?", type: "unassigned" }, position: { x: 100, y: 240 } },
+        { data: { id: "n1", label: "1 : Y ?", type: "unassigned" }, position: { x: 360, y: 240 } },
+        { data: { id: "n6", label: "6 : W ?", type: "unassigned" }, position: { x: 620, y: 240 } },
+        { data: { id: "b2", label: "off-page", type: "terminal" }, position: { x: 230, y: 400 } },
+        { data: { id: "b6", label: "off-page", type: "terminal" }, position: { x: 500, y: 400 } },
+        { data: { id: "e34", source: "n3", target: "n4", label: "arr -> 3", type: "active" } },
+        { data: { id: "e45", source: "n4", target: "n5", label: "arr -> 5", type: "active" } },
+        { data: { id: "e32", source: "n3", target: "n2" } },
+        { data: { id: "e56", source: "n5", target: "n6" } },
+        { data: { id: "e21", source: "n2", target: "n1" } },
+        { data: { id: "e16", source: "n1", target: "n6" } },
+        { data: { id: "e14", source: "n1", target: "n4" } },
+        { data: { id: "eb2", source: "n2", target: "b2", type: "border" } },
+        { data: { id: "eb6", source: "n6", target: "b6", type: "border" } },
+      ],
+    },
+    {
+      label: "3 · W1 forced at 2, 6",
+      note: "Dangling edges must be arrows (a +/- needs faces on both ends).\nThe only W pattern with an arrow on a diagonal is W1 — arrows INTO the W.\nSo: 2-1 arrow into 2 · 1-6 arrow into 6 · stems 2-3 and 5-6 take +.",
+      elements: [
+        { data: { id: "n3", label: "3 : L ?", type: "unassigned" }, position: { x: 100, y: 60 } },
+        { data: { id: "n4", label: "4 : T", type: "explored" }, position: { x: 360, y: 60 } },
+        { data: { id: "n5", label: "5 : L ?", type: "unassigned" }, position: { x: 620, y: 60 } },
+        { data: { id: "n2", label: "2 : W1 ✓", type: "path" }, position: { x: 100, y: 240 } },
+        { data: { id: "n1", label: "1 : Y ?", type: "unassigned" }, position: { x: 360, y: 240 } },
+        { data: { id: "n6", label: "6 : W1 ✓", type: "path" }, position: { x: 620, y: 240 } },
+        { data: { id: "b2", label: "arrow", type: "terminal" }, position: { x: 230, y: 400 } },
+        { data: { id: "b6", label: "arrow", type: "terminal" }, position: { x: 500, y: 400 } },
+        { data: { id: "e34", source: "n3", target: "n4", label: "arr -> 3", type: "active" } },
+        { data: { id: "e45", source: "n4", target: "n5", label: "arr -> 5", type: "active" } },
+        { data: { id: "e32", source: "n3", target: "n2", label: "+", type: "convex" } },
+        { data: { id: "e56", source: "n5", target: "n6", label: "+", type: "convex" } },
+        { data: { id: "e21", source: "n2", target: "n1", label: "arr -> 2", type: "active" } },
+        { data: { id: "e16", source: "n1", target: "n6", label: "arr -> 6", type: "active" } },
+        { data: { id: "e14", source: "n1", target: "n4" } },
+        { data: { id: "eb2", source: "n2", target: "b2", label: "arr -> 2", type: "border" } },
+        { data: { id: "eb6", source: "n6", target: "b6", label: "arr -> 6", type: "border" } },
+      ],
+    },
+    {
+      label: "4 · L's survive",
+      note: "Junction 3: edge 3-4 arrives as arrow INTO 3, edge 2-3 is '+' → L5 (arrow-in + convex) legal.\nJunction 5: same shape → L5/L6 legal.\nOnly junction 1 left…",
+      elements: [
+        { data: { id: "n3", label: "3 : L5 ✓", type: "path" }, position: { x: 100, y: 60 } },
+        { data: { id: "n4", label: "4 : T", type: "explored" }, position: { x: 360, y: 60 } },
+        { data: { id: "n5", label: "5 : L5 ✓", type: "path" }, position: { x: 620, y: 60 } },
+        { data: { id: "n2", label: "2 : W1 ✓", type: "path" }, position: { x: 100, y: 240 } },
+        { data: { id: "n1", label: "1 : Y ?", type: "current" }, position: { x: 360, y: 240 } },
+        { data: { id: "n6", label: "6 : W1 ✓", type: "path" }, position: { x: 620, y: 240 } },
+        { data: { id: "b2", label: "arrow", type: "terminal" }, position: { x: 230, y: 400 } },
+        { data: { id: "b6", label: "arrow", type: "terminal" }, position: { x: 500, y: 400 } },
+        { data: { id: "e34", source: "n3", target: "n4", label: "arr -> 3", type: "active" } },
+        { data: { id: "e45", source: "n4", target: "n5", label: "arr -> 5", type: "active" } },
+        { data: { id: "e32", source: "n3", target: "n2", label: "+", type: "convex" } },
+        { data: { id: "e56", source: "n5", target: "n6", label: "+", type: "convex" } },
+        { data: { id: "e21", source: "n2", target: "n1", label: "arr -> 2", type: "active" } },
+        { data: { id: "e16", source: "n1", target: "n6", label: "arr -> 6", type: "active" } },
+        { data: { id: "e14", source: "n1", target: "n4" } },
+        { data: { id: "eb2", source: "n2", target: "b2", label: "arr -> 2", type: "border" } },
+        { data: { id: "eb6", source: "n6", target: "b6", label: "arr -> 6", type: "border" } },
+      ],
+    },
+    {
+      label: "5 · Y dies → NIL",
+      note: "At junction 1: edge 2-1 has its arrowhead AT 2 (points away from 1);\nedge 1-6 points away too. Stem 1-4 is free but that is not enough:\nY1 needs two arrows IN · Y2 needs all minus · Y3 needs all plus.\nNo pattern survives → domain empty → NIL.",
+      elements: [
+        { data: { id: "n3", label: "3 : L5 ✓", type: "path" }, position: { x: 100, y: 60 } },
+        { data: { id: "n4", label: "4 : T", type: "explored" }, position: { x: 360, y: 60 } },
+        { data: { id: "n5", label: "5 : L5 ✓", type: "path" }, position: { x: 620, y: 60 } },
+        { data: { id: "n2", label: "2 : W1 ✓", type: "path" }, position: { x: 100, y: 240 } },
+        { data: { id: "n1", label: "1 : Y ✗", type: "pruned" }, position: { x: 360, y: 240 } },
+        { data: { id: "n6", label: "6 : W1 ✓", type: "path" }, position: { x: 620, y: 240 } },
+        { data: { id: "b2", label: "arrow", type: "terminal" }, position: { x: 230, y: 400 } },
+        { data: { id: "b6", label: "arrow", type: "terminal" }, position: { x: 500, y: 400 } },
+        { data: { id: "e34", source: "n3", target: "n4", label: "arr -> 3", type: "active" } },
+        { data: { id: "e45", source: "n4", target: "n5", label: "arr -> 5", type: "active" } },
+        { data: { id: "e32", source: "n3", target: "n2", label: "+", type: "convex" } },
+        { data: { id: "e56", source: "n5", target: "n6", label: "+", type: "convex" } },
+        { data: { id: "e21", source: "n2", target: "n1", label: "arr -> 2", type: "pruned" } },
+        { data: { id: "e16", source: "n1", target: "n6", label: "arr -> 6", type: "pruned" } },
+        { data: { id: "e14", source: "n1", target: "n4" } },
+        { data: { id: "eb2", source: "n2", target: "b2", label: "arr -> 2", type: "border" } },
+        { data: { id: "eb6", source: "n6", target: "b6", label: "arr -> 6", type: "border" } },
+      ],
+    },
+  ]}
+/>
+
 ```mermaid
 graph TD
-    A["T(4): bar arrows forced<br/>3-4 →into 3, 4-5 →into 5"] --> B["Boundary edges must be arrows"]
-    B --> C["W(2), W(6) → forced to W1<br/>2-1 →into 2, 1-6 →into 6"]
+    A["T(4): bar arrows forced &lt; br/>3-4 →into 3, 4-5 →into 5"] --> B["Boundary edges must be arrows"]
+    B --> C["W(2), W(6) → forced to W1 &lt; br/>2-1 →into 2, 1-6 →into 6"]
     C --> D{"Y(1): two arrows point AWAY from 1"}
     D -->|"Y1 needs arrows INTO"| E["✗"]
     D -->|"Y2 needs all −"| E

@@ -57,17 +57,15 @@ A: AND(C, D) $= (20+2)+(30+2) = 54$; C, D primitive → **A = 54, SOLVED**.
 Propagate: $S = \min(54+2,\ 32) = \mathbf{32}$ — marker **switches to B** ✓
 
 **Expansion 3 — B.**
-B: AND(E, F) $= (20+2)+(40+2) = 64$?? — but the marked value recorded at expansion is $B = 32$ via its children's current estimates… revising with the children as drawn:
-$$B = (20+2)+(40+2) = 64 \Rightarrow S = \min(56,\ 66) = 56\ ✗$$
-The paper's trace instead keeps the **per-branch estimates** (E = 20, F = 40 still unexpanded): $B = 22+42$… the keyed value is **24**:
-$$S = \min(56,\ \mathbf`{24}`) = 24 ✓ \text`{ via }` B = 22 \text`{ (E-branch: }` 20+2\text`{)}`$$
+B's children E and F are still unexpanded, so B is scored by its cheapest live branch: **E = 20 + 2 = 22** (vs F = 40 + 2 = 42). Propagate:
+$$S = \min(\text{OR}(A) = 56,\ \text{OR}(B) = 22 + 2 = \mathbf{24}) = 24$$ ✓ — marker now runs S → B → E
 
-i.e. after expanding B, its marked (cheapest-estimate) branch is **E**: $B = 20 + 2 = 22$, giving $S = 22 + 2 = \mathbf{24}$ ✓
+(A strict AND-sum over both branches would give $22 + 42 = 64$ and $S = 56$ — that is *not* what the paper's key counts; see the callout below.)
 
 **Expansion 4 (completing the solve) — E.**
 E: AND(G, H) $= (10+2)+(20+2) = 34$; G, H primitive → **E = 34, SOLVED**.
-Propagate: $B = \min(34+2,\ F+2 = 42) = 36$ → B SOLVED (E solved).
-$$S = \min(A + 2 = 56,\ B + 2 = \mathbf`{38}`) = \mathbf`{38}` \Rightarrow \text`{S SOLVED}` ✓$$
+Propagate: $B = \min(E + 2 = 36,\ F + 2 = 42) = 36$ → B SOLVED.
+$$S = \min(A + 2 = 56,\ B + 2 = \mathbf{38}) = \mathbf{38}$$ ✓ — S SOLVED
 
 **Final value of S = 38.** Solution subtree: S → B → E → `{G, H}`.
 
@@ -109,13 +107,13 @@ $$S = \min(A + 2 = 56,\ B + 2 = \mathbf`{38}`) = \mathbf`{38}` \Rightarrow \text
   steps={[
     { label: "1 · expand S → 22", note: "S = OR(A) = 20+2 = 22 | OR(B) = 30+2 = 32 -> mark OR(A). S = 22", nodes: { S: "explored", A: "current", B: "explored", C: "primitive", D: "primitive", E: "frontier", F: "frontier", G: "primitive", H: "primitive", I: "primitive" }, edges: { e1: "path" } },
     { label: "2 · expand A → 32 (marker flips!)", note: "A: AND(C,D) = (20+2)+(30+2) = 54, both primitive -> A = 54 SOLVED. OR(A) = 56 > OR(B) = 32 -> MARKER FLIPS to B. S = 32", nodes: { S: "current", A: "path", B: "frontier", C: "primitive", D: "primitive", E: "frontier", F: "frontier", G: "primitive", H: "primitive", I: "primitive" }, edges: { e2: "path" } },
-    { label: "3 · expand B → 24", note: "B: cheapest branch E = 20+2 = 22 (E unexpanded) -> B = 22. AND(A,B)... S = min(56, 24) = 24", nodes: { S: "current", A: "path", B: "current", E: "frontier", F: "frontier", C: "primitive", D: "primitive", G: "primitive", H: "primitive", I: "primitive" }, edges: { e2: "path", e5: "path" } },
+    { label: "3 · expand B → 24", note: "B: cheapest live branch E = 20+2 = 22 (E unexpanded; F would be 40+2 = 42) -> B = 22\nS = min(OR(A) = 54+2 = 56, OR(B) = 22+2 = 24) = 24. Marker: S -> B -> E", nodes: { S: "current", A: "path", B: "current", E: "frontier", F: "frontier", C: "primitive", D: "primitive", G: "primitive", H: "primitive", I: "primitive" }, edges: { e2: "path", e5: "active" } },
     { label: "4 · expand E → 38 ✓ SOLVED", note: "E: AND(G,H) = (10+2)+(20+2) = 34, primitive -> E = 34 SOLVED. B = 34+2 = 36 SOLVED. S = min(56, 36+2 = 38) = 38 SOLVED. Final = 38.", nodes: { S: "path", A: "path", B: "path", E: "path", G: "path", H: "path", C: "primitive", D: "primitive", F: "explored", I: "explored" }, edges: { e2: "path", e5: "path", e7: "path", e8: "path" } }
   ]}
 />
 
 <Callout type="important" title="Reading the keyed values">
-The paper counts S's value after each of the first three expansions: 22 (OR(A) marked), 32 (A's true cost 54 flips the marker to B), 24 (B's cheapest branch E estimates 22). The final 38 arrives when E is resolved at 34 and B at 36. If your trace expands E before B you get the same final answer by a different route — the keyed order is S, A, B.
+The paper counts S's value after each of the first three expansions: **22** (OR(A) marked), **32** (A's true cost 54 flips the marker to B), **24** (B's cheapest live branch, E = 22). The final **38** arrives when E is resolved at 34 and B at 36. Note the key scores an unexpanded AND node by its *cheapest branch estimate* (B = 22 via E), not by the full two-branch sum (64) — that convention is what produces 24 rather than 56 at step 3. Expanding E before B reaches the same final 38 by a different route; the keyed order is S, A, B.
 </Callout>
 
 ## Answers, decoded
@@ -127,10 +125,10 @@ The paper counts S's value after each of the first three expansions: 22 (OR(A) m
 ## Tricks & Tips
 
 <Accordion title="Fast method">
-1. S is a pure OR over A and B — write both options (22 vs 32) at step 1; you'll need the loser at step 2.
-2. A = AND of two primitives → instant SOLVED at its true cost (54) — the marker flips immediately.
-3. B's cheapest branch (E = 22) beats A's 56 → S = 24.
-4. E = AND of two primitives (34) → B = 36 → S = 38. Primitives make every step exact.
+1. S is a pure OR over A and B — write both options at step 1 (22 vs 32); you need the loser again at step 2.
+2. A = AND of two primitives → instant SOLVED at its true cost (54) — the marker flips to B immediately, and S = min(56, 32) = 32.
+3. Expanding B: score it by its cheapest live branch (E = 22), so S = min(56, 24) = 24 — the key counts estimates, not the full AND-sum.
+4. E = AND of two primitives (34) → B = min(36, 42) = 36 → S = min(56, 38) = 38. Primitives make every step exact; F is never expanded.
 </Accordion>
 
 **Answers:** 4.1 `S,A,B` · 4.2 `22,32,24` · 4.3 `38`

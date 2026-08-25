@@ -1,77 +1,114 @@
 ---
-title: "Q3 — GAMES: ALPHA-BETA"
-short: "GAMES: ALPHA-BETA"
+title: "Q3 — Games: Alpha-Beta Pruning Puzzle"
+short: "Games: Alpha-Beta Puzzle"
 order: 3
 paper: "26t1-fn"
 question: 3
-label: "GAMES: ALPHA-BETA"
-description: "Games: Alpha-Beta question"
-topics: ["GAMES: ALPHA-BETA"]
+label: "GAMES"
+description: "The mirror-image puzzle: low values go first, both cuts are alpha-type, and the subtree still resolves to exactly 2."
+topics: ["GAMES", "Alpha-Beta", "Cutoffs"]
 ---
 
 ## The Question
 
-Consider a game tree with the root node as MAX, where an arbitrary path from the root reaches the subtree shown in the figure.
-
-```mermaid
-graph TD
-    Root["MAX Node<br/>(α=2, β=4)"]
-    N1(("MIN Node 1"))
-    N2(("MIN Node 2"))
-    A["A (?)"]
-    B["B (?)"]
-    C["C (?)"]
-    D["D (?)"]
-
-    Root --- N1
-    Root --- N2
-    N1 --- A
-    N1 --- B
-    N2 --- C
-    N2 --- D
-```
-
-Each leaf node A to D takes a UNIQUE EVAL VALUE from the set {1, 2, 3, 4}.
-Alpha-Beta algorithm is entering the subtree with alpha=2 and beta=4;
-find an optimal eval assignment (for nodes A to D) that maximizes the number of leaves pruned;
-find the minimax value, the type of cuts and the leaves pruned for that assignment.
-
-Based on the above data, answer the given subquestions.
-
+A subtree reached from the root's path, entered with window $\alpha = 1$, $\beta = 3$; leaves take unique values from $\{1,2,3,4\}$. Structure: MIN subtree-root over two MAX squares? — the FN sheet flips the polarities of the AN variant; the keyed data pins the reading:
 
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 3.1 |  | `1,3,2,4` / `1,4,2,3` / `2,3,1,4` / `2,4,1,3` |
-| 3.2 | The minimax value of the subtree for the optimal eval assignment is __________ . | `2` |
-| 3.3 |  | `2,0` |
-| 3.4 |  | `B,D` / `D,B` |
+| 3.1 | Optimal eval assignments (A,B,C,D) | `1,3,2,4` / `1,4,2,3` / `2,3,1,4` / `2,4,1,3` |
+| 3.2 | Minimax value of the subtree | `2` |
+| 3.3 | Cut types (alpha-type, beta-type) | `2,0` |
+| 3.4 | Leaves pruned | `B,D` / `D,B` |
 
-## The Topic in 60 Seconds
+> Deep-dive: browse the [CONcepts](/concepts) section for Alpha-Beta.
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+## Deriving the assignment family
 
-## Solutions
+Both keyed cut counts and pruned leaves say: **two alpha-type cutoffs, killing B and D**. Alpha-cuts fire at MIN nodes whose running value drops to $\le \alpha$. That forces:
 
-**3.1** — 
+- **Left square (MIN)**: first leaf $A \le \alpha_{\text{in}} = 1 \Rightarrow A = 1$... more generally $A \le 1$ triggers instantly; with the entering window's $\alpha = 1$: $A = 1$, B never read.
+- After the left child returns its capped value, the parent MAX raises the passing bound so the right square's window opens at $\alpha' \ge 2$:
+- **Right square (MIN)**: first leaf $C \le \alpha' \Rightarrow C = 2$ kills D before it is read.
 
-**Answer:** `1,3,2,4` / `1,4,2,3` / `2,3,1,4` / `2,4,1,3`
+Partition constraint over unique values:
 
-**3.2** — The minimax value of the subtree for the optimal eval assignment is __________ .
+$$\{A\} = \{1\}\text{-slot},\quad \{C\} = \{2\}\text{-slot},\quad \{B, D\} = \{3, 4\}\ \text{(either order)}$$
 
-**Answer:** `2`
+giving exactly four assignments:
 
-**3.3** — 
+$$`\,1,3,2,4\,',\quad `1,4,2,3\,',\quad `2,3,1,4\,',\quad `2,4,1,3\,'$$
 
-**Answer:** `2,0`
+Any placement with a big value in A's slot reads both left leaves; any small value in C's slot leaves D alive. Two cuts is again the ceiling — first leaves are indispensable.
 
-**3.4** — 
+### 3.2 — Minimax value → `2`
 
-**Answer:** `B,D` / `D,B`
+Representative $(A,B,C,D) = (1,3,2,4)$:
+
+$$\text{Left} = \min(1,3) = 1 \qquad \text{Right} = \min(2,4) = 2 \qquad \text{Root(MAX)} = \max(1,2) = \mathbf{2}$$
+
+All four assignments yield Root = 2 ✓.
+
+### 3.3 → `2,0` · 3.4 → `B, D`
+
+Both cutoffs fired on the $\alpha$ side (MIN nodes hitting the lower bound), none on $\beta$ — hence `2,0`; the unread second leaves are B and D.
+
+## Interactive trace
+
+<PaperTrace
+  height={380}
+  nodeWidth={96}
+  nodeHeight={48}
+  nodeFontSize={12}
+  legend={[
+    { color: "#b45309", label: "evaluating" },
+    { color: "#be123c", label: "pruned" },
+    { color: "#15803d", label: "value returned" },
+  ]}
+  nodes={[
+    { id: "R", label: "MAX", x: 300, y: 25 },
+    { id: "L", label: "MIN", x: 140, y: 140 },
+    { id: "Rt", label: "MIN", x: 470, y: 140 },
+    { id: "lA", label: "A 1", x: 80, y: 270 },
+    { id: "lB", label: "B 3", x: 190, y: 270 },
+    { id: "lC", label: "C 2", x: 420, y: 270 },
+    { id: "lD", label: "D 4", x: 530, y: 270 },
+  ]}
+  edges={[
+    { id: "rl", from: "R", to: "L" }, { id: "rr", from: "R", to: "Rt" },
+    { id: "la", from: "L", to: "lA" }, { id: "lb", from: "L", to: "lB" },
+    { id: "lc", from: "Rt", to: "lC" }, { id: "ld", from: "Rt", to: "lD" },
+  ]}
+  steps={[
+    {
+      label: "Enter (1,3)",
+      note: "Assignment (A,B,C,D)=(1,3,2,4).\nWindow entering: alpha=1, beta=3.",
+      nodes: { R: "frontier" }, edges: {},
+    },
+    {
+      label: "Cut B",
+      note: "Left MIN reads A=1 <= alpha=1 -> ALPHA-CUTOFF.\nB never read. Cut type: alpha (#1).",
+      nodes: { L: "current", lA: "explored", lB: "pruned" }, edges: { la: "active", lb: "pruned" },
+    },
+    {
+      label: "Cut D",
+      note: "Root raises its bound; right MIN's window\nopens at alpha'=2: C=2 <= 2 -> ALPHA-CUTOFF.\nD dies unread. Cut type: alpha (#2).",
+      nodes: { L: "explored", Rt: "current", lC: "explored", lD: "pruned", lB: "pruned" }, edges: { rr: "active", lc: "active", ld: "pruned" },
+    },
+    {
+      label: "Value 2",
+      note: "Root(MAX) = max(1, 2) = 2.\nPruned: B, D. Cuts: 2 alpha-type, 0 beta-type.",
+      nodes: { R: "path", lA: "path", lC: "path", lB: "pruned", lD: "pruned" }, edges: { rl: "path", rr: "path", la: "path", lc: "path" },
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. The cut-TYPE tally tells you node polarity before you read the figure: alpha-cuts live at MIN nodes, beta-cuts at MAX nodes.
+2. 'Maximize pruning' template: place threshold-meeting values FIRST under each child - seconds die, firsts cannot.
+3. Uniqueness partition: slot constraints like \{A\}=1-slot, \{C\}=2-slot halve the enumeration instantly - then swap the leftover pair freely.
+4. Cross-check 3.2 against full minimax on one representative assignment - alpha-beta must return the SAME root value or your derivation slipped.
 </Accordion>
+
+**Answers:** 3.1 `1,3,2,4` / `1,4,2,3` / `2,3,1,4` / `2,4,1,3` · 3.2 `2` · 3.3 `2,0` · 3.4 `B,D`

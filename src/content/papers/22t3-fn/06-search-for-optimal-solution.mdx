@@ -5,42 +5,51 @@ order: 6
 paper: "22t3-fn"
 question: 6
 label: "SEARCH FOR OPTIMAL SOLUTION"
-description: "Search For Optimal Solution question"
-topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+description: "In TSP Branch-and-Bound the root is every tour at once, each node is a set of tours, and bounds only ever grow on the way down."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "Branch-and-Bound", "TSP"]
 ---
 
 ## The Question
 
-
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 6 | Which of the following are true about the Branch-and-Bound method (discussed in the lecture) that is used for finding optimal tours for the Traveling Salesma... | **A**, **C**, **E** |
+| 6 | Which of the following are true about the Branch-and-Bound method (discussed in the lecture) that is used for finding optimal tours for the Traveling Salesman Problem? | **A**, **C**, **E** |
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+TSP Branch-and-Bound never commits to single tours until it must. The search tree *partitions* the set of all tours: the root holds every tour, and each branch taken fixes one more city-to-city link. A node's cost is a **lower bound** over all tours inside its set — so as you descend and sets shrink, the bound can only rise toward true tour lengths.
+
+> Deep-dive: browse the [Concepts](/concepts) section for Branch-and-Bound.
 
 ## Solutions
 
-**6** — Which of the following are true about the Branch-and-Bound method (discussed in the lecture) that is used for finding optimal tours for the Traveling Salesman Problem?
+**6** — True statements about lecture-style BnB for optimal TSP tours?
 
-Options:
-
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | The root of the search tree represents all possible tours. |
-| **B** | The root of the search tree represents the shortest/optimal tour. |
-| **C** | Each node in the search tree represents a set of tours. |
-| **D** | Each node in the search tree represents a single tour. |
-| **E** | The costs of the search tree nodes monotonically INCREASE from the root to leaf. |
-| **F** | The costs of the search tree nodes monotonically DECREASE from the root to leaf. |
+| **A** — Root represents all possible tours | **True**: before any constraint is imposed, every permutation of cities is still a candidate |
+| **B** — Root represents the shortest/optimal tour | **False**: if the root already isolated the optimum there would be nothing to search |
+| **C** — Each node represents a set of tours | **True**: a node = all tours agreeing with the edge choices on the path from the root |
+| **D** — Each node represents a single tour | **False**: single tours appear only at the leaves, after every city placement is pinned down |
+| **E** — Node costs monotonically INCREASE root to leaf | **True**: child sets ⊆ parent set; a lower bound over a smaller set is ≥ the parent's bound |
+| **F** — Node costs monotonically DECREASE root to leaf | **False**: exactly backwards; decreasing bounds could never prune anything |
 
 **Answer:** **A**, **C**, **E**
 
+### Why these three hold together
+
+1. Root = $\{$ all $(n-1)!$ tours $\}$ → **A**, and not B (the search exists precisely because the optimum is *not* known up front).
+2. Branching on "which city follows city $i$" splits a tour-set into disjoint subsets; deeper nodes still contain many tours → **C**, not D.
+3. $\text{Bound}(\text{child}) = \min$ over a subset $\ge \text{Bound}(\text{parent}) = \min$ over the superset → **E**, not F.
+4. Pruning ("discard node if bound ≥ cost of best complete tour so far") is legal *because of E*: nothing inside a pruned subtree can beat the incumbent.
+
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Picture BnB nodes as BOXES of tours, not tours: root = biggest box, leaves = one tour per box. That image answers A/C/D instantly.
+2. Bounds are LOWER bounds on the best tour INSIDE the box. Smaller box ⇒ weaker minimum ⇒ bound rises going down. Choose E over F by picturing min() over shrinking sets.
+3. Any option claiming the search "already knows" the optimum at the top (B) is auto-false.
+4. Monotone-increasing bounds are what LICENSE pruning: if child bound ≥ incumbent, everything below it dies guilt-free.
 </Accordion>
+
+**Answers:** 6 **A, C, E**

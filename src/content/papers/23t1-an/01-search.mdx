@@ -47,6 +47,20 @@ DFS uses a stack (LIFO). Expand the most recently added node first.
 
 Path (follow parents): G ← E ← B ← A ← S = **S, A, B, E, G** ✓
 
+## Bonus — the same table under BFS → `S,A,D,G`
+
+The official key records the DFS answer above. If you re-run the table as a **queue** (FIFO), the frontier sweeps level by level:
+
+| Step | QUEUE | Expand | New (append) |
+|------|-------|--------|--------------|
+| 1 | [S] | S | A, C → [A, C] |
+| 2 | [A, C] | A | B, D → [C, B, D] |
+| 3 | [C, B, D] | C | none (A, D, S seen) → [B, D] |
+| 4 | [B, D] | B | E → [D, E] |
+| 5 | [D, E] | D | **G** → goal |
+
+Parents give G ← D ← A ← S = `S,A,D,G` — BFS finds the 3-edge route while DFS dives to the 4-edge one. Same MoveGen table, opposite data structure, different path.
+
 <PaperTrace
   height={380}
   nodeWidth={90}
@@ -82,10 +96,10 @@ Path (follow parents): G ← E ← B ← A ← S = **S, A, B, E, G** ✓
   ]}
   steps={[
     { label: "Push S", note: "STACK = [S]", nodes: { S: "frontier" } },
-    { label: "Expand S", note: "MoveGen(S) = [A, C]\\nPush C, A (alphabetical reversed for LIFO)\\nSTACK = [C, A] — A is on top", nodes: { S: "explored", A: "frontier", C: "frontier" } },
-    { label: "Expand A", note: "MoveGen(A) = [B, C, D, S]\\nNew: B, D (C, S seen)\\nSTACK = [C, D, B] — B is on top", nodes: { S: "explored", A: "current", B: "frontier", C: "frontier", D: "frontier" } },
-    { label: "Expand B", note: "MoveGen(B) = [A, D, E]\\nNew: E (A, D seen)\\nSTACK = [C, D, E]", nodes: { S: "explored", A: "explored", B: "current", C: "frontier", D: "frontier", E: "frontier" } },
-    { label: "Expand E → Goal!", note: "MoveGen(E) = [B, D, G]\\nNew: G\\nSTACK = [C, D, G]\\nG is the GOAL!", nodes: { S: "path", A: "path", B: "path", E: "path", G: "goal", C: "explored", D: "explored" }, edges: { e1: "path", e3: "path", e7: "path", e11: "path" } },
+    { label: "Expand S", note: "MoveGen(S) = [A, C]\nPush C, A (alphabetical reversed for LIFO)\nSTACK = [C, A] — A is on top", nodes: { S: "explored", A: "frontier", C: "frontier" } },
+    { label: "Expand A", note: "MoveGen(A) = [B, C, D, S]\nNew: B, D (C, S seen)\nSTACK = [C, D, B] — B is on top", nodes: { S: "explored", A: "current", B: "frontier", C: "frontier", D: "frontier" } },
+    { label: "Expand B", note: "MoveGen(B) = [A, D, E]\nNew: E (A, D seen)\nSTACK = [C, D, E]", nodes: { S: "explored", A: "explored", B: "current", C: "frontier", D: "frontier", E: "frontier" } },
+    { label: "Expand E → Goal!", note: "MoveGen(E) = [B, D, G]\nNew: G\nSTACK = [C, D, G]\nG is the GOAL!", nodes: { S: "path", A: "path", B: "path", E: "path", G: "goal", C: "explored", D: "explored" }, edges: { e1: "path", e3: "path", e7: "path", e11: "path" } },
   ]}
 />
 

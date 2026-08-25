@@ -5,8 +5,8 @@ order: 11
 paper: "22t3-fn"
 question: 11
 label: "AUTOMATED PLANNING"
-description: "Automated Planning question"
-topics: ["AUTOMATED PLANNING"]
+description: "Holding D opens exactly three doors right now, but relevance only blesses the two Stack actions that write goal facts directly."
+topics: ["AUTOMATED PLANNING", "STRIPS", "Applicable actions", "Relevant actions"]
 ---
 
 ## The Question
@@ -53,8 +53,6 @@ Consider the following planning problem.
 **Goal Description:**
 `Goal: { on(A,D), on(B,C) }`
 
-Based on the above data, answer the given subquestions.
-
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -63,44 +61,56 @@ Based on the above data, answer the given subquestions.
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+| Notion | Tested against | Meaning |
+|---|---|---|
+| **Applicable** | Start state | every literal of $\text{PRE}(a)$ is present *right now* |
+| **Relevant** | Goal description | $\text{ADD}(a)$ writes a goal literal and $\text{DEL}(a)$ destroys none of them |
+
+The two tests are independent: an applicable action can be useless; a relevant action may need five moves before it can run.
+
+> Deep-dive: browse the [Concepts](/concepts) section for STRIPS planning.
 
 ## Solutions
 
-**11.1** — Which of the following are applicable actions for the given problem?
+### 11.1 — Applicable actions → **A, B, C**
 
-Options:
+Start state highlights: `armEmpty` is **absent** — the robot is `holding(D)` — while A, C, D are all `clear`.
 
-| Option | |
+| Option | Preconditions required | Present? | Verdict |
+|---|---|---|---|
+| **A** `Putdown(D)` | holding(D) | ✓ | **Applicable** |
+| **B** `Stack(D,A)` | holding(D) ✓, clear(A) ✓ | both | **Applicable** |
+| **C** `Stack(D,C)` | holding(D) ✓, clear(C) ✓ | both | **Applicable** |
+| D `Pickup(A)` | needs armEmpty | ✗ robot busy | Not applicable |
+| E `Stack(A,D)` | needs holding(A) | ✗ holding D | Not applicable |
+| F `Stack(B,C)` | needs holding(B) | ✗ | Not applicable |
+
+Exactly three actions fire — put D down, or drop it onto either exposed block.
+
+### 11.2 — Relevant actions → **A, B**
+
+Regress the goal $\{\text{on}(A,D),\ \text{on}(B,C)\}$:
+
+- $\text{on}(A,D)$ is added by exactly one action: `Stack(A,D)` → option **A**. Its delete list `{holding(A), clear(D)}` touches no goal literal → relevant.
+- $\text{on}(B,C)$ is added by exactly one action: `Stack(B,C)` → option **B**. Delete list `{holding(B), clear(C)}` also goal-safe → relevant.
+
+Why the others miss:
+
+| Option | Why not relevant |
 |---|---|
-| **A** | Putdown(D) |
-| **B** | Stack(D,A) |
-| **C** | Stack(D,C) |
-| **D** | Pickup(A) |
-| **E** | Stack(A,D) |
-| **F** | Stack(B,C) |
-
-**Answer:** **A**, **B**, **C**
-
-**11.2** — Which of the following are relevant actions for the given problem?
-
-Options:
-
-| Option | |
-|---|---|
-| **A** | Stack(A,D) |
-| **B** | Stack(B,C) |
-| **C** | Putdown(D) |
-| **D** | Pickup(A) |
-| **E** | Stack(C,B) |
-| **F** | Stack(D,C) |
-
-**Answer:** **A**, **B**
+| C `Putdown(D)` | adds `armEmpty`, `onTable(D)` — neither is a goal literal |
+| D `Pickup(A)` | adds `holding(A)` — enabling at best, never a goal fact |
+| E `Stack(C,B)` | adds `on(C,B)` — the REVERSE of goal literal `on(B,C)`! Classic trap |
+| F `Stack(D,C)` | adds `on(D,C)` — again not asked for |
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. First glance at the state: WHO is holding what? holding(D) instantly kills every Pickup/Unstack option (they all demand armEmpty).
+2. Applicability is set intersection - PRE(a) ⊆ State? Tick row by row mechanically; usefulness plays no role here.
+3. Relevance = find the WRITER of each goal literal in ADD lists. on(A,D) has exactly one writer (Stack(A,D)); on(B,C) too.
+4. Watch argument ORDER: Stack(C,B) writes on(C,B) which is NOT on(B,C). Swapped arguments are this domain's favourite distractor.
+5. A relevant action must not delete any goal literal - scan DEL lists before blessing a candidate.
 </Accordion>
+
+**Answers:** 11.1 **A, B, C** · 11.2 **A, B**

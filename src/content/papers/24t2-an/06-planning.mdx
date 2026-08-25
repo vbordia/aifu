@@ -26,13 +26,13 @@ Standard one-armed Blocks World operators.
 
 ## The Topic in 60 Seconds
 
-**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅. $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
+**Applicable** = preconditions ⊆ state. **Relevant** = add-list ∩ goal ≠ ∅ (applicability irrelevant). $A_1$ = applicable in $P_0$ (+no-ops). **Action mutex** (ANY): inconsistent effects / interference / competing needs. **Proposition mutex** (ALL): every producer pair mutex.
 
 > Deep-dive: [Blocks World & STRIPS](/concepts/week-08-planning/01-blocks-world-strips), [GraphPlan Mutexes](/concepts/week-09-goal-trees/02-graphplan-mutexes).
 
 ## 6.1 — Applicable → **B, C, D**
 
-armEmpty holds:
+armEmpty holds, so only unstacks and pickups are candidates:
 
 | Action | Preconditions | Verdict |
 |--------|---------------|---------|
@@ -40,38 +40,103 @@ armEmpty holds:
 | **Unstack(D,B)** | armEmpty ✓, clear(D) ✓, on(D,B) ✓ | **✓** |
 | **Unstack(C,A)** | armEmpty ✓, clear(C) ✓, on(C,A) ✓ | **✓** |
 | **Pickup(E)** | armEmpty ✓, clear(E) ✓, onTable(E) ✓ | **✓** |
-| Pickup(A) | clear(A) ✗ (C on A) | ✗ |
+| Pickup(A) | clear(A) ✗ (C sits on A) | ✗ |
 | Stack(B,A) / Stack(A,C) | holding(·) ✗ | ✗ |
 
 ## 6.2 — Relevant → **F, G**
 
-Goal = on(A,C), on(B,A): **Stack(A,C)** adds on(A,C) ✓; **Stack(B,A)** adds on(B,A) ✓. Nothing else adds a goal fact.
+Goal = on(A,C), on(B,A):
+
+| Action | Adds | Hits goal? |
+|--------|------|-----------|
+| **Stack(A,C)** | on(A,C), armEmpty | ✓ on(A,C) |
+| **Stack(B,A)** | on(B,A), armEmpty | ✓ on(B,A) |
+| everything else | no goal fact | ✗ |
 
 ## 6.3 — Mutex action pairs → **A**
 
-$A_1$ = `{ Unstack(D,B), Unstack(C,A), Pickup(E) }` + no-ops (options C, D name inapplicable Stacks → auto-wrong).
+$A_1$ = \{ Unstack(D,B), Unstack(C,A), Pickup(E) \} + no-ops of the start facts (options C, D name Stacks — inapplicable here, auto-wrong).
 
-- Unstack(D,B) ⊕ Pickup(E): both **delete armEmpty** → interference → **mutex** ✓
-- Unstack(D,B) ⊕ Unstack(C,A): hmm — both delete armEmpty → interference → **mutex**?! But the key lists only **A**. Re-check option B: "Unstack(D,B), Unstack(C,A)" — both delete armEmpty, so they ARE mutex… the official key records only A; the safest reading is that the paper counts the pair once and keys A. For the exam: tick **A** (and note B is equally mutex by the same test — the paper's single-answer key here is A).
+- **Unstack(D,B) ⊕ Pickup(E)**: both delete armEmpty → interference → **mutex** ✓ (option A)
+- Unstack(D,B) ⊕ Unstack(C,A): both delete armEmpty → interference → mutex by the standard test too.
+
+The official key records a single pair, **A**. Both listed pairs pass the interference test; if the paper wants exactly one, A is the safe pick — but be aware B is equally mutex under the textbook rule (this is a known quirk of this key). Never tick C or D: those actions don't exist in $A_1$ at all.
 
 ## 6.4 — Mutex propositions → **A, B**
 
-$P_1$ = start facts (nops) ∪ adds: clear(B), clear(A), holding(D), holding(C), holding(E).
+$P_1$ = start facts (clean no-ops) ∪ adds: clear(B), clear(A), holding(D), holding(C), holding(E).
 
 | Pair | Producers | Verdict |
 |------|-----------|---------|
-| **clear(B) ⊕ holding(C)** | clear(B): only Unstack(D,B) (D sits on B); holding(C): only Unstack(C,A) — producers mutex (6.3) | **✓** |
+| **clear(B) ⊕ holding(C)** | clear(B): only Unstack(D,B) (D sits on B); holding(C): only Unstack(C,A); producers mutex (6.3) | **✓** |
 | **clear(B) ⊕ clear(A)** | clear(A): only Unstack(C,A) — same mutex pair | **✓** |
-| clear(E) ⊕ on(D,B) | clear(E) is a **start fact** → nop producer clean | Not mutex |
-| clear(E) ⊕ holding(D) | same clean no-op | Not mutex |
+| clear(E) ⊕ on(D,B) | both are start facts → their no-ops coexist cleanly | Not mutex |
+| clear(E) ⊕ holding(D) | clear(E)'s nop is clean against anything in $A_1$ | Not mutex |
+
+<PaperTrace
+  height={520}
+  nodeWidth={110}
+  nodeHeight={44}
+  nodeFontSize={11}
+  legend={[
+    { color: "#4b5563", label: "start facts (P0)" },
+    { color: "#b45309", label: "applicable actions (A1)" },
+    { color: "#0369a1", label: "new facts (P1)" },
+    { color: "#15803d", label: "keyed answers" }
+  ]}
+  nodes={[
+    { id: "arm", label: "armEmpty", x: 40, y: 40 },
+    { id: "cD", label: "clear(D)", x: 40, y: 100 },
+    { id: "oDB", label: "on(D,B)", x: 40, y: 160 },
+    { id: "cC", label: "clear(C)", x: 40, y: 220 },
+    { id: "oCA", label: "on(C,A)", x: 40, y: 280 },
+    { id: "cE", label: "clear(E)", x: 40, y: 340 },
+    { id: "otE", label: "onTable(E)", x: 40, y: 400 },
+    { id: "udb", label: "Unstack(D,B)", x: 300, y: 100 },
+    { id: "uca", label: "Unstack(C,A)", x: 300, y: 250 },
+    { id: "pce", label: "Pickup(E)", x: 300, y: 400 },
+    { id: "cB", label: "clear(B)+", x: 560, y: 60 },
+    { id: "hD", label: "holding(D)", x: 560, y: 150 },
+    { id: "cA", label: "clear(A)+", x: 560, y: 240 },
+    { id: "hC", label: "holding(C)", x: 560, y: 330 },
+    { id: "hE", label: "holding(E)", x: 560, y: 420 }
+  ]}
+  edges={[
+    { id: "f1", from: "arm", to: "udb" },
+    { id: "f2", from: "cD", to: "udb", label: "pre" },
+    { id: "f3", from: "oDB", to: "udb", label: "pre" },
+    { id: "f4", from: "arm", to: "uca" },
+    { id: "f5", from: "cC", to: "uca", label: "pre" },
+    { id: "f6", from: "oCA", to: "uca", label: "pre" },
+    { id: "f7", from: "arm", to: "pce" },
+    { id: "f8", from: "cE", to: "pce", label: "pre" },
+    { id: "f9", from: "otE", to: "pce", label: "pre" },
+    { id: "g1", from: "udb", to: "cB" },
+    { id: "g2", from: "udb", to: "hD" },
+    { id: "g3", from: "uca", to: "cA" },
+    { id: "g4", from: "uca", to: "hC" },
+    { id: "g5", from: "pce", to: "hE" }
+  ]}
+  steps={[
+    { label: "Layer P0", note: "Start state:\nonTable(B), onTable(A), onTable(E),\nclear(D), clear(C), clear(E), on(D,B), on(C,A), armEmpty\nGoal: on(A,C), on(B,A)", nodes: { arm: "explored", cD: "explored", oDB: "explored", cC: "explored", oCA: "explored", cE: "explored", otE: "explored" } },
+    { label: "A1: applicable", note: "armEmpty -> unstack/pickup only.\nUnstack(D,B): clear(D)+on(D,B) YES\nUnstack(C,A): clear(C)+on(C,A) YES\nPickup(E): clear(E)+onTable(E) YES\nPickup(A)? clear(A) NO (C sits on A). All Stacks/Putdowns need holding.", nodes: { udb: "current", uca: "current", pce: "current", arm: "frontier", cD: "frontier", oDB: "frontier", cC: "frontier", oCA: "frontier", cE: "frontier", otE: "frontier" }, edges: { f1: "active", f2: "active", f3: "active", f4: "active", f5: "active", f6: "active", f7: "active", f8: "active", f9: "active" } },
+    { label: "Action mutexes", note: "All three real actions DELETE armEmpty:\nany two interfere -> all pairs mutex by the textbook test.\nKeyed answer: option A (Unstack(D,B)+Pickup(E)).\nOptions C/D name Stacks - not in A1 at all.", nodes: { udb: "path", uca: "path", pce: "path" } },
+    { label: "Layer P1", note: "P1 = P0 (clean nops) UNION adds:\nUnstack(D,B) -> clear(B), holding(D)\nUnstack(C,A) -> clear(A), holding(C)\nPickup(E) -> holding(E)\nStart-fact nops coexist cleanly; new facts inherit producer mutexes.", nodes: { cB: "frontier", hD: "frontier", cA: "frontier", hC: "frontier", hE: "frontier" }, edges: { g1: "path", g2: "path", g3: "path", g4: "path", g5: "path" } },
+    { label: "Proposition mutexes", note: "clear(B)+holding(C): producers UDB vs UCA - mutex -> A keyed.\nclear(B)+clear(A): UDB vs UCA again -> B keyed.\nclear(E)+on(D,B), clear(E)+holding(D):\nclear(E) is a start fact - its nop is clean -> NOT mutex.", nodes: { cB: "path", hC: "path", cA: "path", hD: "explored", cE: "explored", oDB: "explored", hE: "explored" } }
+  ]}
+/>
+
+<Callout type="tip" title="The armEmpty hinge">
+With armEmpty in the state, every applicable action deletes it — so layer 1's real actions form one mutual mutex clique, every new proposition is locked to its producer's fate, and only start-state facts escape through their clean no-ops.
+</Callout>
 
 ## Tricks & Tips
 
 <Accordion title="One minute each">
-1. Applicable: armEmpty ⇒ unstacks/pickups only.
-2. Relevant: add-list ∩ goal.
-3. Layer-1 mutex: armEmpty interference; inapplicable options are free eliminations.
-4. Proposition mutex: start facts escape via no-ops; single-producer facts are locked to their producer's mutex status.
+1. Applicable: see armEmpty ⇒ think unstacks/pickups only; then check the two extra preconditions (clear of the top block, on-pair or onTable).
+2. Relevant: scan the goal facts and ask which schema adds each one — Stack adds on(·,·), so F and G fall out immediately.
+3. Layer-1 action mutex: shared deleted fact (armEmpty) = interference = mutex; options naming non-existent actions are free eliminations.
+4. Proposition mutex: write producer sets first. Singleton sets married to mutex producers give mutex (A, B); any start fact in the pair brings a clean no-op along and kills the mutex.
 </Accordion>
 
 **Answers:** 6.1 **B, C, D** · 6.2 **F, G** · 6.3 **A** · 6.4 **A, B**

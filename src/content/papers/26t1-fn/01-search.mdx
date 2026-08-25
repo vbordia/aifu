@@ -1,57 +1,111 @@
 ---
-title: "Q1 — SEARCH"
-short: "SEARCH"
+title: "Q1 — Search: Water Jug BFS"
+short: "Search: Water Jug BFS"
 order: 1
 paper: "26t1-fn"
 question: 1
 label: "SEARCH"
-description: "Search question"
-topics: ["SEARCH"]
+description: "Same three move-types, fresh endpoints: three pours carry 320 to 401 and BFS level-counting proves nothing shorter exists."
+topics: ["SEARCH", "Water jug", "BFS", "State space"]
 ---
 
 ## The Question
 
-Consider a water-jug puzzle with three jugs a, b and c of capacities 5L, 3L and 2L, respectively.
-
-A state, encoded as a digit string ABC, denotes volume of water in jugs a, b and c, respectively.
-For example, state 212 denotes that jugs a, b and c contain 2L, 1L and 2L of water, respectively.
-
-The allowable moves (actions) are:
-- `xETy`: pick up jug x and empty it into jug y and jug y is also topped up,
-- `xEy`: pick up jug x and empty it into jug y and jug y is still not topped up,
-- `xTy`: pick up jug x and top up jug y and jug x is still not emptied out.
-
-For example: $212 \xrightarrow{cEa} 410 \xrightarrow{aTb} 230 \xrightarrow{bETa} 500$.
-
-`MoveGen` takes a state ABC and returns a set of neighbours that are one move away from ABC.
-For example, $\text{MoveGen}(212) = \{ 032, 302, 410, 230 \}$.
-
-Based on the above data, answer the given subquestions.
-
+Consider a water-jug puzzle with three jugs a, b and c of capacities 5L, 3L and 2L, respectively. States encode volumes ABC; moves are `xETy` (pour until y tops out), `xEy` (empty x into y, y not topped), `xTy` (top up y, x retains water).
 
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 1.1 | Let 320 be the start state and 401 be the goal state, find the shortest path from start to goal. Enter the path starting with 320 as a comma separated list o... | `320,122,131,401` |
-| 1.2 | Let 320 be the start state and 401 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of mov... | `aTc,cTb,bEa` |
+| 1.1 | Let 320 be the start state and 401 be the goal state, find the shortest path from start to goal. | `320,122,131,401` |
+| 1.2 | Find the sequence of moves that produce the shortest path. | `aTc,cTb,bEa` |
 
-## The Topic in 60 Seconds
+> Deep-dive: browse the [Concepts](/concepts) section for Breadth First Search.
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+## Step-by-step verification
 
-## Solutions
+| Move | From | Arithmetic | Result |
+|---|---|---|---|
+| `aTc` | 320 (a=3,b=2,c=0) | top c (needs 2) from a; a keeps 1 | a=1, c=2 → **122** |
+| `cTb` | 122 (a=1,b=2,c=2) | top b (needs 1) from c; c keeps 1 | b=3, c=1 → **131** |
+| `bEa` | 131 (a=1,b=3,c=1) | b's whole 3L into a (room 4, not topped) | a=4, b=0 → **401** ✓ goal |
 
-**1.1** — Let 320 be the start state and 401 be the goal state, find the shortest path from start to goal. Enter the path starting with 320 as a comma separated list of states.
+## Shortest-path proof by BFS levels
 
-**Answer:** `320,122,131,401`
+| Level | States |
+|---|---|
+| 0 | 320 |
+| 1 | 230 (a→b), **122** (a→c), 520 (b→a, c→a), 331 (c→b) |
+| 2 | … **131** appears while expanding 122 … |
+| 3 | … **401** appears while expanding 131 — FIRST arrival ⇒ shortest |
 
-**1.2** — Let 320 be the start state and 401 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.
+No goal at depths 0–2 ⇒ the 3-move solution is provably minimal.
 
-**Answer:** `aTc,cTb,bEa`
+Label logic worth quoting: the middle move is `cTb` (not `cEb`) because c ends holding 1L — *not emptied*; the last is `bEa` (not `bETa`) because a had room to spare — *not topped*.
+
+## Interactive trace
+
+<PaperTrace
+  height={400}
+  nodeWidth={100}
+  nodeHeight={54}
+  nodeFontSize={13}
+  legend={[
+    { color: "#b45309", label: "expanding" },
+    { color: "#15803d", label: "solution path" },
+    { color: "#4b5563", label: "seen" },
+  ]}
+  nodes={[
+    { id: "s320", label: "320", x: 40, y: 180 },
+    { id: "s230", label: "230", x: 260, y: 40 },
+    { id: "s122", label: "122", x: 260, y: 160 },
+    { id: "s520", label: "520", x: 260, y: 280 },
+    { id: "s331", label: "331", x: 260, y: 380 },
+    { id: "s131", label: "131", x: 500, y: 200 },
+    { id: "s401", label: "401", x: 740, y: 240 },
+  ]}
+  edges={[
+    { id: "e1", from: "s320", to: "s230", label: "aTb" },
+    { id: "e2", from: "s320", to: "s122", label: "aTc" },
+    { id: "e3", from: "s320", to: "s520", label: "bTa" },
+    { id: "e4", from: "s320", to: "s331", label: "cTb" },
+    { id: "e5", from: "s122", to: "s131", label: "cTb" },
+    { id: "e6", from: "s131", to: "s401", label: "bEa" },
+  ]}
+  steps={[
+    {
+      label: "Init",
+      note: "OPEN = { 320 } (a=3, b=2, c=0)",
+      nodes: { s320: "frontier" }, edges: {},
+    },
+    {
+      label: "Level 1",
+      note: "MoveGen(320):\na->b tops b: 230 ; a->c: 122\nb->a tops a: 520 ; c->b tops b: 331",
+      nodes: { s320: "explored", s230: "frontier", s122: "frontier", s520: "frontier", s331: "frontier" }, edges: { e1: "active", e2: "active", e3: "active", e4: "active" },
+    },
+    {
+      label: "Level 2",
+      note: "Expanding 122 (a=1,b=2,c=2):\ncTb tops b -> 131 at depth 2.\nOther expansions yield nothing new toward 401.",
+      nodes: { s320: "explored", s122: "current", s131: "frontier", s230: "explored", s520: "explored", s331: "explored" }, edges: { e2: "path", e5: "active" },
+    },
+    {
+      label: "Level 3: GOAL",
+      note: "Expanding 131 (a=1,b=3,c=1):\nbEa empties b into a (room 4):\na=4, b=0 -> 401 GOAL.\nFirst arrival => shortest.",
+      nodes: { s122: "explored", s131: "current", s401: "goal" }, edges: { e6: "active" },
+    },
+    {
+      label: "Path found",
+      note: "Path: 320 -> 122 -> 131 -> 401\nMoves: aTc, cTb, bEa\nLabels check: a keeps 1L (T), c keeps 1L (T),\nb fully drains with a untopped (E).",
+      nodes: { s320: "path", s122: "path", s131: "path", s401: "goal" }, edges: { e2: "path", e5: "path", e6: "path" },
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Label discipline wins 1.2: T-moves leave x non-empty; E-moves drain x; ET additionally tops y. Read the END volumes off your own states.
+2. Generate neighbours pair-by-pair (ab, ac, bc) both directions - duplicates collapse and levels stay small.
+3. Note when a shortcut exists: 122 sat at depth 1 here, so the 'long-looking' official path is genuinely minimal - always run the level table before doubting the key.
+4. Quote the proof line: '401 first pops while expanding a depth-2 state, hence no shorter solution exists.'
 </Accordion>
+
+**Answers:** 1.1 `320,122,131,401` · 1.2 `aTc,cTb,bEa`

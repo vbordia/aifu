@@ -5,43 +5,57 @@ order: 4
 paper: "22t3-an"
 question: 4
 label: "SEARCH FOR OPTIMAL SOLUTION"
-description: "Search For Optimal Solution question"
-topics: ["SEARCH FOR OPTIMAL SOLUTION"]
+description: "With unit costs and an unknown-quality heuristic, only the heuristic-free algorithms — BFS, Dijkstra and Branch-and-Bound — carry optimality guarantees."
+topics: ["SEARCH FOR OPTIMAL SOLUTION", "Optimal search", "Heuristic quality"]
 ---
 
 ## The Question
 
-
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 4 | Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for ... | **B**, **C**, **D** |
+| 4 | Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path? | **B**, **C**, **D** |
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+An algorithm guarantees the optimal path only if its machinery cannot be spoiled by the inputs. With **unit costs**, "fewest edges" = "cheapest path". If $h$'s admissibility is unknown, every method that *trusts* $h$ inherits that uncertainty. Heuristic-free methods (BFS, Dijkstra, BnB) are immune.
+
+> Deep-dive: browse the [Concepts](/concepts) section for optimal search.
 
 ## Solutions
 
-**4** — Given a finite state space with unit edge costs, and a heuristic function whose properties are not known, which of the following algorithms are suitable for finding the optimal path?
+**4** — Finite state space, unit edge costs, heuristic properties unknown. Which find the optimal path?
 
 Options:
 
-| Option | |
+| Option | Verdict |
 |---|---|
-| **A** | Depth First Search |
-| **B** | Breadth First Search |
-| **C** | Dijkstra's algorithm |
-| **D** | Branch and Bound Search |
-| **E** | A* |
-| **F** | WA* for some w |
-| **G** | Sparse Memory Graph Search (SMGS) |
+| **A** — Depth First Search | **No**: not optimal even with unit costs — it commits to one deep branch and can return a goal at depth 50 while a depth-3 goal waits elsewhere |
+| **B** — Breadth First Search | **Yes**: FIFO order dequeues goals in non-decreasing depth; with unit costs minimum depth = minimum cost |
+| **C** — Dijkstra's algorithm | **Yes**: expands nodes in increasing $g$; first dequeue of the goal has $g = g^*$ regardless of any heuristic |
+| **D** — Branch and Bound Search | **Yes**: orders OPEN by path cost $g$ alone (never consults $h$); the first complete path popped is provably cheapest |
+| **E** — A* | **No**: A* is optimal only for admissible $h$; properties unknown → an inflated $h$ can bait it into a suboptimal return |
+| **F** — WA* for some w | **No**: any $w > 1$ multiplies $h$ deliberately inadmissibly — speed bought with loss of the optimality guarantee |
+| **G** — SMGS | **No**: Sparse Memory Graph Search bounds memory by pruning on $f = g+h$; its optimality proof assumes an admissible $h$, which we are not given |
 
 **Answer:** **B**, **C**, **D**
 
+### The pattern
+
+The three correct answers share one property: **they ignore $h$ entirely**. Their correctness rests only on facts given in the question — finite space, unit costs:
+
+- BFS: shallowest goal first; unit costs make that cheapest.
+- Dijkstra: cheapest-first expansion; no assumptions beyond non-negative costs.
+- Branch-and-Bound: keeps the best complete solution and prunes partial paths with $g \ge$ best; exact for any finite space.
+
+Every rejected option leans on $h$: A* and SMGS need admissibility, WA* needs $w=1$ to be optimal at all. "Properties not known" kills all three guarantees in one stroke.
+
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Split the option list into h-users (A*, WA*, SMGS) and h-ignorers (BFS, Dijkstra, BnB). Unknown heuristic → keep only ignorers.
+2. Unit costs are BFS's licence: they promote it from "fewest moves" to "cheapest path". When costs become arbitrary (see Q5), BFS loses the licence.
+3. DFS never appears in a correct-optimal answer unless the question adds "with cycle checking AND uniform costs AND ... " — and even then it finds A goal, not the best.
+4. WA* trick phrasing: "for SOME w" includes w > 1, so the guarantee dies. Only w = 1 (plain A*) could be optimal, and that needs admissible h anyway.
 </Accordion>
+
+**Answers:** 4 **B, C, D**

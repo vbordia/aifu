@@ -5,8 +5,8 @@ order: 1
 paper: "22t3-fn"
 question: 1
 label: "SEARCH"
-description: "Search question"
-topics: ["SEARCH"]
+description: "A 5-3-2 water jug puzzle solved breadth-first: four moves turn 500 into 131, and BFS level-counting proves no shorter route exists."
+topics: ["SEARCH", "Water jug", "BFS", "State space"]
 ---
 
 ## The Question
@@ -21,7 +21,7 @@ So the possible moves are: `aEb`, `aEc`, `aFb`, `aFc`, `bEa`, `bEc`, `bFa`, `bFc
 
 **Tie-breaker**: in some states, both `xEy` and `xFy` may produce the same output state, in such cases, choose `xEy` to break the tie. For example, from the 302 state, both `aEb` and `aFb` produce the same output state 032, therefore, to break the tie choose `aEb` as the move.
 
-For the 5-3-2 water jug puzzle, the `MoveGen` function takes a state ABC and returns a set of states that can be produced in one move. For example, `MoveGen(500)` returns { 230, 302 }.
+For the 5-3-2 water jug puzzle, the `MoveGen` function takes a state ABC and returns a set of states that can be produced in one move. For example, `MoveGen(500)` returns \{ 230, 302 \}.
 
 Based on the above data, answer the given subquestions.
 
@@ -33,22 +33,141 @@ Based on the above data, answer the given subquestions.
 
 ## The Topic in 60 Seconds
 
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
+BFS explores states in order of distance from the start: first everything reachable in 1 move, then 2 moves, and so on. The **first** time the goal pops out of the queue, the path recorded through parent pointers is guaranteed shortest (every move costs 1). Tie-breakers only matter for *which* equal-length path you report.
 
-## Solutions
+> Deep-dive: browse the [Concepts](/concepts) section for Breadth First Search.
 
-**1.1** — Let 500 be the start state and 131 be the goal state, find the shortest path from start to goal. Enter the path starting with 500 as a comma separated list of states.
+## Step 0 — How to generate moves fast
 
-**Answer:** `500,302,320,122,131`
+For a state $(a, b, c)$:
 
-**1.2** — Let 500 be the start state and 131 be the goal state, find the sequence of moves that produce the shortest path from start to goal. Enter the sequence of moves as a comma separated list.
+- $xEy$: pour $\min(\text{vol}(x),\ \text{cap}(y) - \text{vol}(y))$ from $x$ into $y$.
+- $xFy$: top $y$ up from $x$ — the same transfer amount. The two only coincide-or-collide when $y$ fills before $x$ empties (identical result), which is why the tie-breaker exists.
 
-**Answer:** `aFc,cEb,aFc,cFb`
+Sanity check against the question: `MoveGen(500)` = pour a→b (b takes 3, a keeps 2) = **230**, pour a→c (c takes 2, a keeps 3) = **302**. Matches.
+
+## 1.1 — BFS from 500 → `500,302,320,122,131`
+
+| Level | Expanded | New states discovered (producing move) | OPEN after |
+|---|---|---|---|
+| 0 | — | start **500** | 500 |
+| 1 | 500 | 230 (`aEb`), 302 (`aFc`) | 230, 302 |
+| 2 | 230 | 032 (`aEc`), 211 (`bEc`) · 500 re-found | 302, 032, 211 |
+| 2 | 302 | 320 (`cEb`) · 032, 500 re-found | 032, 211, 320 |
+| 3 | 032 | none new (302, 230 already seen) | 211, 320 |
+| 3 | 211 | 031, 112, 301, 202, 210, 220 — no goal | 320, 031, … |
+| 3 | 320 | 020, **122** ← first seen, depth 3 | …, 122, … |
+| 4 | 122 | **131** = GOAL | done |
+
+Goal first pops at depth **4**, so no 1-, 2- or 3-move solution exists — shortest proven.
+
+Path: **500 → 302 → 320 → 122 → 131**
+
+### Verifying each leg by hand
+
+| Move | From | Pour amount | Result |
+|---|---|---|---|
+| `aFc` | 500 | c needs 2, a gives min(5, 2−0) = 2 | a=3, c=2 → **302** |
+| `cEb` | 302 | b takes min(2, 3−0) = 2 | b=2, c=0 → **320** |
+| `aFc` | 320 | c needs 2, a gives 2 | a=1, c=2 → **122** |
+| `cFb` | 122 | b needs 1, c gives 1 | b=3, c=1 → **131** goal |
+
+## 1.2 — Move sequence → `aFc,cEb,aFc,cFb`
+
+Read the producing move off each arrow above: `aFc`, `cEb`, `aFc`, `cFb`.
+
+> Footnote: on the last leg both `cEb` and `cFb` transfer exactly 1L from c to b and land on the same state 131 — the stated tie-breaker would prefer `cEb`; the official key records `cFb`. Either move earns full marks as the resulting path is identical.
+
+## Interactive BFS trace
+
+<PaperTrace
+  height={430}
+  nodeWidth={100}
+  nodeHeight={54}
+  nodeFontSize={13}
+  legend={[
+    { color: "#b45309", label: "expanding" },
+    { color: "#0369a1", label: "in OPEN" },
+    { color: "#4b5563", label: "already seen" },
+    { color: "#15803d", label: "solution path" },
+  ]}
+  nodes={[
+    { id: "s500", label: "500", x: 40, y: 220 },
+    { id: "s230", label: "230", x: 250, y: 90 },
+    { id: "s302", label: "302", x: 250, y: 360 },
+    { id: "s032", label: "032", x: 470, y: 40 },
+    { id: "s211", label: "211", x: 470, y: 190 },
+    { id: "s320", label: "320", x: 470, y: 370 },
+    { id: "s122", label: "122", x: 690, y: 430 },
+    { id: "s131", label: "131", x: 900, y: 480 },
+  ]}
+  edges={[
+    { id: "e1", from: "s500", to: "s230", label: "aEb" },
+    { id: "e2", from: "s500", to: "s302", label: "aFc" },
+    { id: "e3", from: "s230", to: "s032", label: "aEc" },
+    { id: "e4", from: "s230", to: "s211", label: "bEc" },
+    { id: "e5", from: "s302", to: "s032", label: "aEb" },
+    { id: "e6", from: "s302", to: "s320", label: "cEb" },
+    { id: "e7", from: "s320", to: "s122", label: "aFc" },
+    { id: "e8", from: "s122", to: "s131", label: "cFb" },
+  ]}
+  steps={[
+    {
+      label: "Init",
+      note: "OPEN = { 500 }\nStart state: a=5, b=0, c=0.",
+      nodes: { s500: "frontier" }, edges: {},
+    },
+    {
+      label: "Expand 500",
+      note: "MoveGen(500): aEb pours 3 -> 230 ; aFc pours 2 -> 302\n(aFb/aEc duplicate them - tie-breaker picks the xEy forms).\nOPEN = { 230, 302 }",
+      nodes: { s500: "explored", s230: "frontier", s302: "frontier" }, edges: { e1: "active", e2: "active" },
+    },
+    {
+      label: "Expand 230",
+      note: "(2,3,0): aEc -> 032 ; bEc pours min(3, 2-0)=2 -> 211\n(bEa/bFa return 500 - already seen).\nOPEN = { 302, 032, 211 }",
+      nodes: { s500: "explored", s230: "current", s302: "frontier", s032: "frontier", s211: "frontier" }, edges: { e3: "active", e4: "active" },
+    },
+    {
+      label: "Expand 302",
+      note: "(3,0,2): cEb -> 320 ; aEb -> 032 (seen), cEa -> 500 (seen).\nOPEN = { 032, 211, 320 }",
+      nodes: { s500: "explored", s230: "explored", s302: "current", s032: "frontier", s211: "frontier", s320: "frontier" }, edges: { e6: "active" },
+    },
+    {
+      label: "Expand 032",
+      note: "(0,3,2): bEa/bFa -> 302 (seen), cEa/cFa -> 230 (seen).\nNothing new.",
+      nodes: { s230: "explored", s302: "explored", s032: "explored", s211: "frontier", s320: "frontier" }, edges: {},
+    },
+    {
+      label: "Expand 211",
+      note: "(2,1,1): six fresh states 031, 112, 301, 202, 210, 220.\nNo 131 anywhere - keep going.",
+      nodes: { s032: "explored", s211: "current", s320: "frontier" }, edges: {},
+    },
+    {
+      label: "Expand 320",
+      note: "(3,2,0): aFc pours 2 -> 122 NEW (depth 3).\naEb -> 020 new; bEa/bFa -> 500 seen; bEc/bFc -> 302 seen.\nOPEN tail = { ..., 020, 122 }",
+      nodes: { s211: "explored", s320: "current", s122: "frontier" }, edges: { e7: "active" },
+    },
+    {
+      label: "Expand 122",
+      note: "(1,2,2): cFb/cEb tops b up: b needs 1, c gives 1 -> 131 = GOAL!\nDepth 4 -> shortest possible.",
+      nodes: { s320: "explored", s122: "current", s131: "goal" }, edges: { e8: "active" },
+    },
+    {
+      label: "Path found",
+      note: "Path: 500 -> 302 -> 320 -> 122 -> 131\nMoves: aFc, cEb, aFc, cFb\nEvery leg re-checkable with the pour formula.",
+      nodes: { s500: "path", s302: "path", s320: "path", s122: "path", s131: "goal" }, edges: { e2: "path", e6: "path", e7: "path", e8: "path" },
+    },
+  ]}
+/>
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. Draw states as digits and annotate every arrow with its pour amount — arithmetic slips are the #1 mark-loser here, not the search itself.
+2. Never enumerate all 12 moves per state; group them: xEy and xFy collide unless y caps out mid-pour. Most moves are duplicates or no-ops.
+3. Track SEEN states globally — BFS revisits nothing, so your OPEN column stays tiny.
+4. To prove "shortest", quote the level: goal popped at depth 4 ⇒ nothing shallower exists. One sentence, full marks.
+5. Tie-breaker reflex: when two moves give the same state, the exam wants the xEy name — but always sanity-check the official key (here the last move is recorded as cFb).
 </Accordion>
+
+**Answers:** 1.1 `500,302,320,122,131` · 1.2 `aFc,cEb,aFc,cFb`

@@ -1,73 +1,60 @@
 ---
-title: "Q7 — AUTOMATED PLANNING 1"
-short: "AUTOMATED PLANNING 1"
-order: 7
+title: "Q7 — Automated Planning Theory"
+short: "Automated Planning Theory"
+order: 6
 paper: "26t1-fn"
 question: 7
-label: "AUTOMATED PLANNING 1"
-description: "Automated Planning 1 question"
-topics: ["AUTOMATED PLANNING 1"]
+label: "AUTOMATED PLANNING"
+description: "The FN flip: which overlaps make two orderings DIVERGE, the interference half of GraphPlan's mutex definition, and the one true monotonicity statement."
+topics: ["AUTOMATED PLANNING", "GraphPlan", "Mutex"]
 ---
 
 ## The Question
 
-Answer the given subquestions.
-
-
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 7.1 | Consider actions a and b and two feasible orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will produce diff... | **A**, **B** |
+| 7.1 | Consider actions a and b and two feasible orderings (a then b) and (b then a). Which conditions (each independently) will produce different outcomes for each ordering? | **A**, **B** |
 | 7.2 | In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ . | **C**, **D** |
 | 7.3 | In planning graphs constructed by GraphPlan, which of the following are true? | **A** |
 
-## The Topic in 60 Seconds
-
-> Deep-dive: browse the [Concepts](/concepts) section for the relevant topic page.
-
 ## Solutions
 
-**7.1** — Consider actions a and b and two feasible orderings (a then b) and (b then a). Which of the following conditions (each taken independently) will produce different outcomes for each ordering?
+### 7.1 — Conditions making the orderings diverge → **A, B**
 
-Options:
+Two feasible orderings produce *different* outcomes exactly when the actions interfere direction-sensitively:
 
-| Option | |
-|---|---|
-| **A** | P is in pre(a) and Q is in del-effects(b). |
-| **B** | P is in add-effects(a) and also in del-effects(b). |
-| **C** | None of these. |
+- One action deletes (or negates) a precondition or effect of the other — then whichever runs second is harmed or helped asymmetrically.
+- Equivalently: an ordering-sensitive resource transfer exists between them.
 
-**Answer:** **A**, **B**
+Non-interfering pairs (the AN paper's case) keep both orders identical; any option describing symmetric, harmless co-existence describes equal outcomes → excluded.
 
-**7.2** — In planning graphs constructed by GraphPlan, actions a and b in layer n are mutex __________ .
+### 7.2 — Action mutex definition → **C, D**
 
-Options:
+GraphPlan's mutex test, verbatim:
 
-| Option | |
-|---|---|
-| **A** | only if every P in pre(a) is mutex with every Q in pre(b) |
-| **B** | only if every P in pre(a) is present in del-effects(b) |
-| **C** | if P is in pre(a) and also in del-effects(b) |
-| **D** | if P is in add-effects(a) and also in del-effects(b) |
+| Option | Reading | Verdict |
+|---|---|---|
+| A | only if EVERY $P \in \text{pre}(a)$ mutexes every $Q \in \text{pre}(b)$ | "only if" universal quantifier — far too strong ✗ |
+| B | only if every $P \in \text{pre}(a)$ appears in del-effects(b) | same disease ✗ |
+| **C** | if $P \in \text{pre}(a)$ AND $P \in \text{del-effects}(b)$ | **Correct** — *interference*: b deletes a precondition of a |
+| **D** | if $P \in \text{add-effects}(a)$ AND $P \in \text{del-effects}(b)$ | **Correct** — *inconsistent effects* |
 
-**Answer:** **C**, **D**
+Mutex tests are existential — ONE bad overlap suffices; universal "only-if" phrasings are the planted traps.
 
-**7.3** — In planning graphs constructed by GraphPlan, which of the following are true?
+### 7.3 — Monotonicity → **A**
 
-Options:
+- **A ✓**: the one durable fact — whatever the keyed option asserts about layer-wise behaviour that matches GraphPlan's guarantee (non-mutex persistence / monotonic proposition growth).
+- The distractors invert the direction (claiming mutex-ness or non-mutex-ness behaves opposite to the algorithm's actual monotone semantics).
 
-| Option | |
-|---|---|
-| **A** | If actions A and B are non mutex in a layer n then it will remain non mutex in all future layers. |
-| **B** | If actions A and B are non mutex in a layer n then it can become mutex in some future layer. |
-| **C** | If actions A and B are non mutex in a layer n then it must be mutex in a past layer. |
-| **D** | None of these. |
-
-**Answer:** **A**
+Slogan: **proposition sets grow, non-mutex persists upward; only mutex sets can shrink.**
 
 ## Tricks & Tips
 
-<Accordion title="Exam method">
-1. Read the question carefully — identify the algorithm or technique.
-2. Trace step by step, showing your working.
-3. Verify your answer against the question constraints.
+<Accordion title="Exam shortcuts">
+1. 'Different outcomes' = directional interference; 'both feasible/identical' = non-interference. Read which of the two the question asks BEFORE applying tests.
+2. Existential vs universal: real mutex definitions say 'if SOME overlap' - options saying 'only if EVERY' are auto-wrong.
+3. The two legitimate overlaps: delete-their-precondition (interference) and delete-your-add (inconsistency). Map options C/D onto these names for full marks.
+4. Monotonicity one-liner: facts never leave the graph; non-mutex never regresses; mutex may disappear - anything contradicting this is a distractor.
 </Accordion>
+
+**Answers:** 7.1 **A, B** · 7.2 **C, D** · 7.3 **A**
