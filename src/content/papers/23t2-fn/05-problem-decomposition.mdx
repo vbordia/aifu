@@ -17,7 +17,34 @@ Nodes shown in double lines are primitive nodes and their values are actual cost
 
 The cost of each edge is 10 units.
 
-Tie-breaker 1: If several nodes have the same
+Tie-breaker 1: If several nodes have the same cost then break the tie using node labels.
+Tie-breaker 2: For AND nodes, expand the unsolved branch with the highest cost.
+
+```mermaid
+graph TD
+    S(("S (40)"))
+    A(("A (20)"))
+    B(("B (10)"))
+    C(("C (50)"))
+    D(("D (55)"))
+    E(("E (20)"))
+    F[["F (primitive): 20"]]
+    G[["G (primitive): 10"]]
+    H(("H (30)"))
+
+    S ---|AND| A
+    S ---|AND| B
+    S --> C
+    A --> D
+    B --> D
+    B --> E
+    C ---|AND| E
+    C ---|AND| F
+    D ---|AND| G
+    D ---|AND| H
+    E --> H
+```
+
 
 | # | Question | Official answer |
 |---|----------|-----------------|

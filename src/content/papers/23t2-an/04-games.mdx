@@ -32,6 +32,32 @@ graph TD
     
     A["A: 24"]
     B["B: 34"]
+    C["C: 26"]
+    D["D: 52"]
+    E["E: 54"]
+    F["F: 62"]
+    G["G: 64"]
+
+    R --> L1_1
+    R --> L1_2
+    
+    L1_1 --> L2_1
+    L1_1 --> L2_2
+    
+    L2_1 --> A
+    L2_1 --> B
+    L2_2 --> C
+    
+    L1_2 --> L2_3
+    L2_3 --> L3_1
+    L2_3 --> L3_2
+    
+    L3_1 --> D
+    L3_1 --> E
+    
+    L3_2 --> F
+    L3_2 --> G
+```
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -57,7 +83,6 @@ graph TD
 
 **3.4** — List the horizon nodes SOLVED by SSS*.  
 **Answer:** `A,C,D,E`
-
 
 ## Tricks & Tips
 

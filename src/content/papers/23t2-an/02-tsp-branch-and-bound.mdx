@@ -17,6 +17,40 @@ Each node in the search tree displays an edge (either XY or ~XY), a cost value, 
 
 What information can you glean from the search tree? Answer the sub-questions based on the information gleaned from the se
 
+```mermaid
+graph TD
+    a1["a1: S0 (375)"]
+    b1["b1: BD (375)"]
+    b2["b2: ~BD (414)"]
+    c1["c1: CD (418)"]
+    c2["c2: ~CD (410)"]
+    c3["c3: CD (414)"]
+    c4["c4: ~CD (452)"]
+    d1["d1: AB (456)"]
+    d2["d2: ~AB (548)"]
+    d3["d3: AB (434)"]
+    d4["d4: ~AB (468)"]
+    d5["d5: AB (414)"]
+    d6["d6: ~AB (572)"]
+    e1["e1: AD (436)"]
+    e2["e2: ~AD (472)"]
+
+    a1 --> b1
+    a1 --> b2
+    b1 --> c1
+    b1 --> c2
+    b2 --> c3
+    b2 --> c4
+    c1 --> d1
+    c1 --> d2
+    c2 --> d3
+    c2 --> d4
+    c3 --> d5
+    c3 --> d6
+    d5 --> e1
+    d5 --> e2
+```
+
 | # | Question | Official answer |
 |---|----------|-----------------|
 | 2.1 | Let S0 (ref. no. a1) be the first node to be refined, identify the next 4 nodes  | `b1,c2,b2,c3` |

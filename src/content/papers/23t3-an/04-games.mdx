@@ -17,6 +17,25 @@ Use these labels to enter a horizon node or a list of horizon nodes in short ans
 
 Tie-breaker: when several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
 
+```mermaid
+graph TD
+    R["MAX"] --> M1(("MIN"))
+    R --> M2(("MIN"))
+    R --> M3(("MIN"))
+    M1 --> A["A: 40"]
+    M1 --> X1["MAX"]
+    X1 --> B(("B: 80"))
+    X1 --> C(("C: 60"))
+    M2 --> D["D: 30"]
+    M2 --> X2["MAX"]
+    X2 --> E(("E: 10"))
+    X2 --> F(("F: 90"))
+    M3 --> G["G: 60"]
+    M3 --> X3["MAX"]
+    X3 --> H(("H: 70"))
+    X3 --> I(("I: 50"))
+```
+
 Based on the above data, answer the given subquestions.
 
 

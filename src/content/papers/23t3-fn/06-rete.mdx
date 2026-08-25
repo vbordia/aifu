@@ -26,7 +26,33 @@ graph TD
     A3 --> A6["A6: specimen = &lt;n&gt;"]
     
     A4 --> A7["A7: odour = NONE"]
-    A4 --> 
+    A4 --> A8["A8: odour = NONE"]
+    A4 --> A9["A9: habitat = LEAVES"]
+    
+    A5 --> A10["A10: br-surface = SCALY"]
+    A5 --> A11["A11: root = BULBOUS"]
+    
+    A6 --> A12["A12: colour = WHITE"]
+    A6 --> A13["A13: surface = SMOOTH"]
+    
+    A7 --> A14["A14: sp-colour &lt;&gt; GREEN"]
+    A9 --> A15["A15: ar-colour &lt;&gt; BROWN"]
+    A13 --> A16["A16: colour = RED"]
+    
+    A14 --> R1["R1"]
+    
+    A10 --> B1["B1: = &lt;n&gt;"]
+    A11 --> B1
+    B1 --> R2["R2"]
+    
+    A8 --> B2["B2: = &lt;n&gt;"]
+    A15 --> B2
+    B2 --> R3["R3"]
+    
+    A12 --> B3["B3: = &lt;n&gt;"]
+    A13 --> B3
+    B3 --> R4["R4"]
+```
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -48,7 +74,6 @@ graph TD
 
 **5.3** — If the Inference Engine uses Recency as the conflict resolution strategy then wh  
 **Answer:** `A`
-
 
 ## Tricks & Tips
 

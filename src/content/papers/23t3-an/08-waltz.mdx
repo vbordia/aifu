@@ -15,7 +15,20 @@ The set of junctions (L, W, Y and T type junctions) that occur in a 2D line draw
 
 The junctions carry unique labels: L1, L2, L3, L4, L5, L6, T1, T2, T3, T4, W1, W2, W3, Y1, Y2, Y3. When required, use the labels in short answers.
 
-Note: A 2D line drawing of trihedral objects is considered to be consistent if all 
+Note: A 2D line drawing of trihedral objects is considered to be consistent if all the edges and junctions can be assigned labels that are consistent with each other, otherwise the drawing is considered to be inconsistent and all labels are reset to NIL.
+
+Apply a suitable algorithm to assign consistent labels to edges/junctions in the 2D line drawings in the sub-questions. Choose a suitable edge and junction order for solving the problems.
+
+```mermaid
+graph TD
+    3 --- 4 --- 5
+    3 --- 2
+    4 --- 1
+    5 --- 6
+    2 --- 1 --- 6
+```
+
+Based on the above data, answer the given subquestions.
 
 | # | Question | Official answer |
 |---|----------|-----------------|

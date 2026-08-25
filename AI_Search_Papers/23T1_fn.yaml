@@ -116,7 +116,7 @@ questions:
 - id: 3
   type: comprehension
   label: SEARCH FOR OPTIMAL SOLUTION
-  description: "The figure shows a map on a uniform grid where each tile is 10x10 in size. The start node is S and the goal node is G and the cost of each edge is 15 units. The MoveGen function returns nodes in alphabetical order. Use Manhattan Distance as the heuristic function. Where necessary, use node labels to break ties.\n\n```mermaid\ngraph TD\n    D((\"D\")) --- E((\"E\"))\n    E --- H((\"H\"))\n    A((\"A\")) --- C((\"C\"))\n    C --- F((\"F\"))\n    F --- K((\"K\"))\n    K --- L((\"L\"))\n    S((\"S\")) --- B((\"B\"))\n    B --- M((\"M\"))\n    M --- G((\"G\"))\n    \n    S --- A\n    S --- C\n    B --- C\n    D --- C\n    E --- C\n    E --- F\n    E --- K\n    H --- K\n    K --- M\n    K --- G\n    L --- G\n```\n\nBased on the above data, answer the given subquestions.\n"
+  description: "The figure shows a map on a uniform grid where each tile is 10x10 in size. The start node is S and the goal node is G and the cost of each edge is 15 units. The MoveGen function returns nodes in alphabetical order. Use Manhattan Distance as the heuristic function. Where necessary, use node labels to break ties.\n\n```mermaid\ngraph TD\n    D((\"D\")) --- E((\"E\"))\n    E --- H((\"H\"))\n    A((\"A\")) --- C((\"C\"))\n    C --- F((\"F\"))\n    F --- K((\"K\"))\n    K --- L((\"L\"))\n    S((\"S\")) --- B((\"B\"))\n    M --- G((\"G\"))\n    \n    S --- A\n    S --- C\n    B --- C\n    D --- C\n    E --- C\n    E --- F\n    E --- K\n    H --- K\n    K --- M\n    K --- G\n    L --- G\n```\n\nBased on the above data, answer the given subquestions.\n"
   subquestions:
   - sub_id: '3.1'
     question_type: short_answer
@@ -219,6 +219,7 @@ questions:
         B --- F
         C --- F
         E --- G
+        F --- G
         F --- H
     ```
   subquestions:

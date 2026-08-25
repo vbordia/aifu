@@ -13,11 +13,51 @@ topics: ["RULE BASED EXPERT SYSTEMS"]
 
 A part of the Rete Net that classifies mushrooms (as edible or poisonous) is shown in the figure. The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, ..., R4 uniquely identify the nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
 
+```mermaid
+graph TD
+    WME --> A1["A1: CLASS = Cap"]
+    WME --> A2["A2: CLASS = Stalk"]
+    WME --> A3["A3: CLASS = Mushroom"]
+    A1 --> A4["A4: specimen = <n>"]
+    A2 --> A5["A5: specimen = <n>"]
+    A3 --> A6["A6: specimen = <n>"]
+    A4 --> A7["A7: surface = SMOOTH"]
+    A4 --> A8["A8: colour = WHITE"]
+    A5 --> A9["A9: root = BULBOUS"]
+    A5 --> A10["A10: br-surface = SCALY"]
+    A6 --> A11["A11: habitat = LEAVES"]
+    A6 --> A12["A12: odour = NONE"]
+    A6 --> A13["A13: odour = NONE"]
+    A7 --> A14["A14: colour = RED"]
+    A11 --> A15["A15: ar-colour <> BROWN"]
+    A13 --> A16["A16: sp-colour <> GREEN"]
+    A14 --> B2["B2: = <n>"]
+    A9 --> B2
+    A8 --> B1["B1: = <n>"]
+    A11 --> B1
+    B1 --> R1["R1"]
+    A15 --> B3["B3: = <n>"]
+    A12 --> B3
+    B3 --> R4["R4"]
+    A16 --> R2["R2"]
+    B2 --> R3["R3"]
+```
+
 Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order. Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
 
 ```text
 201. (Mushroom ^specimen B43 ^odour ALMOND ^sp-colour BROWN)
-202. (Stalk ^specimen B43 ^br-surfac
+202. (Stalk ^specimen B43 ^br-surface SMOOTH)
+203. (Mushroom ^specimen K13 ^odour NONE ^habitat LEAVES)
+204. (Cap ^specimen A23 ^colour RED ^surface SMOOTH)
+205. (Mushroom ^specimen B37 ^odour NONE ^habitat LEAVES)
+206. (Cap ^specimen B37 ^colour WHITE ^surface SMOOTH)
+207. (Stalk ^specimen A23 ^root BULBOUS ^ar-colour WHITE)
+208. (Stalk ^specimen K13 ^br-surface SCALY ^ar-colour WHITE)
+209. (Mushroom ^specimen A23 ^odour NONE ^sp-colour WHITE)
+```
+
+For each WME identify its location (node label) in the Rete Net, and prepare the conflict set for the first cycle, then answer the given subquestions.
 
 | # | Question | Official answer |
 |---|----------|-----------------|

@@ -17,8 +17,8 @@ AND–OR decomposition. Double circles = primitive. Edge = 2. Tie-breakers: labe
 %% wide
 graph TD
     S(("S (10)")) --- A(("A (12)"))
-    S --- B(("B (2)"))
-    S --- C(("C (6)"))
+    S ---|AND| B(("B (2)"))
+    S ---|AND| C(("C (6)"))
     A --- D[["D (primitive): 30"]]
     A --- E(("E (10)"))
     B --- E

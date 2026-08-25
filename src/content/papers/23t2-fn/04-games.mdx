@@ -31,7 +31,21 @@ graph TD
     D["D: 32"]
     E["E: 84"]
     F["F: 50"]
-   
+    G["G: 14"]
+
+    Root --> N1
+    Root --> N2
+    N1 --> A
+    N1 --> N3
+    N3 --> N4
+    N3 --> N5
+    N4 --> B
+    N4 --> C
+    N5 --> D
+    N5 --> E
+    N2 --> F
+    N2 --> G
+```
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -57,7 +71,6 @@ graph TD
 
 **3.4** — List the horizon nodes SOLVED by SSS*.  
 **Answer:** `A,F,G`
-
 
 ## Tricks & Tips
 

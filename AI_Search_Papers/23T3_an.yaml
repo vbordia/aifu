@@ -7,12 +7,30 @@ questions:
 - id: 1
   type: comprehension
   label: SEARCH
-  description: |
+  description: |-
     The figure shows a map on a uniform grid where each tile is 1x1 in size.
     The start node is S and the goal node is G.
     The MoveGen function returns nodes in alphabetical order.
     Use Manhattan Distance as the heuristic function.
-    Tie-breaker: If several nodes have the same cost, use node labels to break the tie.
+    **Tie-breaker:** If several nodes have the same cost, use node labels to break the tie.
+
+    ```mermaid
+    graph TD
+        C((C)) ---|4| D((D))
+        D ---|4| E((E))
+        E ---|6| H((H))
+        H ---|2| I((I))
+        C ---|6| B((B))
+        D ---|6| B
+        C ---|6| S((S))
+        S ---|16| A((A))
+        A ---|16| B
+        B ---|6| F((F))
+        E ---|8| F
+        I ---|8| F
+        I ---|2| G((G))
+        F ---|8| G
+    ```
 
     Based on the above data, answer the given subquestions.
   subquestions:
@@ -62,12 +80,34 @@ questions:
 - id: 2
   type: comprehension
   label: TSP BRANCH-AND-BOUND
-  description: |
+  description: |-
     The TSP Branch-and-Bound algorithm is solving a TSP instance where the cities are A, B, C, .... and so on. The Branch-and-Bound search tree at the time when the algorithm has discovered the optimal tour is shown below.
 
     Each node in the search tree displays an edge (either XY or ~XY), a cost value, and a unique reference number (a1, b1, b2, ..., c1, ..., d1, ..., e2, ..., f1, f2). Use the reference numbers to break ties. When required, enter the reference numbers in short answers.
 
     What information can you glean from the search tree? Answer the sub-questions based on the information gleaned from the search tree.
+
+    ```mermaid
+    graph TD
+        a1["a1<br/>S0<br/>372"] --> b1["b1<br/>AB<br/>372"]
+        a1 --> b2["b2<br/>¬AB<br/>415"]
+        b1 --> c1["c1<br/>CE<br/>372"]
+        b1 --> c2["c2<br/>¬CE<br/>410"]
+        b2 --> c3["c3<br/>CE<br/>415"]
+        b2 --> c4["c4<br/>¬CE<br/>449"]
+        c1 --> d1["d1<br/>BC<br/>432"]
+        c1 --> d2["d2<br/>¬BC<br/>397"]
+        c2 --> d3["d3<br/>BC<br/>469"]
+        c2 --> d4["d4<br/>¬BC<br/>452"]
+        c3 --> d5["d5<br/>BC<br/>438"]
+        c3 --> d6["d6<br/>¬BC<br/>441"]
+        d1 --> e1["e1<br/>AD<br/>432"]
+        d1 --> e2["e2<br/>¬AD<br/>562"]
+        d2 --> e3["e3<br/>AC<br/>446"]
+        d2 --> e4["e4<br/>¬AC<br/>420"]
+        e4 --> f1["f1<br/>BD<br/>453"]
+        e4 --> f2["f2<br/>¬BD<br/>447"]
+    ```
   subquestions:
   - sub_id: '2.1'
     question_type: short_answer
@@ -110,12 +150,31 @@ questions:
 - id: 3
   type: comprehension
   label: GAMES
-  description: |
+  description: |-
     The figure shows a game tree with evaluation function values at the horizon nodes.
     The horizon nodes are labeled from A to I.
     Use these labels to enter a horizon node or a list of horizon nodes in short answers (textbox).
 
-    Tie-breaker: when several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+    **Tie-breaker:** when several nodes carry the same best cost then select the deepest node, if tie persists then select the leftmost of the deepest nodes to break the tie.
+
+    ```mermaid
+    graph TD
+        R["MAX"] --> M1(("MIN"))
+        R --> M2(("MIN"))
+        R --> M3(("MIN"))
+        M1 --> A["A: 40"]
+        M1 --> X1["MAX"]
+        X1 --> B(("B: 80"))
+        X1 --> C(("C: 60"))
+        M2 --> D["D: 30"]
+        M2 --> X2["MAX"]
+        X2 --> E(("E: 10"))
+        X2 --> F(("F: 90"))
+        M3 --> G["G: 60"]
+        M3 --> X3["MAX"]
+        X3 --> H(("H: 70"))
+        X3 --> I(("I: 50"))
+    ```
 
     Based on the above data, answer the given subquestions.
   subquestions:
@@ -158,17 +217,41 @@ questions:
 - id: 4
   type: comprehension
   label: PROBLEM DECOMPOSITION
-  description: |
+  description: |-
     The figure shows an AND-OR graph that depicts how a problem S can be decomposed into one or more smaller problems. Nodes are uniquely identified by labels (S, A, B, ...). The number in each node is the heuristic estimate of the cost of solving that node.
 
     Nodes shown in double lines are primitive nodes and their values are actual costs. Observe that a primitive node is added to the graph by its parent when the parent is expanded, and the primitive node is labeled as SOLVED and it will not be expanded subsequently.
 
     The cost of each edge is 1 unit.
 
-    Tie-breaker 1: If several nodes have the same cost then break the tie using node labels.
-    Tie-breaker 2: For AND nodes, select the unsolved branch with the highest cost.
+    **Tie-breaker 1:** If several nodes have the same cost then break the tie using node labels.
+    **Tie-breaker 2:** For AND nodes, select the unsolved branch with the highest cost.
 
     Use AO* algorithm to solve S, then answer the given subquestions.
+
+    ```mermaid
+    graph TD
+        S(("S: 10"))
+        A(("A: 15"))
+        B(("B: 5"))
+        C(("C: 6"))
+        D(("D: 6"))
+        E[["E (primitive): 6"]]
+        F[["F (primitive): 4"]]
+        G[["G (primitive): 4"]]
+        H[["H (primitive): 5"]]
+        S --> A
+        S ---|AND| B
+        S ---|AND| C
+        A ---|AND| G
+        A ---|AND| D
+        D ---|AND| G
+        D ---|AND| H
+        B --> E
+        B --> H
+        C ---|AND| E
+        C ---|AND| F
+    ```
   subquestions:
   - sub_id: '4.1'
     question_type: short_answer
@@ -204,8 +287,38 @@ questions:
 - id: 5
   type: comprehension
   label: RULE BASED EXPERT SYSTEMS
-  description: |
+  description: |-
     A part of the Rete Net that classifies mushrooms (as edible or poisonous) is shown in the figure. The labels A1, A2, ..., A10, A16, ..., B1, B2, B3, R1, ..., R4 uniquely identify the nodes in the network. When required, use the above label ordering to break ties and to enter short answers.
+
+    ```mermaid
+    graph TD
+        WME --> A1["A1: CLASS = Cap"]
+        WME --> A2["A2: CLASS = Stalk"]
+        WME --> A3["A3: CLASS = Mushroom"]
+        A1 --> A4["A4: specimen = <n>"]
+        A2 --> A5["A5: specimen = <n>"]
+        A3 --> A6["A6: specimen = <n>"]
+        A4 --> A7["A7: surface = SMOOTH"]
+        A4 --> A8["A8: colour = WHITE"]
+        A5 --> A9["A9: root = BULBOUS"]
+        A5 --> A10["A10: br-surface = SCALY"]
+        A6 --> A11["A11: habitat = LEAVES"]
+        A6 --> A12["A12: odour = NONE"]
+        A6 --> A13["A13: odour = NONE"]
+        A7 --> A14["A14: colour = RED"]
+        A11 --> A15["A15: ar-colour <> BROWN"]
+        A13 --> A16["A16: sp-colour <> GREEN"]
+        A14 --> B2["B2: = <n>"]
+        A9 --> B2
+        A8 --> B1["B1: = <n>"]
+        A11 --> B1
+        B1 --> R1["R1"]
+        A15 --> B3["B3: = <n>"]
+        A12 --> B3
+        B3 --> R4["R4"]
+        A16 --> R2["R2"]
+        B2 --> R3["R3"]
+    ```
 
     Run the Rete algorithm for the Working Memory shown below, the WMEs are in timestamp order. Assume that WMEs reside at appropriate Alpha nodes, and the Beta nodes point to WMEs residing in Alpha nodes.
 
@@ -233,7 +346,11 @@ questions:
       D: R4,203,208
       E: R1,203,206
       F: R4,205,208
-    correct_options: [A, B, C, D]
+    correct_options:
+    - A
+    - B
+    - C
+    - D
   - sub_id: '5.2'
     question_type: multiple_select
     question: If the Inference Engine uses Specificity as the conflict resolution strategy then which of the following rule-data tuples will qualify?
@@ -244,7 +361,9 @@ questions:
       D: R4,203,208
       E: R1,203,206
       F: R4,205,208
-    correct_options: [C, D]
+    correct_options:
+    - C
+    - D
   - sub_id: '5.3'
     question_type: multiple_choice
     question: If the Inference Engine uses Recency as the conflict resolution strategy then which of the following rule-data tuples will qualify?
@@ -279,7 +398,9 @@ questions:
       C: Putdown (B)
       D: Stack (C,B)
       E: Stack (A,C)
-    correct_options: [A, B]
+    correct_options:
+    - A
+    - B
   - sub_id: '6.2'
     question_type: multiple_select
     question: Which of the following are relevant actions in the goal state?
@@ -289,7 +410,10 @@ questions:
       C: Putdown (B)
       D: Stack (C,B)
       E: Stack (A,C)
-    correct_options: [C, D, E]
+    correct_options:
+    - C
+    - D
+    - E
   - sub_id: '6.3'
     question_type: multiple_select
     question: In the planning graph, which of the following are mutex action pairs in Layer 1?
@@ -299,7 +423,10 @@ questions:
       C: Unstack(A,B), NOP-ACTION for on(A,B)
       D: Putdown(B), Stack(C,B)
       E: Stack(A,C), Stack(C,B)
-    correct_options: [A, B, C]
+    correct_options:
+    - A
+    - B
+    - C
   - sub_id: '6.4'
     question_type: multiple_select
     question: In the planning graph, which of the following are mutex proposition pairs in Layer 1?
@@ -308,7 +435,9 @@ questions:
       B: holding (A), clear (D)
       C: armEmpty, on (A,B)
       D: on (A,B), on (C,D)
-    correct_options: [A, B]
+    correct_options:
+    - A
+    - B
 - id: 7
   type: comprehension
   label: CONSTRAINT SATISFACTION
@@ -322,6 +451,16 @@ questions:
     Apply a suitable algorithm to assign consistent labels to edges/junctions in the 2D line drawings in the sub-questions. Choose a suitable edge and junction order for solving the problems.
 
     Based on the above data, answer the given subquestions.
+
+
+    ```mermaid
+    graph TD
+        3 --- 4 --- 5
+        3 --- 2
+        4 --- 1
+        5 --- 6
+        2 --- 1 --- 6
+    ```
   subquestions:
   - sub_id: '7.1'
     question_type: short_answer

@@ -29,7 +29,50 @@ graph TD
     A5["A5: itemNo = &lt;n&gt;"]
     A6["A6: itemNo = &lt;n&gt;"]
     A7["A7: itemNo = &lt;n&gt;"]
-    A8["A8: itemNo = &lt;n&
+    A8["A8: itemNo = &lt;n&gt;"]
+
+    A1 --> A5
+    A2 --> A6
+    A3 --> A7
+    A4 --> A8
+
+    A9["A9: colour = black"]
+    A10["A10: colour = brown"]
+    A11["A11: colour = red"]
+    A12["A12: colour = yellow"]
+    A13["A13: colour = orange"]
+    A14["A14: colour = blue"]
+    A15["A15: colour = gold"]
+
+    A5 --> A9
+    A5 --> A10
+    A6 --> A11
+    A6 --> A12
+    A7 --> A13
+    A7 --> A14
+    A8 --> A15
+
+    B1["B1: = &lt;n&gt;"]
+    B2["B2: = &lt;n&gt;"]
+    B3["B3: = &lt;n&gt;"]
+    B4["B4: = &lt;n&gt;"]
+    B5["B5: = &lt;n&gt;"]
+
+    A10 --> B1
+    A11 --> B1
+    A9 --> B2
+    A11 --> B2
+    A12 --> B3
+    A14 --> B3
+    A13 --> B4
+    A15 --> B5
+
+    B1 --> B3
+    B3 --> R1["R1"]
+    B2 --> R2["R2"]
+    B3 --> B5
+    B5 --> R3["R3"]
+```
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -51,7 +94,6 @@ graph TD
 
 **5.3** — If the Inference Engine uses Recency as the conflict resolution strategy then id  
 **Answer:** `B`
-
 
 ## Tricks & Tips
 

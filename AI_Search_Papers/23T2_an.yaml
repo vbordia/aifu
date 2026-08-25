@@ -236,15 +236,16 @@ questions:
         H[["H (primitive): 10"]]
 
         S --> A
-        S --> B
-        S --> C
-        A --> D
-        A --> E
+        S ---|AND| B
+        S ---|AND| C
+        A ---|AND| D
+        A ---|AND| E
         B --> E
         B --> F
         C --> F
-        F --> G
-        F --> H
+        E --> G
+        F ---|AND| G
+        F ---|AND| H
     ```
   subquestions:
   - sub_id: '4.1'

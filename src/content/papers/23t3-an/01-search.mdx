@@ -17,6 +17,24 @@ The MoveGen function returns nodes in alphabetical order.
 Use Manhattan Distance as the heuristic function.
 Tie-breaker: If several nodes have the same cost, use node labels to break the tie.
 
+```mermaid
+graph TD
+    C((C)) ---|4| D((D))
+    D ---|4| E((E))
+    E ---|6| H((H))
+    H ---|2| I((I))
+    C ---|6| B((B))
+    D ---|6| B
+    C ---|6| S((S))
+    S ---|16| A((A))
+    A ---|16| B
+    B ---|6| F((F))
+    E ---|8| F
+    I ---|8| F
+    I ---|2| G((G))
+    F ---|8| G
+```
+
 Based on the above data, answer the given subquestions.
 
 

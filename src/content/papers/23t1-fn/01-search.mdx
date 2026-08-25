@@ -11,9 +11,18 @@ topics: ["DFS", "BFS", "MoveGen", "State space search"]
 
 ## The Question
 
-A MoveGen table defines the state space. DFS and BFS inspect only new nodes.
+A MoveGen table defines the state space. S is the start, G is the goal. MoveGen returns nodes in table order. DFS and BFS inspect only new nodes.
 
-**Official answer (DFS):** See the paper for the MoveGen table; the method is identical to the AN version.
+| X | MoveGen(X) |
+|---|---|
+| S | [A,B] |
+| A | [C,D,S] |
+| B | [D,G,S] |
+| C | [A,B,G,S] |
+| D | [A,B] |
+| G | [A,B,C,D] |
+
+**Official answer (DFS):** `S,A,C,G`
 
 ## The Topic in 60 Seconds
 

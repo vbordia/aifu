@@ -19,6 +19,24 @@ The cost of each edge is 1 unit.
 
 **Tie-breaker 1**: If several nodes have the sa
 
+```mermaid
+graph TD
+    S(("S: 15")) ---> A(("A: 20"))
+    S --->|AND| B(("B: 8"))
+    S --->|AND| C(("C: 9"))
+    
+    A --->|AND| G[["G (primitive): 4"]]
+    A --->|AND| D(("D: 16"))
+    
+    B ---> E[["E (primitive): 6"]]
+    
+    C --->|AND| E
+    C --->|AND| F[["F (primitive): 4"]]
+    
+    D --->|AND| G
+    D --->|AND| H[["H (primitive): 5"]]
+```
+
 | # | Question | Official answer |
 |---|----------|-----------------|
 | 4.1 | List the first three nodes (including S) expanded by AO* algorithm. List the nod | `S,C,A` |

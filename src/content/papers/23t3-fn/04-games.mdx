@@ -27,6 +27,17 @@ graph TD
     N1 --> N12["MAX"]
     N12 --> B(("B: 70"))
     N12 --> C(("C: 80"))
+    
+    N2 --> D["D: 20"]
+    N2 --> N22["MAX"]
+    N22 --> E(("E: 10"))
+    N22 --> F(("F: 90"))
+    
+    N3 --> G["G: 60"]
+    N3 --> N32["MAX"]
+    N32 --> H(("H: 40"))
+    N32 --> I(("I: 50"))
+```
 
 | # | Question | Official answer |
 |---|----------|-----------------|
@@ -52,7 +63,6 @@ graph TD
 
 **3.4** — List the horizon nodes not processed (neither LIVE nor SOLVED) by SSS*.  
 **Answer:** `B,C,E,F`
-
 
 ## Tricks & Tips
 

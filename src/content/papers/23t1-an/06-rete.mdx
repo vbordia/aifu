@@ -25,6 +25,42 @@ A Rete net classifies vehicles. Working memory:
 109. (Wheel     ^vin C3 ^tyre regular)
 ```
 
+```mermaid
+graph TD
+    WME[WME] --> A1["A1: CLASS = Passenger"]
+    WME --> A2["A2: CLASS = Power"]
+    WME --> A3["A3: CLASS = Cargo"]
+    
+    A1 --> A4["A4: vin = &lt;v&gt;"]
+    A2 --> A5["A5: vin = &lt;v&gt;"]
+    A3 --> A6["A6: vin = &lt;v&gt;"]
+    
+    A4 --> A7["A7: limit = 2"]
+    A4 --> A8["A8: limit = 8"]
+    
+    A5 --> A9["A9: hp &gt;= 700"]
+    A5 --> A10["A10: hp &gt;= 100"]
+    A5 --> A11["A11: hp &lt;= 300"]
+    A5 --> A12["A12: hp &gt;= 300"]
+    A5 --> A13["A13: hp &lt;= 500"]
+    
+    A6 --> A14["A14: bed = &lt;x&gt;"]
+    
+    A7 --> B1["B1: = &lt;v&gt;"]
+    A9 --> B1
+    B1 --> Luxury["Luxury-Car"]
+    
+    A8 --> B2["B2: = &lt;v&gt;"]
+    A10 --> B2
+    A11 --> B2
+    B2 --> Minivan["Minivan"]
+    
+    A12 --> B3["B3: = &lt;v&gt;"]
+    A13 --> B3
+    A14 --> B3
+    B3 --> Truck["Truck"]
+```
+
 | # | Question | Official answer |
 |---|----------|-----------------|
 | 6.1 | Conflict set (A: Luxury-Car,104,107 · B: Minivan,103,106 · C: Truck,101,102,105 · D: Minivan,103,106,108) | **A, B, C** |

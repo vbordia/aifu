@@ -5,7 +5,7 @@ order: 8
 paper: "23t1-fn"
 question: 8
 label: "CONSTRAINT SATISFACTION"
-description: "Waltz labeling algorithm"
+description: "Waltz labeling on a six-junction drawing — answer Y3,L5,L4,T3"
 topics: ["CONSTRAINT SATISFACTION"]
 ---
 
@@ -15,11 +15,22 @@ The set of junctions (L, W, Y and T type junctions) that occur in a 2D line draw
 
 The junctions carry unique labels: L1, L2, L3, L4, L5, L6, T1, T2, T3, T4, W1, W2, W3, Y1, Y2, Y3. When required, use the labels in short answers.
 
-Apply a suitable algorithm to assign labels to edges/junctions in the 2D line drawi
+Apply a suitable algorithm to assign labels to edges/junctions in the 2D line drawings given in the sub-questions, process the edges and junctions in any order you see fit.
+
+```mermaid
+graph TD
+    3 --- 4
+    4 --- 5
+    3 --- 2
+    4 --- 1
+    5 --- 6
+    2 --- 1
+    6 --- 1
+```
 
 | # | Question | Official answer |
 |---|----------|-----------------|
-| 8.1 | For the 2D line drawing, assign consistent labels to all edges and junctions. En | `Y3,L5,L4,T3` |
+| 8.1 | For the 2D line drawing, assign consistent labels to all edges and junctions. Enter the labels of the junctions 1, 2, 3, 4 in that order (NIL if inconsistent) | `Y3,L5,L4,T3` |
 
 ## The Topic in 60 Seconds
 
@@ -27,7 +38,7 @@ Apply a suitable algorithm to assign labels to edges/junctions in the 2D line dr
 
 ## Solutions
 
-**8.1** — For the 2D line drawing, assign consistent labels to all edges and junctions. En  
+**8.1** — For the 2D line drawing, assign consistent labels to all edges and junctions  
 **Answer:** `Y3,L5,L4,T3`
 
 
